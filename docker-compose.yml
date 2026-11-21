@@ -1,0 +1,32 @@
+# Local development stack: `docker compose up --build`
+# Secrets below are DEV-ONLY placeholders (fictitious). Override them via a root .env file.
+services:
+  cms:
+    build: ./cms
+    environment:
+      HOST: 0.0.0.0
+      PORT: 1337
+      DATABASE_CLIENT: sqlite
+      DATABASE_FILENAME: .tmp/data.db
+      APP_KEYS: ${APP_KEYS:-devOnlyKey1,devOnlyKey2}
+      API_TOKEN_SALT: ${API_TOKEN_SALT:-devOnlyApiTokenSalt}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-devOnlyAdminJwtSecret}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:-devOnlyTransferTokenSalt}
+      JWT_SECRET: ${JWT_SECRET:-devOnlyJwtSecret}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-devOnlyEncryptionKey}
+    ports:
+      - "1337:1337"
+    volumes:
+      - cms-data:/app/.tmp
+      - cms-uploads:/app/public/uploads
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - cms
+
+volumes:
+  cms-data:
+  cms-uploads:
