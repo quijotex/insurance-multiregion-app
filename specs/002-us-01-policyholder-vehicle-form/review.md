@@ -82,3 +82,11 @@ Unchanged and re-confirmed: no hardcoded country or field-key logic in Angular, 
 7. **Confirm dialog paths from US-00 (FR-007 / FR-012):** type something on `/co/quote`, then use "Cambiar país" and open `/cl/quote` in the same tab. Confirm and cancel both, and check that focus returns to the trigger.
 
 **Verdict: Approved.** R-01 (Major) is resolved. R-02, R-03, R-05–R-08, R-11 and R-12 are resolved, and the fixes introduce no new Blocker or Major issue. R-04, R-09 and R-10 stay Open — human decision for Gate 3.
+
+## Gate 3 decisions (human, 2026-11-22)
+
+| ID | Decision | Status |
+|----|----------|--------|
+| R-04 | Keep the lenient RUT format; the check digit decides. Recorded in spec.md › Clarifications and FR-014 (T021) | Won't fix (accepted) |
+| R-09 | Neutral copy "vehículo" (T020, c10717f) | Resolved |
+| R-10 | Fields stay half width from 768 px | Won't fix (accepted) |
