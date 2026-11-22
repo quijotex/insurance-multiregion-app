@@ -1,0 +1,77 @@
+<header class="brand-bar">
+  <span class="brand-bar__wordmark">Asegura<span class="brand-bar__plus">+</span></span>
+</header>
+
+<main class="country-page">
+  <h1 class="country-page__title">¿Dónde quieres asegurar tu carro?</h1>
+  <p class="country-page__subtitle">Elige tu país para ver los planes y precios</p>
+
+  @if (unavailable) {
+    <p class="country-page__alert" role="alert">
+      El país seleccionado no está disponible. Elige uno de la lista.
+    </p>
+  }
+
+  @switch (status()) {
+    @case ('loading') {
+      <p class="country-page__status" aria-busy="true">Cargando países…</p>
+    }
+    @case ('error') {
+      <div class="country-page__error" role="alert">
+        <p>No pudimos cargar los países.</p>
+        <button type="button" class="button button--secondary" (click)="retry()">Reintentar</button>
+      </div>
+    }
+    @default {
+      @if (isEmpty()) {
+        <p class="country-page__status">Por ahora no hay países disponibles.</p>
+      } @else {
+        <fieldset class="country-page__tiles">
+          <legend class="visually-hidden">País</legend>
+          @for (country of countries(); track country.code) {
+            <label
+              class="choice-tile"
+              [class.choice-tile--selected]="selectedCode() === country.code"
+            >
+              <input
+                class="visually-hidden"
+                type="radio"
+                name="country"
+                [value]="country.code"
+                [checked]="selectedCode() === country.code"
+                (change)="select(country.code)"
+              />
+              @if (country.iconUrl) {
+                <img class="choice-tile__flag" [src]="country.iconUrl" [alt]="country.iconAlt" />
+              }
+              <span class="choice-tile__name">{{ country.name }}</span>
+              @if (selectedCode() === country.code) {
+                <span class="choice-tile__selected">
+                  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+                    <path
+                      d="M3 8.5l3.2 3.2L13 4.8"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  Seleccionado
+                </span>
+              }
+            </label>
+          }
+        </fieldset>
+        <button
+          type="button"
+          class="button button--cta"
+          [disabled]="!canContinue()"
+          (click)="continue()"
+        >
+          Continuar
+        </button>
+      }
+    }
+  }
+</main>
