@@ -46,7 +46,7 @@ describe('US-00 · FR-001 findByCode', () => {
   });
 });
 
-describe('US-01 � FR-007 country legal age', () => {
+describe('US-01 · FR-007 country legal age', () => {
   it('maps the legal age from the CMS', () => {
     expect(mapCountry({ ...base, legalAge: 21 }).legalAge).toBe(21);
   });
