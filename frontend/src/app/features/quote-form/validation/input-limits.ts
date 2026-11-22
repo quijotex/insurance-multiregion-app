@@ -26,6 +26,8 @@ export interface SanitizedInput {
 /**
  * Drops characters outside the allowed set, then anything beyond `maxLength`.
  * `caret` is where the cursor was in `value`; the result keeps it after the same typed character.
+ * Extra length is taken from the text just typed or pasted (right before the caret), so a full
+ * field refuses new characters like native `maxlength` instead of losing its end (review R-14).
  */
 export function sanitizeInput(value: string, caret: number, limits: InputLimits): SanitizedInput {
   const charset = limits.allowedCharacters ? CHARSETS[limits.allowedCharacters] : null;
@@ -37,6 +39,12 @@ export function sanitizeInput(value: string, caret: number, limits: InputLimits)
     if (i < caret) newCaret = kept.length;
   });
   const max = limits.maxLength && limits.maxLength > 0 ? limits.maxLength : null;
-  if (max !== null && kept.length > max) kept = kept.slice(0, max);
+  if (max !== null && kept.length > max) {
+    const excess = kept.length - max;
+    const fromInsert = Math.min(excess, newCaret);
+    kept = kept.slice(0, newCaret - fromInsert) + kept.slice(newCaret);
+    newCaret -= fromInsert;
+    kept = kept.slice(0, max);
+  }
   return { value: kept, caret: Math.min(newCaret, kept.length) };
 }

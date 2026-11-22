@@ -36,3 +36,22 @@ describe('US-01 · FR-015 sanitizeInput', () => {
     expect(isAllowedCharacters(null)).toBe(false);
   });
 });
+
+describe('US-01 · FR-015 sanitizeInput on a full field (review R-14)', () => {
+  const phone = { allowedCharacters: 'digits' as const, maxLength: 10 };
+
+  it('refuses a digit typed at the start instead of cutting the end', () => {
+    expect(sanitizeInput('93001234567', 1, phone)).toEqual({ value: '3001234567', caret: 0 });
+  });
+
+  it('refuses a digit typed in the middle', () => {
+    // "30012|9|34567": typed 9 after the 5th digit
+    expect(sanitizeInput('30012934567', 6, phone)).toEqual({ value: '3001234567', caret: 5 });
+  });
+
+  it('keeps only the part of a paste that fits', () => {
+    // "300|99999|1234" into "3001234" (7 digits): 3 fit
+    expect(sanitizeInput('300999991234', 8, phone)).toEqual({ value: '3009991234', caret: 6 });
+  });
+});
+
