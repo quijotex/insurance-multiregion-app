@@ -10,7 +10,8 @@
     "lint": "ng lint",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.spec.json --noEmit",
     "e2e": "playwright test",
-    "verify": "npm run lint && npm run typecheck && npm test"
+    "verify": "npm run lint && npm run typecheck && npm test",
+    "e2e:docker": "playwright test --config playwright.docker.config.ts"
   },
   "private": true,
   "packageManager": "npm@11.7.0",
