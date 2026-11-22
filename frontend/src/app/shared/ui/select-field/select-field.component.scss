@@ -1,0 +1,134 @@
+:host {
+  display: block;
+}
+
+.select-field {
+  position: relative;
+
+  &__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 52px;
+    padding: 0 var(--space-4);
+    border: 0;
+    border-bottom: 2px solid var(--color-text-muted);
+    border-radius: 12px 12px 0 0;
+    background: var(--color-surface-brand-soft);
+    color: var(--color-text);
+    font: inherit;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 120ms;
+
+    &:focus {
+      border-bottom-color: var(--color-action);
+      background: var(--color-surface-field-focus);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    &--invalid,
+    &--invalid:focus {
+      border-bottom-color: var(--color-error);
+    }
+
+    &:disabled {
+      background: var(--color-disabled-bg);
+      color: var(--color-disabled-text);
+      border-bottom-color: var(--color-disabled-text);
+      cursor: not-allowed;
+    }
+  }
+
+  &__value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &--placeholder {
+      color: var(--color-text-muted);
+    }
+  }
+
+  &__chevron {
+    flex: none;
+    transition: transform 160ms;
+  }
+
+  &--open &__chevron {
+    transform: rotate(180deg);
+  }
+
+  &__listbox {
+    position: absolute;
+    top: calc(100% + var(--space-1));
+    left: 0;
+    right: 0;
+    z-index: 20;
+    box-sizing: border-box;
+    max-height: 280px;
+    margin: 0;
+    padding: 6px;
+    overflow-y: auto;
+    list-style: none;
+    background: var(--color-surface);
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+    animation: select-field-open 160ms ease-out;
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--color-text);
+    font-size: 16px;
+    cursor: pointer;
+
+    &--active {
+      background: var(--color-surface-brand-soft);
+    }
+
+    &--selected {
+      font-weight: 700;
+      color: var(--color-on-cta);
+    }
+  }
+
+  &__check {
+    flex: none;
+  }
+}
+
+@keyframes select-field-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .select-field__listbox {
+    animation: none;
+  }
+
+  .select-field__trigger,
+  .select-field__chevron {
+    transition: none;
+  }
+}

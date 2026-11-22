@@ -11,18 +11,18 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 [P] [CMS] US-01 Add `vitest` as a cms devDependency (approved at Gate 2), a `test` script (`vitest run`) and a minimal `vitest.config.ts` limited to `src/**/*.test.ts`. Strapi build must ignore the test files — `cms/package.json`, `cms/vitest.config.ts`, `cms/tsconfig.json`
-- [ ] T002 [P] [CMS] US-01 Components per [data-model.md](data-model.md):
+- [x] T001 [P] [CMS] US-01 Add `vitest` as a cms devDependency (approved at Gate 2), a `test` script (`vitest run`) and a minimal `vitest.config.ts` limited to `src/**/*.test.ts`. Strapi build must ignore the test files — `cms/package.json`, `cms/vitest.config.ts`, `cms/tsconfig.json`
+- [x] T002 [P] [CMS] US-01 Components per [data-model.md](data-model.md):
   - `FormValidations.min` and `FormValidations.max` (decimal), `FormValidations.pattern` (string), `FormValidations.validators` (repeatable `form.validator`);
   - `FormValidator.name` (string, required), `FormValidator.value` (integer, optional);
   - `FormOption.label` and `FormOption.value` (string, both required).
   (FR-001, FR-003) — `cms/src/components/form/validations.json`, `validator.json`, `option.json`
-- [ ] T003 [P] [CMS] US-01 Add `Country.legalAge` per [data-model.md](data-model.md) (integer, required, min 0, default 18) (FR-007, R4) — `cms/src/api/country/content-types/country/schema.json`
-- [ ] T004 [P] [ORCH] US-01 Add `npm --prefix cms test` to the CLAUDE.md verification commands and to the per-wave checks in the autopilot skill — `CLAUDE.md`, `.claude/skills/autopilot/SKILL.md`
+- [x] T003 [P] [CMS] US-01 Add `Country.legalAge` per [data-model.md](data-model.md) (integer, required, min 0, default 18) (FR-007, R4) — `cms/src/api/country/content-types/country/schema.json`
+- [x] T004 [P] [ORCH] US-01 Add `npm --prefix cms test` to the CLAUDE.md verification commands and to the per-wave checks in the autopilot skill — `CLAUDE.md`, `.claude/skills/autopilot/SKILL.md`
 
 ## Phase 2: Foundational (blocks the stories)
 
-- [ ] T005 [CMS] US-01 `FormField` collection per [data-model.md](data-model.md):
+- [x] T005 [CMS] US-01 `FormField` collection per [data-model.md](data-model.md):
   - Attributes:
     - `FormField.key` (required, `^[a-z][a-zA-Z0-9]*$`)
     - `FormField.label`
@@ -39,13 +39,13 @@
   - Draft & publish enabled.
   - The `find` controller forces `status: 'published'`.
   (FR-001, FR-002, R1, R3) — `cms/src/api/form-field/**` (depends on T002)
-- [ ] T006 [CMS] US-01 Integrity middleware.
+- [x] T006 [CMS] US-01 Integrity middleware.
   - A pure `checkFormFieldIntegrity(data, existing)` plus a Document Service middleware, registered in `register()`, on `create`/`update`/`publish` of FormField.
   - It rejects a missing country, or a `key` already used by another document of the same country, with a ValidationError.
   - It allows the same key in another country, and an update that keeps its own key.
   - Unit tests per the Test plan.
   (Edge Cases, R2) — `cms/src/middlewares/form-field-integrity*.ts`, `cms/src/index.ts` (depends on T001, T005)
-- [ ] T007 [CMS] US-01 Seed, permissions and backfill.
+- [x] T007 [CMS] US-01 Seed, permissions and backfill.
   - Seed the CO (10) and CL (9) fields from [data-model.md](data-model.md) § Seed: all required and published, with the named rules `rut`, `legalAge`, `maxYearsAgo` 20 and `maxYearsAhead` 1.
   - The patterns are exported as constants from `seed/form-field-patterns.ts`.
   - The seed runs only when no FormField exists.
@@ -53,24 +53,24 @@
   - Grant Public `api::form-field.form-field.find`, with a comment saying why.
   - Unit tests: pattern valid/invalid tables, backfill.
   (FR-007, FR-013, R4) — `cms/src/seed/form-fields.ts`, `cms/src/seed/form-field-patterns*.ts`, `cms/src/seed/countries.ts`, `cms/src/seed/permissions.ts`, `cms/src/index.ts` (depends on T001, T003, T005, T006)
-- [ ] T008 [P] [FE] US-01 `Country.legalAge` in the DTO, model and mapper (missing → 18), plus `fields[2]=legalAge` in `CountryService`; unit tests (FR-007) — `frontend/src/app/core/country/**`
-- [ ] T009 [P] [FE] US-01 FormField data layer per [contracts/form-fields-api.md](contracts/form-fields-api.md):
+- [x] T008 [P] [FE] US-01 `Country.legalAge` in the DTO, model and mapper (missing → 18), plus `fields[2]=legalAge` in `CountryService`; unit tests (FR-007) — `frontend/src/app/core/country/**`
+- [x] T009 [P] [FE] US-01 FormField data layer per [contracts/form-fields-api.md](contracts/form-fields-api.md):
   - DTOs and `FormFieldDescriptor`.
   - Pure `mapFormFields`: group by section (policyholder, vehicle), sort by order, drop unknown types with `console.warn`, handle null validations and options.
   - `FormFieldService.load(countryCode)`.
   - Unit tests.
   (FR-001–FR-003, R10) — `frontend/src/app/features/quote-form/data/**`
-- [ ] T010 [P] [FE] US-01 Validation.
+- [x] T010 [P] [FE] US-01 Validation.
   - `named-rules.ts`: `rut` (normalise, modulo 11, `K`), `legalAge(context.legalAge)` against the local today, `maxYearsAgo`, `maxYearsAhead`.
   - `build-validators.ts`: required, min/max, anchored pattern (a bad regex is skipped with a warning), registry lookup (an unknown name is skipped with a warning), and the single error key `invalid`.
   - Unit tests with the plan's valid/invalid tables.
   (FR-005, FR-007, FR-008, FR-014, R6, R7) — `frontend/src/app/features/quote-form/validation/**`
-- [ ] T011 [P] [FE] US-01 `QuoteSessionStore`:
+- [x] T011 [P] [FE] US-01 `QuoteSessionStore`:
   - `readStep1()`, `saveStep1(values)` (which also clears `step1Completed`), `markStep1Completed()`, `isStep1Completed()`.
   - `hasData()` is true only when some value is non-empty.
   - Unit tests.
   (FR-009, R8, R9) — `frontend/src/app/core/session/**`
-- [ ] T012 [P] [FE] US-01 Shared UI per the ui-ux-guidelines recipes:
+- [x] T012 [P] [FE] US-01 Shared UI per the ui-ux-guidelines recipes:
   - Add the `--color-surface-field-focus` token.
   - `StepperComponent` (`<ol>`, S3 colours, `aria-current="step"`, collapses on mobile).
   - `SelectFieldComponent`: a custom select-only combobox implementing `ControlValueAccessor`, with the listbox popup and the keyboard ↑/↓, Home/End, Enter/Space, Esc, Tab; `aria-expanded`/`aria-activedescendant`; a disabled state when there are no options.

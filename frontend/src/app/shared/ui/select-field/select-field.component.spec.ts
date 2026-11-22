@@ -1,0 +1,91 @@
+import { Component, signal } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { SelectFieldComponent, SelectOption } from './select-field.component';
+
+@Component({
+  imports: [ReactiveFormsModule, SelectFieldComponent],
+  template: `<label for="brand">Marca</label>
+    <app-select-field inputId="brand" [options]="options()" [formControl]="control" />`,
+})
+class HostComponent {
+  options = signal<SelectOption[]>([
+    { label: 'Alfa', value: 'a' },
+    { label: 'Beta', value: 'b' },
+    { label: 'Gamma', value: 'c' },
+  ]);
+  control = new FormControl<string>('', { nonNullable: true });
+}
+
+describe('US-01 · FR-011 select field keyboard', () => {
+  let fixture: ComponentFixture<HostComponent>;
+  let host: HostComponent;
+  let trigger: HTMLButtonElement;
+
+  const key = (k: string) => {
+    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+  };
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(HostComponent);
+    host = fixture.componentInstance;
+    fixture.detectChanges();
+    trigger = fixture.nativeElement.querySelector('[role="combobox"]');
+  });
+
+  it('opens with ArrowDown and updates aria-expanded', () => {
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    key('ArrowDown');
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    expect(fixture.nativeElement.querySelectorAll('[role="option"]').length).toBe(3);
+  });
+
+  it('moves with arrows (wrapping), Home and End, updating aria-activedescendant', () => {
+    key('ArrowDown');
+    expect(trigger.getAttribute('aria-activedescendant')).toBe('brand-option-0');
+    key('ArrowDown');
+    expect(trigger.getAttribute('aria-activedescendant')).toBe('brand-option-1');
+    key('End');
+    expect(trigger.getAttribute('aria-activedescendant')).toBe('brand-option-2');
+    key('ArrowDown');
+    expect(trigger.getAttribute('aria-activedescendant')).toBe('brand-option-0');
+    key('ArrowUp');
+    expect(trigger.getAttribute('aria-activedescendant')).toBe('brand-option-2');
+    key('Home');
+    expect(trigger.getAttribute('aria-activedescendant')).toBe('brand-option-0');
+  });
+
+  it('Enter picks the active option, emits the value and closes', () => {
+    key('ArrowDown');
+    key('ArrowDown');
+    key('Enter');
+    expect(host.control.value).toBe('b');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(trigger.textContent).toContain('Beta');
+  });
+
+  it('Escape closes without changing the value', () => {
+    key('ArrowDown');
+    key('ArrowDown');
+    key('Escape');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    expect(host.control.value).toBe('');
+  });
+
+  it('writeValue shows the matching label', () => {
+    host.control.setValue('c');
+    fixture.detectChanges();
+    expect(trigger.textContent).toContain('Gamma');
+    key('Enter');
+    expect(trigger.getAttribute('aria-activedescendant')).toBe('brand-option-2');
+  });
+
+  it('is disabled with a message when there are no options', () => {
+    host.options.set([]);
+    fixture.detectChanges();
+    expect(trigger.disabled).toBe(true);
+    expect(trigger.textContent).toContain('Sin opciones disponibles');
+  });
+});
