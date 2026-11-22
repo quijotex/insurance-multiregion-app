@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Edit(./cms/**)",
+      "Edit(./frontend/**)",
+      "Edit(./specs/**)",
+      "Edit(./docs/adr/**)",
+      "Write(./cms/**)",
+      "Write(./frontend/**)",
+      "Write(./specs/**)",
+      "Write(./docs/adr/**)",
+      "Bash(npm --prefix frontend run:*)",
+      "Bash(npm --prefix frontend test:*)",
+      "Bash(npm --prefix frontend ci)",
+      "Bash(npm --prefix cms run:*)",
+      "Bash(npm --prefix cms ci)",
+      "Bash(npx --prefix frontend playwright:*)",
+      "Bash(.specify/scripts/bash/:*)",
+      "Bash(bash .specify/scripts/bash/:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout -b:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(docker compose ps:*)",
+      "Bash(docker compose logs:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git rebase:*)",
+      "Bash(npm install:*)",
+      "Bash(npm i:*)",
+      "Bash(npm --prefix frontend install:*)",
+      "Bash(npm --prefix cms install:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./cms/.env)",
+      "Read(./**/.env)",
+      "Edit(./docs/user-stories/**)",
+      "Write(./docs/user-stories/**)",
+      "Edit(./.specify/memory/constitution.md)",
+      "Write(./.specify/memory/constitution.md)",
+      "Edit(./ai-logs/**)",
+      "Write(./ai-logs/**)"
+    ]
+  }
+}
