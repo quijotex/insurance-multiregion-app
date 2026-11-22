@@ -84,3 +84,37 @@ No new Blocker or Major findings. No extra scope was built. The security posture
 5. **Keyboard focus visuals:** Tab from the focused heading into the radio group and onto Continuar. The tile and the button should show the focus ring, and the heading should not.
 
 **Verdict: Approved** (R-01–R-09 all Resolved, no open findings).
+
+## Round 4 — 2026-11-22 (Gate 3 image)
+
+Commits reviewed: `db89fa4` (task T021) and `dfe07ce` (implementation). Verification: `npm --prefix frontend run verify` passed (lint, typecheck, 45 tests in 6 files). `npm --prefix frontend run build` passed with no budget warnings (the `country-selection-page` lazy chunk is 9.99 kB raw). The CMS was not touched. The orchestrator's browser check on docker (1440×900 and 360px) matches the code.
+
+No new findings.
+
+**T021 (split layout with illustration): conforms.**
+- At ≥ 768px, `.country-page` becomes a two-column grid. The left `__hero` has the new `--color-surface-brand-soft` background, the illustration at 300px and the phrase "Tu carro protegido, en el país donde manejas." (20px/700 `--color-brand`, high contrast on the soft background). The right `__content` holds the title, subtitle, alert, tiles and Continuar, left-aligned (`align-items: flex-start`, tiles `justify-content: flex-start`) and vertically centered (`justify-content: center`).
+- Below 768px, the hero is a column above the content: the illustration is 150px, the phrase is `display: none`, and the content stays centered with the tiles side by side (`flex: 1 1 0`, `min-width: 130px`, so two tiles fit at 320px).
+- The template is unchanged apart from the new wrapper elements. The `@switch`, `@if` and `@for` (with `track`) blocks, and all their states, were only re-indented.
+
+**ui-ux-guidelines §6 Imagery: conforms.**
+- `selection-hero.svg` is a small hand-written SVG made of geometric primitives (ellipse and circle blobs, a car path, a shield with a check). It has no embedded raster, no `<script>`, no external references and no third-party artwork, so it counts as an own SVG with no licensing concern. Its colours are the token values (brand, action, CTA yellow, cyan accent, highlight, border, text) plus one lighter window blue (`#9fc0ff`). Raw hex inside a static asset is fine: the "tokens only" rule in §1 applies to component styles.
+- The image is decorative and uses `alt=""`, with explicit `width`/`height` (no layout shift while it loads). The relative `images/...` path resolves from `/` because the page is only served at the root route.
+
+**Choice tile recipe: unchanged.** Default, hover (border only), selected (border, highlight background and the absolutely positioned check), `:has(:focus-visible)` ring, skeleton and reduced motion all work as in round 3. The new 768px rule only changes how the tile row is aligned.
+
+**Regressions: none.**
+- Heading focus still works. `afterNextRender` queries `h1` inside the host, and the `h1` (still `tabindex="-1"`) is now inside `__content`. The unit test still passes.
+- Moving `.visually-hidden` to `styles.scss` keeps it working. The component scss is emulated, so before the move the rule only applied inside this page. It now applies everywhere, and no other component defines a conflicting rule. The hidden legend "País", the "Cargando países…" text and the hidden radios are unaffected.
+- Security, the Public role and relative URLs are unchanged. No data was added.
+
+**Budget note (no finding):** `anyComponentStyle` `maximumWarning` went from 4 kB to 6 kB, while `maximumError` stays at 8 kB. The page stylesheet compiles to about 4.9 kB unminified (header, page layout, hero, tiles, skeleton), so going over 4 kB is expected for a page that styles its own tiles. The raise is acceptable. When a later story reuses the choice tile, moving it into `shared/ui/` would shrink this stylesheet and make it possible to lower the warning again.
+
+### For the human to check by hand
+1. **Scenario 8 (not run):** in the admin, switch Chile's **Active** off, reload `/` (Chile gone) and `/cl/quote` (redirect with the "not available" message). Then unpublish Colombia and confirm the same behaviour. Restore both afterwards.
+2. **Confirm dialog paths (FR-007 / FR-012):** still reachable only once US-01 writes session data. Re-test then: a same-tab link to the other country (confirm and cancel), "Cambiar país" with data, Esc to cancel, and focus returning to the trigger.
+3. **Screen reader pass:** on entering `/` (first load and after "Cambiar país"), the heading should be announced first, then the radio group as legend "País" plus the tile names, with the checked state announced by the radio. The illustration should be skipped (`alt=""`). The hero is an `<aside>`, so it also shows up as a "complementary" landmark that contains only the phrase. Check that this does not feel noisy. If it does, a plain `div` is enough. While loading, the region should be busy and read "Cargando países…". Also check the header chip (name only) and the `role="alert"` "not available" message.
+4. **Mobile header and tiles without icon (R-01):** create a country with no icon and check at 320px that its name is visible in the header. A country with an icon should show only the flag below 576px. A tile without a flag centers its name, so it will not line up with tiles that have a flag. Decide whether that is acceptable.
+5. **Keyboard focus visuals:** Tab from the focused heading into the radio group and onto Continuar. The tile and the button should show the focus ring, and the heading should not.
+6. **Split layout at the 768px edge and in between (T021):** at 768–1000px, check that the two halves still look balanced (each is 50%, and the content is capped at 480px), that the tiles do not wrap awkwardly, and that the "not available" alert and the error panel look right in the right column. At 320px, check that the 150px illustration plus the title still leave the tiles and Continuar visible without much scrolling.
+
+**Verdict: Approved** (T021 conforms. No open findings.)
