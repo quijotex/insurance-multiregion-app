@@ -1,3 +1,4 @@
+import { isAllowedCharacters, type InputLimits } from '../validation/input-limits';
 import type { FieldType } from '../validation/validation.model';
 import type {
   FormFieldDescriptor,
@@ -15,6 +16,18 @@ function isFieldType(value: string): value is FieldType {
 
 function isSection(value: string): value is FormSection {
   return (SECTIONS as readonly string[]).includes(value);
+}
+
+function mapInputLimits(dto: FormFieldDto): InputLimits {
+  const chars = dto.validations?.allowedCharacters ?? null;
+  if (chars !== null && !isAllowedCharacters(chars)) {
+    console.warn(`Form field "${dto.key}": unknown allowedCharacters "${chars}" ignored.`);
+  }
+  const max = dto.validations?.maxLength ?? null;
+  return {
+    allowedCharacters: isAllowedCharacters(chars) ? chars : null,
+    maxLength: max !== null && max > 0 ? max : null,
+  };
 }
 
 function mapField(dto: FormFieldDto, section: FormSection, type: FieldType): FormFieldDescriptor {
@@ -40,6 +53,7 @@ function mapField(dto: FormFieldDto, section: FormSection, type: FieldType): For
         value: v.value ?? null,
       })),
     },
+    inputLimits: mapInputLimits(dto),
   };
 }
 

@@ -29,7 +29,12 @@ interface SeedField {
   placeholder?: string;
   errorMessage: string;
   options?: SeedOption[];
-  validations?: { pattern?: string; validators?: Array<{ name: string; value?: number }> };
+  validations?: {
+    pattern?: string;
+    validators?: Array<{ name: string; value?: number }>;
+    allowedCharacters?: 'digits' | 'alphanumeric' | 'rut';
+    maxLength?: number;
+  };
 }
 
 const opts = (labels: string[]): SeedOption[] => labels.map((l) => ({ label: l, value: l }));
@@ -102,7 +107,11 @@ const vehicleYear: Omit<SeedField, 'order'> = {
   helpText: 'Año de fabricación del vehículo.',
   placeholder: 'Ej: 2020',
   errorMessage: 'Indica un año de hasta 20 años atrás o el próximo año.',
-  validations: { validators: [{ name: 'maxYearsAgo', value: 20 }, { name: 'maxYearsAhead', value: 1 }] },
+  validations: {
+    validators: [{ name: 'maxYearsAgo', value: 20 }, { name: 'maxYearsAhead', value: 1 }],
+    allowedCharacters: 'digits',
+    maxLength: 4,
+  },
 };
 
 const withOrder = (fields: Array<Omit<SeedField, 'order'>>): SeedField[] => {
@@ -134,7 +143,7 @@ const CO_FIELDS: SeedField[] = withOrder([
     helpText: 'Solo números, sin puntos ni espacios.',
     placeholder: 'Ej: 1020304050',
     errorMessage: 'Escribe de 6 a 10 dígitos, sin puntos ni espacios.',
-    validations: { pattern: CO_DOCUMENT_NUMBER_PATTERN },
+    validations: { pattern: CO_DOCUMENT_NUMBER_PATTERN, allowedCharacters: 'digits', maxLength: 10 },
   },
   fullName,
   birthDate,
@@ -147,7 +156,7 @@ const CO_FIELDS: SeedField[] = withOrder([
     helpText: '10 dígitos, empieza por 3.',
     placeholder: 'Ej: 3001234567',
     errorMessage: 'Escribe un celular de 10 dígitos que empiece por 3.',
-    validations: { pattern: CO_MOBILE_PATTERN },
+    validations: { pattern: CO_MOBILE_PATTERN, allowedCharacters: 'digits', maxLength: 10 },
   },
   {
     key: 'city',
@@ -166,7 +175,7 @@ const CO_FIELDS: SeedField[] = withOrder([
     helpText: '3 letras y 3 números, sin guiones.',
     placeholder: 'Ej: ABC123',
     errorMessage: 'Escribe una placa de 3 letras y 3 números, por ejemplo ABC123.',
-    validations: { pattern: CO_PLATE_PATTERN },
+    validations: { pattern: CO_PLATE_PATTERN, allowedCharacters: 'alphanumeric', maxLength: 6 },
   },
   vehicleMake,
   vehicleYear,
@@ -181,7 +190,7 @@ const CL_FIELDS: SeedField[] = withOrder([
     helpText: 'Con o sin puntos, con dígito verificador.',
     placeholder: 'Ej: 12.345.678-5',
     errorMessage: 'Escribe un RUT válido, por ejemplo 12.345.678-5.',
-    validations: { pattern: CL_RUT_PATTERN, validators: [{ name: 'rut' }] },
+    validations: { pattern: CL_RUT_PATTERN, validators: [{ name: 'rut' }], allowedCharacters: 'rut', maxLength: 12 },
   },
   fullName,
   birthDate,
@@ -194,7 +203,7 @@ const CL_FIELDS: SeedField[] = withOrder([
     helpText: '9 dígitos, empieza por 9.',
     placeholder: 'Ej: 912345678',
     errorMessage: 'Escribe un celular de 9 dígitos que empiece por 9.',
-    validations: { pattern: CL_MOBILE_PATTERN },
+    validations: { pattern: CL_MOBILE_PATTERN, allowedCharacters: 'digits', maxLength: 9 },
   },
   {
     key: 'region',
@@ -213,13 +222,13 @@ const CL_FIELDS: SeedField[] = withOrder([
     helpText: '4 letras y 2 números, o 2 letras y 4 números.',
     placeholder: 'Ej: BCDF12',
     errorMessage: 'Escribe una patente válida, por ejemplo BCDF12 o AB1234.',
-    validations: { pattern: CL_PLATE_PATTERN },
+    validations: { pattern: CL_PLATE_PATTERN, allowedCharacters: 'alphanumeric', maxLength: 6 },
   },
   vehicleMake,
   vehicleYear,
 ]);
 
-const BY_COUNTRY: Record<string, SeedField[]> = { CO: CO_FIELDS, CL: CL_FIELDS };
+export const BY_COUNTRY: Record<string, SeedField[]> = { CO: CO_FIELDS, CL: CL_FIELDS };
 
 /** Pure helper: countries whose legalAge is missing (null/undefined). Existing values are never touched. */
 export function countriesNeedingLegalAge<T extends { legalAge?: number | null }>(countries: T[]): T[] {

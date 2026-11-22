@@ -1,3 +1,4 @@
+import type { InputLimits } from '../validation/input-limits';
 import type { FieldRules, FieldType } from '../validation/validation.model';
 
 /** Strapi DTOs — mirror cms/src/api/form-field (see contracts/form-fields-api.md). */
@@ -13,6 +14,8 @@ export interface FormValidationsDto {
   max: number | null;
   pattern: string | null;
   validators: FormValidatorDto[] | null;
+  allowedCharacters?: string | null;
+  maxLength?: number | null;
 }
 
 export interface FormOptionDto {
@@ -62,6 +65,7 @@ export interface FormFieldDescriptor {
   section: FormSection;
   options: FieldOption[];
   rules: FieldRules;
+  inputLimits: InputLimits;
 }
 
 export interface FormSections {

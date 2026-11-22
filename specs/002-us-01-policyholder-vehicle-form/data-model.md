@@ -34,6 +34,8 @@ The existing fields are unchanged: `name`, `code`, `icon`, `order`, `active`.
 | `max` | decimal | for numbers |
 | `pattern` | string | a regular expression, applied anchored (whole value) |
 | `validators` | component `form.validator` (repeatable) | named rules |
+| `allowedCharacters` | enumeration `digits`, `alphanumeric`, `rut` | optional. Other characters are dropped as the person types (FR-015, Gate 3) |
+| `maxLength` | integer | optional, min 1. Extra characters are dropped as the person types (FR-015, Gate 3) |
 
 ### Component `form.validator` (`FormValidator`)
 | Field | Type | Notes |

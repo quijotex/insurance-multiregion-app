@@ -4,6 +4,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { startWith, switchMap } from 'rxjs';
 import { SelectFieldComponent } from '../../../../shared/ui/select-field/select-field.component';
 import { FormFieldDescriptor } from '../../data/form-field.model';
+import { sanitizeInput } from '../../validation/input-limits';
 import { FieldValue } from '../../validation/validation.model';
 
 /** DOM id of the focusable control of a field (also used to focus the first invalid one). */
@@ -67,9 +68,10 @@ export function fieldInputId(key: string): string {
           <input
             class="form-field__control"
             type="text"
-            [attr.inputmode]="field().type === 'number' ? 'numeric' : null"
+            [attr.inputmode]="inputMode()"
             [id]="inputId()"
             [formControl]="control()"
+            (input)="applyLimits($event)"
             [placeholder]="field().placeholder ?? ''"
             [attr.required]="field().required ? '' : null"
             [attr.aria-required]="field().required ? 'true' : null"
@@ -115,6 +117,21 @@ export class FormFieldComponent {
     const control = this.control();
     return control.invalid && (control.touched || this.submitted());
   });
+
+  protected readonly inputMode = computed(() =>
+    this.field().type === 'number' || this.field().inputLimits.allowedCharacters === 'digits' ? 'numeric' : null,
+  );
+
+  /** FR-015: drop characters the field can never accept, and anything beyond its max length. */
+  protected applyLimits(event: Event): void {
+    const el = event.target as HTMLInputElement;
+    const caret = el.selectionStart ?? el.value.length;
+    const { value, caret: next } = sanitizeInput(el.value, caret, this.field().inputLimits);
+    if (value === el.value) return;
+    el.value = value;
+    el.setSelectionRange(next, next);
+    this.control().setValue(value);
+  }
 
   protected readonly describedBy = computed(() => {
     const ids: string[] = [];

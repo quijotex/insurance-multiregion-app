@@ -18,6 +18,7 @@ const FIELD: FormFieldDescriptor = {
   section: 'policyholder',
   options: [],
   rules: { type: 'text', required: true, min: null, max: null, pattern: null, validators: [] },
+  inputLimits: { allowedCharacters: null, maxLength: null },
 };
 
 @Component({
@@ -117,3 +118,52 @@ describe('US-01 · FR-005 form field error visibility and a11y', () => {
     expect(combo.getAttribute('aria-required')).toBe('true');
   });
 });
+
+describe('US-01 · FR-015 form field input limits', () => {
+  let fixture: ComponentFixture<HostComponent>;
+  let host: HostComponent;
+  let el: HTMLElement;
+  const input = () => el.querySelector<HTMLInputElement>('input')!;
+  const type = async (value: string) => {
+    input().value = value;
+    input().dispatchEvent(new Event('input'));
+    await fixture.whenStable();
+  };
+
+  beforeEach(async () => {
+    fixture = TestBed.createComponent(HostComponent);
+    host = fixture.componentInstance;
+    el = fixture.nativeElement;
+    host.field.set({
+      ...FIELD,
+      key: 'documentNumber',
+      inputLimits: { allowedCharacters: 'digits', maxLength: 10 },
+    });
+    await fixture.whenStable();
+  });
+
+  it('drops letters and caps the length in the input and the control', async () => {
+    await type('12ab345678901234');
+    expect(input().value).toBe('1234567890');
+    expect(host.control.value).toBe('1234567890');
+  });
+
+  it('opens the numeric keyboard and sets no native maxlength (it would cut a paste before filtering)', () => {
+    expect(input().getAttribute('inputmode')).toBe('numeric');
+    expect(input().getAttribute('maxlength')).toBeNull();
+  });
+
+  it('keeps a formatted paste whole: filters first, then caps', async () => {
+    await type('300-123-4567');
+    expect(host.control.value).toBe('3001234567');
+  });
+
+  it('leaves a field without limits untouched', async () => {
+    host.field.set(FIELD);
+    await fixture.whenStable();
+    await type('Ana María 2');
+    expect(host.control.value).toBe('Ana María 2');
+    expect(input().getAttribute('inputmode')).toBeNull();
+  });
+});
+

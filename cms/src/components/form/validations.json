@@ -6,6 +6,8 @@
     "min": { "type": "decimal" },
     "max": { "type": "decimal" },
     "pattern": { "type": "string" },
-    "validators": { "type": "component", "repeatable": true, "component": "form.validator" }
+    "validators": { "type": "component", "repeatable": true, "component": "form.validator" },
+    "allowedCharacters": { "type": "enumeration", "enum": ["digits", "alphanumeric", "rut"] },
+    "maxLength": { "type": "integer", "min": 1 }
   }
 }

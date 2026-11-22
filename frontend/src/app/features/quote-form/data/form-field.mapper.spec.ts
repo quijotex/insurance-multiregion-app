@@ -100,3 +100,30 @@ describe('US-01 · FR-003 form field mapper rules and options', () => {
     expect(text.options).toEqual([]);
   });
 });
+
+describe('US-01 · FR-015 form field mapper input limits', () => {
+  const validations = (allowedCharacters: string | null, maxLength: number | null) => ({
+    id: 1,
+    min: null,
+    max: null,
+    pattern: null,
+    validators: null,
+    allowedCharacters,
+    maxLength,
+  });
+
+  it('maps allowed characters and max length', () => {
+    const [field] = mapFormFields([dto({ validations: validations('digits', 10) })]).policyholder;
+    expect(field.inputLimits).toEqual({ allowedCharacters: 'digits', maxLength: 10 });
+  });
+
+  it('ignores an unknown character set with a warning, and missing limits', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const [field] = mapFormFields([dto({ validations: validations('emoji', null) })]).policyholder;
+    expect(field.inputLimits).toEqual({ allowedCharacters: null, maxLength: null });
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+    const [plain] = mapFormFields([dto({ validations: null })]).policyholder;
+    expect(plain.inputLimits).toEqual({ allowedCharacters: null, maxLength: null });
+  });
+});

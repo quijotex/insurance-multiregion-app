@@ -27,6 +27,7 @@ GET /api/form-fields
       "placeholder": null, "errorMessage": "Debes tener al menos 18 años.",
       "order": 4, "section": "policyholder",
       "validations": { "id": 3, "min": null, "max": null, "pattern": null,
+        "allowedCharacters": null, "maxLength": null,
         "validators": [{ "id": 1, "name": "legalAge", "value": null }] },
       "options": []
     },

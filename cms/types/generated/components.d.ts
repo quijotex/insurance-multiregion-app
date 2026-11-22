@@ -19,7 +19,17 @@ export interface FormValidations extends Struct.ComponentSchema {
     displayName: 'Validations';
   };
   attributes: {
+    allowedCharacters: Schema.Attribute.Enumeration<
+      ['digits', 'alphanumeric', 'rut']
+    >;
     max: Schema.Attribute.Decimal;
+    maxLength: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
     min: Schema.Attribute.Decimal;
     pattern: Schema.Attribute.String;
     validators: Schema.Attribute.Component<'form.validator', true>;

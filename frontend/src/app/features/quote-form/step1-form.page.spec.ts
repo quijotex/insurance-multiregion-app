@@ -25,6 +25,7 @@ function field(partial: Partial<FormFieldDescriptor> & { key: string }): FormFie
     section: 'policyholder',
     options: [],
     rules: { type, required, min: null, max: null, pattern: null, validators: [] },
+    inputLimits: { allowedCharacters: null, maxLength: null },
     ...partial,
   };
 }
