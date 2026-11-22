@@ -94,9 +94,10 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 
 **Form field** — `.form-field`, `__label`, `__control`, `__help`, `__error`, `--invalid`
 - Label above the control, 14px/500; required marked with `*` and announced (`required` attribute).
-- Control: min-height 52px, `--radius-sm`, 1px `--color-border`, 16px text (prevents iOS zoom). Focus: `--focus-ring` + border `--color-action`.
+- Control (soft filled, chosen at US-01 Gate 2): min-height 52px, 16px text (prevents iOS zoom), `--color-surface-brand-soft` fill, 12px top radius, no side borders, 2px bottom line `--color-text-muted` (≥3:1 against the fill). Focus: bottom line `--color-action`, fill `--color-surface-field-focus` (`#e8f0ff`), plus `--focus-ring` on `:focus-visible`. Invalid: bottom line `--color-error`.
 - Placeholder only as an example (`Ej: ABC123`), never as the label.
 - Error: icon + text in `--color-error` below the control, `aria-describedby` linked, `aria-invalid="true"` on the control.
+- **Select** (`.select-field`): never the native option list. A `role="combobox"` trigger with the same soft-filled look and a chevron that rotates when open, plus a `role="listbox"` popup: white, 14px radius, `--shadow-card`, 6px padding; options 10px/12px padding, 10px radius, `--color-surface-brand-soft` for the active option, selected option bold `--color-on-cta` with a check icon. Keyboard per the WAI-ARIA select-only combobox: ↑/↓, Home/End, Enter/Space to pick, Esc to close, Tab to leave; `aria-expanded`, `aria-activedescendant`.
 - Yes/No and short choices: segmented toggle built on native radio inputs (`.segmented`, `__option`, `--checked`).
 
 **Form card** — `.form-card`: `--color-surface`, `--radius-md`, `--shadow-card`, padding `--space-6`, max-width 560px, centered. Title 20px/700 `--color-action`.
@@ -110,7 +111,9 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 - Price: large, formatted in country currency, with period ("/año").
 - Selectable as a native radio group (`role` comes from `<input type="radio">` inside a `<label>`), one choice only.
 
-**Stepper** — `.stepper`, `__step`, `--current`, `--done`: numbered steps with text labels; current step has `aria-current="step"`. On mobile show "Paso 2 de 3" + current label.
+**Stepper** — `.stepper`, `__step`, `--current`, `--done`: numbered steps with text labels in an `<ol>`, above the form card; current step has `aria-current="step"`. Current and done circles (32px): `--color-surface-highlight` fill, 2px `--color-action` ring, `--color-brand` number (check icon when done); upcoming: white, 1.5px `--color-border` ring, `--color-text-muted`. Current label bold `--color-brand`; connector lines 2px, `--color-action` up to a done step, else `--color-border`. On mobile show only the current circle + "Paso 2 de 3" + current label.
+
+**Motion** — content loads with a skeleton, then items fade up 14px one by one (600ms `cubic-bezier(.2,.7,.2,1)`, 110ms stagger), only on first render, never on validation re-renders. Popups open with a 160ms fade/slide. All of it is off under `prefers-reduced-motion`.
 
 **Summary block** — `.summary-section` with a title + "Editar" secondary link per section (data, vehicle, plan). Masked document shown as `•••• 5678`.
 
