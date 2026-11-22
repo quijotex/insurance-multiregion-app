@@ -149,7 +149,7 @@ R-13 and R-14 are resolved, and their rows in Rounds 3 and 4 are updated.
 
 | ID | Severity | Location | Finding | Rule/FR | Status | Resolution |
 |----|----------|----------|---------|---------|--------|------------|
-| R-17 | Minor | commit `2a5f1c7`: step1-form.page.spec.ts:10, 249-270 | `2a5f1c7` imports `restoredValue` from `step1-form.page`, but that function is first exported in `628756a`. At `2a5f1c7` alone, the typecheck and the frontend unit tests fail, so the commit is not "a complete, working unit". The R-13 tests also sit in the T028 commit (the CMS fix), not in the T029 commit they test. HEAD is correct. Only the history is affected (bisect, or reverting one commit). | Constitution: Atomic Conventional Commits | Open | The commits are not pushed yet, so the history can still be fixed: move the `restoredValue` describe and import into `628756a`. Or record Won't fix (history only, HEAD is green). Keep tests in the commit they cover next time. |
+| R-17 | Minor | commit `2a5f1c7`: step1-form.page.spec.ts:10, 249-270 | `2a5f1c7` imports `restoredValue` from `step1-form.page`, but that function is first exported in `628756a`. At `2a5f1c7` alone, the typecheck and the frontend unit tests fail, so the commit is not "a complete, working unit". The R-13 tests also sit in the T028 commit (the CMS fix), not in the T029 commit they test. HEAD is correct. Only the history is affected (bisect, or reverting one commit). | Constitution: Atomic Conventional Commits | Won't fix (accepted by the human at Gate 3; HEAD is green, history not rewritten) | The commits are not pushed yet, so the history can still be fixed: move the `restoredValue` describe and import into `628756a`. Or record Won't fix (history only, HEAD is green). Keep tests in the commit they cover next time. |
 | R-18 | Minor | tasks.md:130 (T028) | T028 says "checked live with `required: false` on every field". The orchestrator reports that this bulk live test was not run (blocked as destructive). The only live check was a no-op save of all 19 fields with an untouched relation. So the task line claims a check that never ran. | Traceability (honest record of verification) | Open | Reword it to what was checked: "checked live: a no-op save of all 19 fields with an untouched country is accepted; the `required: false` publish is checked by the human in the admin". Or keep the text once the human's retry (check 1) passes. |
 | R-19 | Nit | step1-form.page.ts:42-47, 124-137 | A dropped select value leaves the session only on the next `valueChanges` (the first edit). Until then, `sessionStorage` still holds the old region and `step1Completed` stays `true`. So the step 1 guard lets a direct link to step 2 open with a region that is no longer an option. Step 2 does not read the values yet (US-02), so nothing breaks today. Stale keys behave the same way. | FR-009, SC-002 | Open | No change for US-01. For US-02, do one of two things: save the form once after it is built when a restored value was dropped (this also clears `step1Completed`), or have step 2 re-check the values against the current configuration. |
 
@@ -203,3 +203,12 @@ Conformance notes:
 1. **R-20 / R-21:** decide whether the patente keeps `AB1234` (one extra run) and whether the RUT row uses a lenient example. No manual browser check is needed for this round.
 
 **Verdict: Approved.** No Blocker or Major. The removed tests are covered elsewhere and the counts match (146 / 33). R-20 and R-21 (Minor) each leave one accepted behaviour without a seed-pattern test: a one-line change fixes each, or the human records Won't fix. R-22 is a Nit.
+
+## Gate 3 decisions, round 2 (human, 2026-11-22)
+
+- R-17: accepted, no history rewrite.
+- R-20, R-21, R-22: resolved in 98ed062 (examples swapped, still one valid and one invalid per pattern).
+- T028 admin retry: unchecking `required` and publishing now saves (checked by the human).
+- Manual checks from Rounds 1–6, including quickstart 10 and 13: passed (checked by the human).
+
+Gate 3: Approved — 2026-11-22

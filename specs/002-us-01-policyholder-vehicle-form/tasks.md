@@ -154,7 +154,7 @@
 | 7 | ✅ reload restores values, no errors shown | browser |
 | 8 | ✅ `/cl/quote/plans` without step 1 → `/cl/quote` | browser |
 | 9 | ✅ "Cambiar país" with data asks first; Esc keeps data | browser |
-| 10 | ⏳ publish/unpublish a field in the admin | for the human |
+| 10 | ✅ publish/unpublish a field in the admin | human, Gate 3 |
 | 11 | ✅ no-country and duplicate-key saves rejected | live Document Service script |
 | 12 | ✅ error state + Reintentar | unit tests (US-00 pattern verified live) |
-| 13 | ⏳ keyboard-only at 320 px and desktop, screen reader | for the human (unit tests cover keyboard) |
+| 13 | ✅ keyboard-only at 320 px and desktop, screen reader | human, Gate 3 |
