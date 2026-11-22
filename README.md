@@ -63,6 +63,7 @@ npm --prefix frontend start    # Angular on http://localhost:4200 (proxies /api 
 | `npm --prefix frontend run e2e` | Playwright e2e; starts Strapi and Angular itself |
 | `npm --prefix frontend run e2e:docker` | Playwright e2e against the running Docker stack |
 | `npm --prefix cms run build` | Strapi build and typecheck |
+| `npm --prefix cms test` | CMS unit tests (Vitest): seed patterns, form field save rules |
 
 ## Repository structure
 
@@ -93,6 +94,32 @@ To use other values, put them in a root `.env` file, which is never committed. L
 ### Managing countries (US-00)
 
 In the admin, go to **Content Manager › Country**. A country is offered on the selection screen when it is **published** and **Active** is on, and countries are listed by **Order**. To hide one, switch **Active** off or unpublish it. The seed includes Perú as published but inactive, so `/pe/quote` shows the "not available" message.
+
+### Managing the step 1 form (US-01)
+
+Go to **Content Manager › Form Field**. Each entry is one question of step 1 for one country, and changes show after a reload, with no deployment.
+
+- **Add a field:** create an entry and set the following, then **Publish** it:
+  - **Country** (required; a field without a country is rejected on save);
+  - **Key**: a technical name in camelCase, unique within its country (e.g. `vehicleModel`);
+  - **Label**, **Type** (`text`, `number`, `select`, `date`, `checkbox`), **Required**, **Help text**, **Placeholder** (an example such as `Ej: ABC123`) and **Error message**;
+  - **Section** (`policyholder` = "Tus datos", `vehicle` = "Tu carro") and **Order**.
+- **Reorder or relabel:** change **Order** (fields sort by it within their section) or **Label**, then publish.
+- **Remove:** unpublish or delete the entry. It stops appearing and is no longer required.
+- **Select options:** add entries under **Options** (label shown, value stored). They keep their list order.
+- **Rules:** under **Validations**:
+  - **Min** and **Max** apply to numbers.
+  - **Pattern** is a regular expression for the whole value.
+  - **Validators** are named rules the app implements:
+
+| Name | Value | Checks |
+|------|-------|--------|
+| `rut` | — | Chilean RUT format and check digit |
+| `legalAge` | — | Age ≥ the country's **Legal age** (Content Manager › Country) |
+| `maxYearsAgo` | years, e.g. `20` | Year no earlier than current year − value |
+| `maxYearsAhead` | years, e.g. `1` | Year no later than current year + value |
+
+A validator name the app does not know is skipped, with a warning in the browser console, so the form keeps working. A new kind of rule needs a developer ([ADR 0001](docs/adr/0001-multi-country-content-strategy.md), "Limits of configurability"). The legal age is set once per country in the Country entry (seed: 18).
 
 ## Security notes
 

@@ -79,12 +79,12 @@
 
 ## Phase 3: S1 + S2 — Fill in the form and be told what is wrong (P1) 🎯 MVP
 
-- [ ] T013 [FE] US-01 `FormFieldComponent`.
+- [x] T013 [FE] US-01 `FormFieldComponent`.
   - Renders one descriptor as a soft-filled control (`text`, `number` with `inputmode="numeric"`, `date`, `checkbox`, `select` → `SelectFieldComponent`).
   - A visible label, a required `*` plus the `required`/`aria-required` attribute, help text, placeholder.
   - Shows `errorMessage` when `invalid && (touched || submitted)`, live after that, linked with `aria-describedby` and `aria-invalid`.
   (FR-004, FR-005, FR-011) — `frontend/src/app/features/quote-form/components/form-field/**` (depends on T009, T010, T012)
-- [ ] T014 [FE] US-01 `Step1FormPage` at `/:country/quote` per the Gate 2 design.
+- [x] T014 [FE] US-01 `Step1FormPage` at `/:country/quote` per the Gate 2 design.
   - Layout: the stepper above one card ("Cuéntanos de ti y de tu carro" / "Te toma menos de 2 minutos."), the sections "Tus datos" and "Tu carro" with icons, Bootstrap `row`/`col-md-6` pairs for short fields.
   - Data: loads the fields for the active country and builds the typed `FormGroup` with the country's `legalAge`.
   - Session: restores the session values (ignoring unknown keys) and saves on every `valueChanges`.
@@ -96,7 +96,7 @@
 
 ## Phase 4: S3 — Keep my data when I go back (P2)
 
-- [ ] T015 [FE] US-01 Routes and step 2.
+- [x] T015 [FE] US-01 Routes and step 2.
   - `Step2PlaceholderPage` at `/:country/quote/plans`: the stepper on step 2, the card "Elige tu plan" / "Los planes llegan con US-02.", and a secondary "Volver" to step 1.
   - `step1CompleteGuard`: redirects to step 1 unless the step is completed.
   - Wire the child routes and delete the step 1 placeholder.
@@ -105,7 +105,7 @@
 
 ## Phase 5: S4 — Change the form without a deployment (P1)
 
-- [ ] T016 [ORCH] US-01 README: how to add, reorder, publish or unpublish a form field and set its rules in the admin; the named rules available; the per-country legal age (FR-001, SC-001) — `README.md` (depends on T007)
+- [x] T016 [ORCH] US-01 README: how to add, reorder, publish or unpublish a form field and set its rules in the admin; the named rules available; the per-country legal age (FR-001, SC-001) — `README.md` (depends on T007)
 
 ## Phase 6: E2E (approved at Gate 2)
 
