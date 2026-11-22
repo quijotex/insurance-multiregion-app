@@ -3,7 +3,7 @@ name: frontend-developer
 description: Implements Angular features and their unit tests in frontend/src for tasks from an approved tasks.md. Use for any task tagged [FE].
 tools: Read, Write, Edit, Glob, Grep, Bash
 model: sonnet
-skills: angular-conventions
+skills: angular-conventions, ui-ux-guidelines
 ---
 
 You are the frontend developer for this project. You implement only the tasks you are given.

@@ -59,7 +59,7 @@ Steps 2 and 3 each have an **AI substep (a)** followed by a **human, non-AI subs
 | 3a | Plan | Designs the technical solution; writes ADRs for architectural decisions; proposes 2–3 design options per client-facing view; proposes E2E candidates (critical flows only). | Yes | Orchestrator, skills `speckit-plan`, `ui-ux-guidelines`, `angular-conventions`, `strapi-conventions` | `specs/.../plan.md`, `docs/adr/NNNN-*.md` (Proposed) | — (reviewed at 3b) |
 | 3b | **Gate 2 — Plan approval** | Human checks for over-engineering and real ADR alternatives, picks a design option, approves or rejects each E2E candidate. | **No** | — | `plan.md` Status → `Approved (Gate 2) — <date>`; ADRs → Accepted; E2E candidates marked Approved/Rejected | **Human.** Approves, or rejects with comments → back to 3a. |
 | 4 | Tasks | Breaks the plan into tasks tagged `[P]` (parallel), `[CMS]`/`[FE]` (owner) and `US-XX`/`FR-XXX`. | Yes | Orchestrator, skill `autopilot` (Spec Kit `tasks-template.md`) | `specs/.../tasks.md` | None (autopilot). |
-| 5 | Implementation waves | Executes tasks; `[P]` groups run in parallel subagents, dependent tasks in sequence. Unit tests are written with the code. | Yes | Subagents `cms-developer` (Sonnet, skill `strapi-conventions`) and `frontend-developer` (Sonnet, skill `angular-conventions`) | Code in `cms/` and `frontend/src/`, unit tests `*.spec.ts` | None, unless a stop condition fires. |
+| 5 | Implementation waves | Executes tasks; `[P]` groups run in parallel subagents, dependent tasks in sequence. Unit tests are written with the code. | Yes | Subagents `cms-developer` (Sonnet, skill `strapi-conventions`) and `frontend-developer` (Sonnet, skills `angular-conventions`, `ui-ux-guidelines`) | Code in `cms/` and `frontend/src/`, unit tests `*.spec.ts` | None, unless a stop condition fires. |
 | 6 | E2E tests — *conditional* | Writes Playwright tests from the spec's scenarios for the approved critical flows only. A spec mismatch is reported as a defect, never "fixed" in the test. | Yes | Subagent `e2e-tester` (Sonnet) | `frontend/e2e/*.spec.ts` | **Runs only if** E2E candidates were approved at Gate 2; skipped otherwise. |
 | 7 | Verify | Lint, typecheck, unit tests and CMS build after each wave; automatic fixes. | Yes | Orchestrator (Bash: `npm --prefix frontend run verify`, `npm --prefix cms run build`) | Green checks | Human only if still failing after 3 attempts. |
 | 8 | Review | Independent review of the diff against spec, plan, ADRs, constitution and conventions. Blocker/Major findings go back to the developer agents; round 2 verifies them. | Yes | Subagent `code-reviewer` (Opus — a different model from the implementers) | `specs/.../review.md` (findings, status, resolution commit) | Human only for findings still open after round 2. |
@@ -83,7 +83,7 @@ Steps 2 and 3 each have an **AI substep (a)** followed by a **human, non-AI subs
 | `autopilot` | Custom skill | Procedure: tasks → waves → verify → e2e → review → commit | — |
 | `angular-conventions` | Custom skill | Angular project knowledge | — |
 | `strapi-conventions` | Custom skill | Strapi project knowledge | — |
-| `ui-ux-guidelines` | Custom skill | Brand-based UI/UX guidelines (pending) | — |
+| `ui-ux-guidelines` | Custom skill | Brand-based UI/UX guidelines: tokens, components, a11y, design options | — |
 | `speckit-*` | Spec Kit skills | Specify, clarify, plan, tasks | — |
 
 ## Questions

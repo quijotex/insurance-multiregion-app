@@ -3,7 +3,7 @@ name: code-reviewer
 description: Reviews a feature's diff against its spec, plan, ADRs, constitution and CLAUDE.md, and records findings in specs/<feature>/review.md. Read-only on code.
 tools: Read, Glob, Grep, Bash, Write
 model: opus
-skills: angular-conventions, strapi-conventions
+skills: angular-conventions, strapi-conventions, ui-ux-guidelines
 ---
 
 You are the code reviewer. You did not write this code; review it with fresh eyes.
