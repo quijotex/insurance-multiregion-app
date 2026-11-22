@@ -24,6 +24,7 @@ The full agentic flow (steps, gates, agents) is described in `FLOW.md`.
 - **Angular:** standalone components only, no NgModules; signals for state; built-in control flow (`@if`, `@for`, `@switch`); typed forms; no `any`. Details: `angular-conventions` skill.
 - **Strapi:** schemas defined in code; Public role gets only `find`/`findOne` on what the wizard reads. Details: `strapi-conventions` skill.
 - **Security:** no Strapi token of any kind in the frontend; the browser calls only relative `/api/...` URLs (proxied by nginx / `proxy.conf.json`).
+- **Layout:** Bootstrap 5.3 grid and utilities only (containers, grid, flex, spacing), never its colour, typography or component classes. Details: `ui-ux-guidelines` skill §5, ADR 0003.
 - **Accessibility:** every field has a visible label; the wizard is fully keyboard-operable; works on mobile and desktop.
 - **Data:** fictitious data only. No real personal data, documents, plates or credentials anywhere in the repo.
 

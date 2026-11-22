@@ -131,7 +131,13 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 
 ## 5. Layout
 
-- Mobile-first. Breakpoints: 576, 768, 992, 1200px. Gutter 16px mobile, 24px desktop; max content width 1120px.
+- Mobile-first. Breakpoints are Bootstrap's: sm 576, md 768, lg 992, xl 1200 px. Custom media queries use the same values.
+- **Layouts use Bootstrap 5.3 grid and utilities** ([ADR 0003](../../../docs/adr/0003-bootstrap-grid-for-layouts.md)) on every screen. Bootstrap is for layout only:
+  - Page width: every screen's content sits in a `.container`, capped at 1140 px (global override), with Bootstrap's gutters.
+  - Structure: `.row` / `.col-*` (`.col-12 .col-md-6`, …) for columns that stack on mobile.
+  - Alignment and spacing: `.d-flex`, `.flex-column`, `.justify-content-*`, `.align-items-*`, `.gap-*`, `m-*` / `p-*`, `.text-center` / `.text-md-start`, `.d-none .d-md-block`.
+  - Never use Bootstrap colour, typography, border, shadow or component classes (`.btn`, `.card`, `.bg-*`, `.text-primary`, `.fs-*`…). Those come from our tokens and BEM recipes.
+  - Component SCSS holds component styling only (look, states, internal spacing with `--space-*`), not page layout.
 - Plan cards: stacked < 768px, 3 columns ≥ 992px (2 columns in between).
 - Header: navy bar with text wordmark; no navigation beyond the wizard.
 
