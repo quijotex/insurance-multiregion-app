@@ -162,3 +162,5 @@ No new findings.
 6. **Bootstrap layout (T022):** at 1440px and wider, the brand bar is full width while the wordmark, the hero and the selection block stay inside the 1140px container. The hero's soft background now ends at the container edge instead of filling half the screen. Confirm that this is the look you want. At 768–1000px, check that the two columns look balanced and that the alert and the error panel fit the right column. In the wizard (`/co/quote`), check that the header wordmark and the country chip line up with the step content edges. At 320px, check that the tiles and Continuar are visible without much scrolling.
 
 **Verdict: Approved** (T022 conforms to ADR 0003 and the §5 layout rule. No open findings.)
+
+Gate 3: Approved — 2026-11-22
