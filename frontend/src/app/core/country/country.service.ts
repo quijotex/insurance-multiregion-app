@@ -20,6 +20,7 @@ export class CountryService {
       const params = new HttpParams()
         .set('fields[0]', 'name')
         .set('fields[1]', 'code')
+        .set('fields[2]', 'legalAge')
         .set('populate[icon][fields][0]', 'url')
         .set('populate[icon][fields][1]', 'alternativeText')
         .set('sort', 'order:asc');

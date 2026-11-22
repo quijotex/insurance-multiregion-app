@@ -502,6 +502,15 @@ export interface ApiCountryCountry extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     icon: Schema.Attribute.Media<'images'>;
+    legalAge: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<18>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -521,6 +530,57 @@ export interface ApiCountryCountry extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiFormFieldFormField extends Struct.CollectionTypeSchema {
+  collectionName: 'form_fields';
+  info: {
+    description: 'Field of the quote form, defined per country';
+    displayName: 'Form Field';
+    pluralName: 'form-fields';
+    singularName: 'form-field';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    country: Schema.Attribute.Relation<'manyToOne', 'api::country.country'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    errorMessage: Schema.Attribute.String & Schema.Attribute.Required;
+    helpText: Schema.Attribute.String;
+    key: Schema.Attribute.String & Schema.Attribute.Required;
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::form-field.form-field'
+    > &
+      Schema.Attribute.Private;
+    options: Schema.Attribute.Component<'form.option', true>;
+    order: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+    placeholder: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    required: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    section: Schema.Attribute.Enumeration<['policyholder', 'vehicle']> &
+      Schema.Attribute.Required;
+    type: Schema.Attribute.Enumeration<
+      ['text', 'number', 'select', 'date', 'checkbox']
+    > &
+      Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    validations: Schema.Attribute.Component<'form.validations', false>;
   };
 }
 
@@ -1060,6 +1120,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::country.country': ApiCountryCountry;
+      'api::form-field.form-field': ApiFormFieldFormField;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

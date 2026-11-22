@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "form_fields",
+  "info": {
+    "singularName": "form-field",
+    "pluralName": "form-fields",
+    "displayName": "Form Field",
+    "description": "Field of the quote form, defined per country"
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": {},
+  "attributes": {
+    "key": { "type": "string", "required": true, "regex": "^[a-z][a-zA-Z0-9]*$" },
+    "label": { "type": "string", "required": true },
+    "type": { "type": "enumeration", "enum": ["text", "number", "select", "date", "checkbox"], "required": true },
+    "required": { "type": "boolean", "default": false },
+    "helpText": { "type": "string" },
+    "placeholder": { "type": "string" },
+    "errorMessage": { "type": "string", "required": true },
+    "order": { "type": "integer", "required": true, "min": 1 },
+    "section": { "type": "enumeration", "enum": ["policyholder", "vehicle"], "required": true },
+    "country": { "type": "relation", "relation": "manyToOne", "target": "api::country.country" },
+    "validations": { "type": "component", "repeatable": false, "component": "form.validations" },
+    "options": { "type": "component", "repeatable": true, "component": "form.option" }
+  }
+}

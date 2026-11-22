@@ -1,0 +1,11 @@
+{
+  "collectionName": "components_form_validations",
+  "info": { "displayName": "Validations", "description": "Validation rules of a form field" },
+  "options": {},
+  "attributes": {
+    "min": { "type": "decimal" },
+    "max": { "type": "decimal" },
+    "pattern": { "type": "string" },
+    "validators": { "type": "component", "repeatable": true, "component": "form.validator" }
+  }
+}

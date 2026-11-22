@@ -9,14 +9,15 @@ interface SeedCountry {
   name: string;
   order: number;
   active: boolean;
+  legalAge: number;
   icon?: { file: string; alt: string };
 }
 
 // Fictitious demo data. PE is inactive on purpose to demo FR-006.
 const COUNTRIES: SeedCountry[] = [
-  { code: 'CO', name: 'Colombia', order: 1, active: true, icon: { file: 'co.svg', alt: 'Bandera de Colombia' } },
-  { code: 'CL', name: 'Chile', order: 2, active: true, icon: { file: 'cl.svg', alt: 'Bandera de Chile' } },
-  { code: 'PE', name: 'Perú', order: 3, active: false },
+  { code: 'CO', name: 'Colombia', order: 1, active: true, legalAge: 18, icon: { file: 'co.svg', alt: 'Bandera de Colombia' } },
+  { code: 'CL', name: 'Chile', order: 2, active: true, legalAge: 18, icon: { file: 'cl.svg', alt: 'Bandera de Chile' } },
+  { code: 'PE', name: 'Perú', order: 3, active: false, legalAge: 18 },
 ];
 
 async function uploadIcon(strapi: Core.Strapi, file: string, alt: string): Promise<number> {
@@ -37,7 +38,7 @@ export async function seedCountries(strapi: Core.Strapi): Promise<void> {
   for (const country of COUNTRIES) {
     const icon = country.icon ? await uploadIcon(strapi, country.icon.file, country.icon.alt) : undefined;
     await strapi.documents(UID).create({
-      data: { code: country.code, name: country.name, order: country.order, active: country.active, icon },
+      data: { code: country.code, name: country.name, order: country.order, active: country.active, legalAge: country.legalAge, icon },
       status: 'published',
     });
   }
