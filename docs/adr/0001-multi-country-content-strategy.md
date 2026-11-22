@@ -2,7 +2,7 @@
 
 - **Status:** Proposed
 - **Date:** 2026-11-21
-- **Related:** US-01, US-02, US-03
+- **Related:** US-00, US-01, US-02, US-03
 
 ## Context and problem
 
@@ -92,7 +92,8 @@ What we found: Strapi only sends data, so every validation rule ends up as code 
 How does Angular know which country to render? Let's take the **path prefix** approach for its simplicity, e.g. `/co/quote` and `/cl/quote`. The path must always have the prefix.
 
 - The prefix is the country `code` in lower case (`/co` ↔ `CO`).
-- `/` and any unknown or unpublished prefix (e.g. `/pe/quote`) **redirect** to the last country the user was visiting, saved in `sessionStorage`, if it is still active and available in `GET /api/countries`. As a fallback, if there is none, they redirect to the first country in that list (sorted by name). No country code is hardcoded.
+- `/` is the **country selection screen** (US-00): it lists the countries returned by `GET /api/countries`, with the last country the user was visiting (saved in `sessionStorage`) preselected, if it is still active and available. No country code is hardcoded.
+- Any unknown or unpublished prefix (e.g. `/pe/quote`) **redirects** to `/`.
 
 ### Advantages
 
@@ -104,7 +105,7 @@ How does Angular know which country to render? Let's take the **path prefix** ap
 ### Tradeoff
 
 - Changing the country in the middle of the wizard restarts it.
-- A mistyped country in the URL silently lands on another country instead of showing an error. Acceptable because every page shows which country is active.
+- A mistyped country in the URL sends the user to the selection screen instead of showing an error. Acceptable because the user picks the country again in one click.
 
 ## Considered options (not taken)
 
