@@ -42,7 +42,7 @@
                 (change)="select(country.code)"
               />
               @if (country.iconUrl) {
-                <img class="choice-tile__flag" [src]="country.iconUrl" [alt]="country.iconAlt" />
+                <img class="choice-tile__flag" [src]="country.iconUrl" alt="" />
               }
               <span class="choice-tile__name">{{ country.name }}</span>
               @if (selectedCode() === country.code) {
