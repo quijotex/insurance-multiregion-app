@@ -118,3 +118,47 @@ No new findings.
 6. **Split layout at the 768px edge and in between (T021):** at 768–1000px, check that the two halves still look balanced (each is 50%, and the content is capped at 480px), that the tiles do not wrap awkwardly, and that the "not available" alert and the error panel look right in the right column. At 320px, check that the 150px illustration plus the title still leave the tiles and Continuar visible without much scrolling.
 
 **Verdict: Approved** (T021 conforms. No open findings.)
+
+## Round 5 — 2026-11-22 (Gate 3 Bootstrap layout)
+
+Commits reviewed: `4d1bd38` (ADR 0003, ui-ux-guidelines §5, CLAUDE.md Layout rule, task T022), `91c1493` (`bootstrap` 5.3.8 pinned exactly, grid and utilities CSS in `angular.json`) and `212c563` (layout refactor of the selection page, wizard shell and step 1). Verification: `npm --prefix frontend run verify` passed (lint, typecheck, 45 tests in 6 files). `npm --prefix frontend run build` passed with no budget warnings. Global `styles` is 131 kB raw and about 8 kB transfer. The `country-selection-page` chunk went down from 9.99 kB to 9.49 kB. The CMS was not touched. The orchestrator's docker check at 320, 768 and 1440px matches the code.
+
+No new findings.
+
+| ID | Severity | Location | Finding | Rule/FR | Status | Resolution |
+|----|----------|----------|---------|---------|--------|------------|
+| — | — | — | No findings this round | — | — | — |
+
+**ADR 0003: good quality.** It covers context (layout drift, no width cap, the style budget), decision drivers, three options with pros and cons, the decision and who made it (the human at Gate 3, constitution §3.2), concrete rules (layout only, 1140px cap, Bootstrap breakpoints, load order) and honest trade-offs (two vocabularies, the spacer scale differs from `--space-*`, precompiled CSS needs overrides). "Related" lists US-00 to US-03 and T022. The skill §5 and the CLAUDE.md line say the same thing as the ADR. The old "max content width 1120px" was replaced consistently with 1140px.
+
+**Dependency: conforms.** `bootstrap` is pinned to `5.3.8` with no caret. Only `bootstrap-grid.min.css` and `bootstrap-utilities.min.css` are loaded, before `src/styles.scss`. There is no Reboot, no component CSS and no JS.
+
+**New layout rule: conforms.**
+- Only container, grid, display, flex, spacing, sizing (`w-100`, `min-vh-100`) and text-align classes are used. A scan of every template found no Bootstrap colour, typography, border, shadow or component classes (`btn`, `card`, `bg-*`, `text-primary`, `fs-*`, `fw-*`, `border*`, `shadow*`, `rounded*`, `alert`).
+- Every screen's content sits in a `.container`: the selection page header and `main`, the wizard header and the wizard `main`. The 1140px cap is a single global override at ≥ 1400px in `styles.scss`, which matches the ADR.
+- The hand-written page layout was removed: `:host` flex, `.country-page` grid, `__hero` and `__content` flex and padding, `__tiles` flex, `.wizard-header__inner` and `__actions`, `.wizard-main`, and the `.step` margin and padding. No removed class is still referenced in templates, unit tests or e2e.
+- What is left in component SCSS is component styling: colours, typography, the fieldset reset, the hero's soft background at md, the illustration size, the tagline `max-width`, and `.step { max-width: 560px }` (the form-card width from the §3 recipe). Bootstrap utilities are `!important`, so they win over the remaining `margin-top: 0` rules in the emulated component styles. They do not conflict.
+
+**BEM components: untouched.** The choice tile (default, hover, selected with the check, `:has(:focus-visible)`, skeleton, reduced motion), the button variants, the header chip, its narrow-screen hidden name and the "Cambiar país" button are identical to round 4.
+
+**Regressions: none.**
+- Heading focus: the `h1` keeps `tabindex="-1"`, and both pages still focus it from `afterNextRender`. The unit tests pass.
+- States: loading (`aria-busy`, "Cargando países…"), error with Reintentar, empty, and the `role="alert"` "not available" message are unchanged. Only layout and spacing classes were added.
+- Tiles still sit side by side at 320px (`flex: 1 1 0`, `min-width: 130px`, wrapping with `gap-3`).
+- Security, the Public role, relative URLs and data are unchanged.
+
+**Notes (no finding):**
+- The `.visually-hidden` rule in `styles.scss` now duplicates Bootstrap's `.visually-hidden` utility, which is equivalent. It is harmless and can be removed later.
+- The selection page wrapper uses `min-vh-100` (100vh) where it used `100dvh` before. On mobile browsers with a collapsing URL bar, the page can be a few pixels taller than the visible area. Because mobile content is top-aligned (`align-content-start`), this only adds a little scroll at the end.
+- The fieldset reset now sets only `margin-top: 0`, `padding` and `border`, so the browser's default 2px inline margins come back next to `w-100`. The 12px column padding absorbs the extra width, so nothing is clipped and nothing scrolls.
+- Spacing moved to Bootstrap's scale. For example, the subtitle gap is now 24px (`mb-4`) instead of 32px, and the wizard header padding is 8px instead of 12px. This is the expected trade-off from the ADR.
+
+### For the human to check by hand
+1. **Scenario 8 (not run):** in the admin, switch Chile's **Active** off, reload `/` (Chile gone) and `/cl/quote` (redirect with the "not available" message). Then unpublish Colombia and confirm the same behaviour. Restore both afterwards.
+2. **Confirm dialog paths (FR-007 / FR-012):** still reachable only once US-01 writes session data. Re-test then: a same-tab link to the other country (confirm and cancel), "Cambiar país" with data, Esc to cancel, and focus returning to the trigger.
+3. **Screen reader pass:** on entering `/` (first load and after "Cambiar país"), the heading should be announced first, then the radio group as legend "País" plus the tile names, with the checked state announced by the radio. The illustration should be skipped (`alt=""`). The hero `<aside>` shows up as a "complementary" landmark. Check that this does not feel noisy. While loading, the region should be busy and read "Cargando países…". Also check the header chip and the `role="alert"` "not available" message.
+4. **Mobile header and tiles without icon (R-01):** create a country with no icon and check at 320px that its name is visible in the header. A country with an icon should show only the flag below 576px. A tile without a flag centers its name, so it will not line up with tiles that have a flag. Decide whether that is acceptable.
+5. **Keyboard focus visuals:** Tab from the focused heading into the radio group and onto Continuar. The tile and the button should show the focus ring, and the heading should not.
+6. **Bootstrap layout (T022):** at 1440px and wider, the brand bar is full width while the wordmark, the hero and the selection block stay inside the 1140px container. The hero's soft background now ends at the container edge instead of filling half the screen. Confirm that this is the look you want. At 768–1000px, check that the two columns look balanced and that the alert and the error panel fit the right column. In the wizard (`/co/quote`), check that the header wordmark and the country chip line up with the step content edges. At 320px, check that the tiles and Continuar are visible without much scrolling.
+
+**Verdict: Approved** (T022 conforms to ADR 0003 and the §5 layout rule. No open findings.)
