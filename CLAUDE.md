@@ -34,6 +34,11 @@ The full agentic flow (steps, gates, agents) is described in `FLOW.md`.
 - **ADRs:** every architectural decision gets an ADR in `docs/adr/` (context, alternatives, consequences), linked from `plan.md`.
 - **Revisions:** when the human rejects or corrects the plan at Gate 2, append an entry to a `## Revisions` section at the end of `plan.md`: date, what the human asked to change, and what changed. Never delete entries.
 
+## Asking the Human
+- Every question to the human (Gate 1 clarify questions, Gate 2 choices, stop conditions) MUST be asked with the interactive question tool (`AskUserQuestion`): one question per call, 2–4 options, the recommended one first with "(Recommended)" in its label, and a self-contained question text (the human may see only the dialog).
+- Never put a question and its options only in prose: in the desktop app, text written before the end-of-turn summary can be collapsed and the human never sees it.
+- After the answer, repeat the question and the chosen answer in plain text so they stay in the session log.
+
 ## Traceability
 - The user story ID `US-XX` appears in: spec folder name, spec header, each task line, ADR "Related" field, test names (`describe('US-XX · FR-XXX …')`), and commit footer `Refs: US-XX`.
 - Requirements in `spec.md` are numbered `FR-XXX`; tasks and tests reference them.
