@@ -9,6 +9,10 @@
 **Governance:**
 - `.specify/memory/constitution.md` — engineering principles and when agents must stop and ask. Written once by the human.
 - `CLAUDE.md` — repository map, commands, stack rules, plan-phase additions, traceability rules. Read by every agent.
+- `.claude/settings.json` — tool permissions that make the rules enforceable, not just written:
+  - **allow:** the commands and paths the autopilot needs (verify, build, e2e, Spec Kit scripts, `git add/commit`), so it never stops between Gate 2 and Gate 3 except on a stop condition;
+  - **ask:** `npm install` (a new dependency, constitution §3.2), `git push`, `reset` and `rebase`;
+  - **deny:** reading `.env` files, and editing `docs/user-stories/`, the constitution and `ai-logs/` — the non-AI zones of the flow.
 
 ## Diagram
 
@@ -97,6 +101,7 @@ _Journal, filled as it happens:_
 - **2026-11-21** — The first design ran the e2e agent on every feature. Changed to conditional: the orchestrator proposes critical candidates at Gate 2 and only approved ones are built, to avoid low-value e2e tests.
 - **2026-11-21** — The first design had no review step and no named subagents. Added `code-reviewer` with a two-round loop and versioned agent definitions.
 - **2026-11-22** — The handoff review already worked as a gate (approve/reject paths) but was not named as one, and only Gate 1 corrections were recorded in an artifact. Renamed it Gate 3 and added a Revisions section to `plan.md` for Gate 2 corrections, so every human correction leaves a trace.
+- **2026-11-22** — Before the first story we noticed that, without a permissions file, every command a subagent runs (npm, git) would stop for human approval, breaking the autopilot. Added `.claude/settings.json` with an allowlist for the flow's commands, and used deny rules to enforce the non-AI zones (user stories, constitution, logs, `.env`) at tool level.
 
 ### At which points did we decide not to use AI and why?
 - **Constitution (0a):** the rules that govern the agents must come from the human, not from the agents.
