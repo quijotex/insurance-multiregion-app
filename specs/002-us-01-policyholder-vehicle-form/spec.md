@@ -16,6 +16,7 @@
 - Q: When does a field show its error message? → A: When the person leaves the field, or when they press "Continuar". Once shown, the error updates as they type and disappears as soon as the value is valid. Untouched fields show no errors.
 - Q: Which fictitious fields does the seed create? → A: The proposed set: 10 fields for Colombia and 9 for Chile, listed in FR-013.
 - Q: When are step 1 values saved to the tab's session? → A: As the person types, including incomplete or invalid values, so a reload or "Volver" never loses input. Restored invalid values follow the FR-005 timing.
+- Q (Gate 3, review R-04): Must the RUT include the hyphen and dots only as thousand separators? → A: No. Any spelling with digits, optional dots and an optional hyphen is accepted; the check digit decides validity.
 - Q: Where is the legal age configured? → A: On the Country (18 for Colombia and Chile), as ADR 0001 says. The birth-date field turns on the named rule `legalAge`, which reads the active country's value.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -115,7 +116,7 @@ The business team adds, removes, reorders or relabels fields, and changes their 
   - **Colombia (10):** policyholder: document type (select: Cédula de ciudadanía, Cédula de extranjería), document number, full name, birth date, email, mobile phone, city (select). Vehicle: placa (format ABC123), make (select), year.
   - **Chile (9):** policyholder: RUT (rule `rut`), full name, birth date, email, mobile phone, region (select). Vehicle: patente (format BBBB12 or AB1234), make (select), year.
 
-- **FR-014**: A field with the named rule `rut` MUST accept a Chilean RUT only when its format is valid (with or without dots, with a hyphen) and its check digit (0–9 or K, either case) matches the modulo-11 calculation; otherwise its configured error message is shown.
+- **FR-014**: A field with the named rule `rut` MUST accept a Chilean RUT only when its format is valid (digits with or without dots, with or without a hyphen) and its check digit (0–9 or K, either case) matches the modulo-11 calculation; otherwise its configured error message is shown.
 
 ### Key Entities
 

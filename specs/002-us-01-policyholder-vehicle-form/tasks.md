@@ -116,6 +116,12 @@
 
 - [x] T019 [ORCH] US-01 Run quickstart scenarios 1–13 on `docker compose up --build` (fresh volume) and record the results in the handoff summary (FR-001–FR-014, SC-001–SC-005)
 
+## Phase 8: Gate 3 corrections (2026-11-22)
+
+- [x] T020 [FE] US-01 R-09: neutral copy valid in both countries: "Cuéntanos de ti y de tu vehículo" and the section "Tu vehículo" (the human chose neutral copy at Gate 3) — `frontend/src/app/features/quote-form/step1-form.page.*`, `frontend/e2e/us-01-*.spec.ts`
+- [x] T021 [ORCH] US-01 R-04: record in spec.md › Clarifications that the RUT is accepted with or without a hyphen and dots, and validated by its check digit (the human kept the lenient format at Gate 3); FR-014 wording aligned — `specs/002-us-01-policyholder-vehicle-form/spec.md`
+- R-10 (fields half width from 768 px): accepted as is by the human at Gate 3, no task.
+
 ## Waves
 
 | Wave | Tasks | Agents |
