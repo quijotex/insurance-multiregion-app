@@ -13,14 +13,14 @@ import { BY_COUNTRY, countriesNeedingLegalAge } from './form-fields';
 
 // One valid and one invalid example per seed pattern (trimmed at Gate 3 at the human's request).
 const table: Array<[string, string, string, string]> = [
-  ['cédula', CO_DOCUMENT_NUMBER_PATTERN, '1020304050', '1.020.304'],
+  ['cédula', CO_DOCUMENT_NUMBER_PATTERN, '1020304050', '12345'],
   ['placa', CO_PLATE_PATTERN, 'ABC123', 'AB-123'],
-  ['patente', CL_PLATE_PATTERN, 'BCDF12', 'BCD123'],
+  ['patente', CL_PLATE_PATTERN, 'AB1234', 'BCD123'], // E2E-2 covers the BCDF12 form
   ['celular CO', CO_MOBILE_PATTERN, '3001234567', '2001234567'],
   ['celular CL', CL_MOBILE_PATTERN, '912345678', '81234567'],
   ['email', EMAIL_PATTERN, 'ana@correo.test', 'ana correo.test'],
   ['nombre', FULL_NAME_PATTERN, 'Ana María Pérez', 'Ana2'],
-  ['RUT permisivo', CL_RUT_PATTERN, '12.345.678-5', 'abc'],
+  ['RUT permisivo', CL_RUT_PATTERN, '12345678-k', 'abc'], // lenient form (Gate 3, R-04); E2E-2 covers 12.345.678-x
 ];
 
 describe('US-01 · FR-013 seed patterns', () => {
