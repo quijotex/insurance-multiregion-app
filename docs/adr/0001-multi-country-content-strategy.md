@@ -1,6 +1,6 @@
 # 0001 — Multi-country content strategy (Strapi + Angular)
 
-- **Status:** Proposed
+- **Status:** Accepted (Gate 2, US-00 — 2026-11-22)
 - **Date:** 2026-11-21
 - **Related:** US-00, US-01, US-02, US-03
 
@@ -27,7 +27,7 @@ So we need to decide two things:
 
 Let's take a **Country as collection** approach, and **FormField** and **Plan** as collections too, with a many-to-one relation towards Country. All three use native draft/published.
 
-- **Country** saves `code`, `name`, `currency`, `numberLocale` (e.g. `es-CO`), `legalAge` and `termsAndConditions`.
+- **Country** saves `code`, `name`, `icon` (media), `order`, `active`, `currency`, `numberLocale` (e.g. `es-CO`), `legalAge` and `termsAndConditions`. Each story adds the fields it uses (US-00: `code`, `name`, `icon`, `order`, `active`).
 - **FormField** saves `key`, `label`, `type`, `required`, `helpText`, `errorMessage`, `order` and `step`/`section`, plus two components:
   - `validations`: `min`, `max`, `pattern`, and `validators` with name and value.
   - `options`: for selects.
@@ -39,7 +39,8 @@ Let's take a **Country as collection** approach, and **FormField** and **Plan** 
 The queries would be:
 
 ```
-GET /api/countries?fields[0]=code&fields[1]=name&sort=name:asc
+GET /api/countries?fields[0]=name&fields[1]=code&sort=order:asc
+    &populate[icon][fields][0]=url&populate[icon][fields][1]=alternativeText
 
 GET /api/form-fields?filters[country][code][$eq]=CO&sort=order:asc
     &populate[validations][populate][validators]=true&populate[options]=true
@@ -50,13 +51,17 @@ GET /api/plans?filters[country][code][$eq]=CO&filters[active][$eq]=true&sort=ord
 
 Strapi's REST API returns only published documents by default, so "only published" needs no extra filter. Components aren't returned unless populated, so `populate` is explicit (never `populate=*`).
 
+A country is **available** when it is published **and** `active`. The `active` filter is enforced by the Country `find` controller, not sent by the browser, so no client can list inactive countries by omitting it.
+
+Icons are Strapi media served under `/uploads/`, which is proxied like `/api/` (nginx in Docker, the dev-server proxy locally), so the browser still talks only to its own origin.
+
 ### Public role permissions
 
 The browser only reads, so the Public role gets exactly:
 
 | Content type | Action | Why |
 |--------------|--------|-----|
-| Country | `find` | Validate the URL prefix, get currency, locale, legal age and terms. |
+| Country | `find` | List the selection screen, validate the URL prefix, get currency, locale, legal age and terms. |
 | FormField | `find` | Build the step 1 form. |
 | Plan | `find` | Show the step 2 plans. |
 
@@ -67,7 +72,7 @@ Nothing else: no `findOne` (the filtered list is enough), no `create`/`update`/`
 - **Scalable, supports future countries:** create the Country and its fields and plans, without touching code or schema.
 - **Independent publish cycles:** each plan and each field has its own publish cycle.
 - **No hardcoded data:** currency, format and terms and conditions have a place in Strapi.
-- **Country on/off switch:** because Country uses draft/publish, unpublishing a country takes it out of `GET /api/countries`, so the app stops serving it. Changes to the terms and conditions also go through draft and publish instead of going live on save.
+- **Country on/off switch:** a country is offered only when it is published and `active`. Editors can switch it off with `active` without unpublishing its content, or unpublish it. Changes to the terms and conditions also go through draft and publish instead of going live on save.
 
 ### Consequences and tradeoffs
 
@@ -92,19 +97,20 @@ What we found: Strapi only sends data, so every validation rule ends up as code 
 How does Angular know which country to render? Let's take the **path prefix** approach for its simplicity, e.g. `/co/quote` and `/cl/quote`. The path must always have the prefix.
 
 - The prefix is the country `code` in lower case (`/co` ↔ `CO`).
-- `/` is the **country selection screen** (US-00): it lists the countries returned by `GET /api/countries`, with the last country the user was visiting (saved in `sessionStorage`) preselected, if it is still active and available. No country code is hardcoded.
-- Any unknown or unpublished prefix (e.g. `/pe/quote`) **redirects** to `/`.
+- `/` is the **country selection screen** (US-00): it lists the countries returned by `GET /api/countries` in their configured order, with the last country the user was visiting (saved in `sessionStorage`) preselected, if it is still active and available. No country code is hardcoded.
+- Any unknown, inactive or unpublished prefix (e.g. `/pe/quote`) **redirects** to `/` with a message explaining that the country is not available.
+- **Session per tab:** one `sessionStorage` key per tab holds the active country and its wizard data, so a tab works with one country at a time. Changing the country from the wizard, or opening another country's link in the same tab, asks for confirmation before discarding the data. A link opened in a new tab starts its own session and leaves the other tab untouched.
 
 ### Advantages
 
 - **Scalability:** a resolver or guard checks the code against `GET /api/countries`, not against an enum in code.
-- **Separation of domains:** a `CountryContext` with a signal can feed each country separately, loading fields, plans, currency and the unique persistent key per country in `sessionStorage`.
+- **Separation of domains:** a `CountryContext` with a signal can feed each country separately, loading fields, plans and currency, while the tab's `sessionStorage` session keeps the data of the active country.
 - **Easy e2e per country:** just open each prefix.
 - **Close to a production-ready solution:** in production, subdomains could be better and preferable, and they could be implemented without changing the current approach much.
 
 ### Tradeoff
 
-- Changing the country in the middle of the wizard restarts it.
+- Changing the country in the middle of the wizard restarts it, after the person confirms that their data will be discarded.
 - A mistyped country in the URL sends the user to the selection screen instead of showing an error. Acceptable because the user picks the country again in one click.
 
 ## Considered options (not taken)
