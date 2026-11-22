@@ -58,3 +58,29 @@ No new Blocker or Major findings. The fixes are small and scoped, and none of th
 (The `?status=draft` check from round 1 has been dropped because the orchestrator verified it at runtime for R-02.)
 
 **Verdict: Approved** (all Blocker and Major findings resolved; R-05, R-06, R-08 and R-09 remain Open as Minor follow-ups, R-09 recommended as a Gate 3 task).
+
+## Round 3 — 2026-11-22 (Gate 3 corrections)
+
+Commits reviewed: `c0fcee7` (tasks T015–T020 and the updated choice-tile recipe), `44679b4` (R-05), `75ff6a1` (R-06, R-08, R-09, T019, T020). Verification: `npm --prefix frontend run verify` passed (lint, typecheck, 45 tests in 6 files). The CMS was not touched in this round. The orchestrator's browser check on docker (1440×900 and 320px) is consistent with the code.
+
+| ID | Severity | Location | Finding | Rule/FR | Status | Resolution |
+|----|----------|----------|---------|---------|--------|------------|
+| R-05 | Minor | quote-wizard.shell.scss:3, 59-74; styles.scss:10 | Raw colours in the wizard header. | ui-ux-guidelines §1 | Resolved (44679b4) | Every white in the header now uses `var(--color-surface)`. The hover overlay uses a new `--color-on-brand-overlay` token, defined once in `styles.scss`. No raw colour values are left in the component. |
+| R-06 | Minor | country-selection.page.html:16-21; country-selection.page.scss:152-174 | Loading state was text instead of a skeleton. | ui-ux-guidelines §3 States › Loading | Resolved (75ff6a1) | Two `choice-tile--skeleton` placeholders (`aria-hidden`) sit inside an `aria-busy="true"` region with a visually hidden "Cargando países…". They have the same size as the real tiles, so nothing jumps when the countries load. The pulse animation is turned off under `prefers-reduced-motion`. |
+| R-08 | Minor | country-selection.page.spec.ts:43-56; quote-wizard.shell.spec.ts:20-23 | Tests found controls by CSS class. | angular-conventions › Testing | Resolved (75ff6a1) | The tests now find buttons by their text ("Continuar", "Cambiar país") and radios by their label text. The remaining class lookups are acceptable: `choice-tile--selected` and the R-01 modifier are the behaviour being tested, and the index-based `radio()` helper is used only to check that nothing is checked. |
+| R-09 | Minor | country-selection.page.ts:45-47; country-selection.page.html:6 | Focus stayed on `body` after "Cambiar país". | angular-conventions › Accessibility, SC-004 | Resolved (75ff6a1) | The `h1` has `tabindex="-1"` and gets focus in `afterNextRender` every time `/` is entered. A unit test checks that the heading is `document.activeElement`. The focus ring is removed only from this heading (not interactive, reachable only by script), and the same is done for the step 1 heading. Every interactive control keeps its `:focus-visible` ring. |
+
+**T019 (centered desktop layout): conforms.** On the page, `:host` is a column flex container with `min-height: 100dvh`. Below the header, `.country-page` gets `flex: 1` and, at ≥ 768px only, `justify-content: center`, so the title, subtitle, tiles and Continuar are centered both ways below the brand bar. Mobile keeps the top-aligned flow. Tile content is centered (`align-items` and `justify-content: center`), and every tile has the same `min-height: 120px`. The recipe asks for at least 96px, so 120px is allowed.
+
+**T020 (check icon, no "Seleccionado"): conforms to the updated recipe.** A selected tile has a 2px `--color-action` border, a `--color-surface-highlight` background and a 20px check icon. The icon is absolutely positioned at the top right (the tile is `position: relative`) and is `aria-hidden`. There is no extra text, so selecting causes no layout shift. The native radio inside the `<label>` still announces the checked state, and a unit test asserts that the "Seleccionado" text is absent. The selected state is shown by the border, the background and the icon together, not by colour alone. The hover rule changes only the border, as the recipe asks.
+
+No new Blocker or Major findings. No extra scope was built. The security posture (Public role, no token, relative URLs) is unchanged.
+
+### For the human to check by hand
+1. **Scenario 8 (not run):** in the admin, switch Chile's **Active** off, reload `/` (Chile gone) and `/cl/quote` (redirect with the "not available" message). Then unpublish Colombia and confirm the same behaviour. Restore both afterwards.
+2. **Confirm dialog paths (FR-007 / FR-012):** still reachable only once US-01 writes session data. Re-test then: a same-tab link to the other country (confirm and cancel), "Cambiar país" with data, Esc to cancel, and focus returning to the trigger.
+3. **Screen reader pass:** on entering `/` (first load and after "Cambiar país"), the heading should be announced, then the radio group as legend "País" plus the tile names, with the checked state announced by the radio (no "Seleccionado" text now). While loading, the region should be busy and read "Cargando países…". Also check the header chip (name only) and the `role="alert"` "not available" message.
+4. **Mobile header without icon (R-01):** create a country with no icon and check at 320px that its name is visible. A country with an icon should show only the flag below 576px. In the same test, check the selection tiles: a tile without a flag centers its name, so it will not line up with the names in tiles that have a flag. Decide whether that is acceptable.
+5. **Keyboard focus visuals:** Tab from the focused heading into the radio group and onto Continuar. The tile and the button should show the focus ring, and the heading should not.
+
+**Verdict: Approved** (R-01–R-09 all Resolved, no open findings).
