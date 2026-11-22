@@ -111,10 +111,10 @@ describe('US-01 · FR-005/FR-006 step 1 form page', () => {
   it('renders the CMS fields in sections and shows no errors initially', async () => {
     await setup();
     expect(load).toHaveBeenCalledWith('co');
-    expect(el.querySelector('h1')?.textContent).toContain('Cuéntanos de ti y de tu carro');
+    expect(el.querySelector('h1')?.textContent).toContain('Cuéntanos de ti y de tu vehículo');
     expect(Array.from(el.querySelectorAll('h2')).map((h) => h.textContent?.trim())).toEqual([
       'Tus datos',
-      'Tu carro',
+      'Tu vehículo',
     ]);
     expect(control('Nombre completo')).toBeTruthy();
     expect(el.querySelector('[role="combobox"]')).not.toBeNull();

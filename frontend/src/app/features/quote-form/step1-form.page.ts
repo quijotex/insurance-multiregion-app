@@ -32,7 +32,7 @@ interface SectionView {
 
 const SECTION_TITLES: Record<SectionView['id'], string> = {
   policyholder: 'Tus datos',
-  vehicle: 'Tu carro',
+  vehicle: 'Tu vehículo',
 };
 
 @Component({
