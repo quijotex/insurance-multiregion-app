@@ -4,9 +4,19 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Approved (Gate 1) — 2026-11-22
 
 **Input**: User story [US-01](../../docs/user-stories/US-01.md) (verbatim business story, the source of truth). Builds on [US-00](../001-us-00-country-selection/spec.md), which provides the country selection and the wizard shell with a step 1 placeholder. Architecture: [ADR 0001](../../docs/adr/0001-multi-country-content-strategy.md) (content per country, validations, limits of configurability) and [ADR 0003](../../docs/adr/0003-bootstrap-grid-for-layouts.md) (layout).
+
+## Clarifications
+
+### Session 2026-11-22
+
+- Q: Should the Chilean RUT be checked with its modulo-11 check digit or only by format? → A: Format and check digit. The check is a named rule (`rut`) that the application implements and that is turned on per field; seeded RUT examples are valid.
+- Q: When does a field show its error message? → A: When the person leaves the field, or when they press "Continuar". Once shown, the error updates as they type and disappears as soon as the value is valid. Untouched fields show no errors.
+- Q: Which fictitious fields does the seed create? → A: The proposed set: 10 fields for Colombia and 9 for Chile, listed in FR-013.
+- Q: When are step 1 values saved to the tab's session? → A: As the person types, including incomplete or invalid values, so a reload or "Volver" never loses input. Restored invalid values follow the FR-005 timing.
+- Q: Where is the legal age configured? → A: On the Country (18 for Colombia and Chile), as ADR 0001 says. The birth-date field turns on the named rule `legalAge`, which reads the active country's value.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -81,7 +91,7 @@ The business team adds, removes, reorders or relabels fields, and changes their 
 - **Unknown rule name**: a field references a rule the application does not implement. The field still works, that rule is skipped, and the problem is reported for developers. The person is not blocked.
 - **Field saved without a country**: the content manager rejects it, so a field can never be silently lost (ADR 0001 mitigation).
 - **Select without options**: shown as unavailable with its help text; if required, the person cannot continue and sees its error message.
-- **Saved data for a field that no longer exists** (after a configuration change): it is ignored. Saved data that no longer meets a changed rule is shown with its error.
+- **Saved data for a field that no longer exists** (after a configuration change): it is ignored. Saved data that no longer meets a changed rule is restored as is, and shows its error per FR-005.
 - **Two fields with the same technical key in one country**: the content manager rejects the second one.
 - **Dates**: legal age and vehicle year are computed against the current date in the person's time zone.
 
@@ -93,15 +103,19 @@ The business team adds, removes, reorders or relabels fields, and changes their 
 - **FR-002**: Step 1 MUST show only the published fields of the active country, grouped by section (policyholder first, then vehicle) and sorted by their configured order.
 - **FR-003**: Select fields MUST list the options configured for them, in their configured order.
 - **FR-004**: Each field MUST show its label (always visible), its help text when configured, and a required marker when it is required.
-- **FR-005**: A field that does not meet its validation (required, minimum and maximum, pattern, or a named rule) MUST show its configured error message next to it, after the person leaves the field or tries to continue.
+- **FR-005**: A field that does not meet its validation (required, minimum and maximum, pattern, or a named rule) MUST show its configured error message next to it, first when the person leaves the field or presses "Continuar". After that, the message updates as they type and disappears once the value is valid. A field the person has not touched shows no error.
 - **FR-006**: "Continuar" MUST NOT move to step 2 while any field is invalid. Pressing it MUST show every error and move focus to the first invalid field.
-- **FR-007**: The policyholder MUST be of legal age for the active country, using the legal age configured for that country.
+- **FR-007**: The policyholder MUST be of legal age for the active country. The age is configured once on the country (seed: 18 for both), and the birth-date field enables the named rule `legalAge`, which reads it.
 - **FR-008**: The vehicle year MUST be no later than next year and no earlier than 20 years before the current year, with the limits set in the field's configuration.
-- **FR-009**: Valid step 1 data MUST be kept in the tab's session, so going back from step 2 or reloading shows it again, and the US-00 confirmations before discarding data apply.
+- **FR-009**: Every step 1 value MUST be saved in the tab's session as the person types, valid or not, so going back from step 2 or reloading shows it again. Restored values show errors only per FR-005. The US-00 confirmations before discarding data apply.
 - **FR-010**: Step 1 MUST show loading, empty and error states with a retry action (see Edge Cases).
 - **FR-011**: The form MUST be fully keyboard-operable, and errors MUST be announced to assistive technology and linked to their field.
 - **FR-012**: Step 2 MUST exist as a placeholder with a "Volver" action back to step 1, until US-02 replaces it with the plans.
-- **FR-013**: The seed MUST provide fictitious fields for Colombia (document type: cédula de ciudadanía or de extranjería; document number; plate, called placa) and for Chile (RUT; plate, called patente), plus name, birth date, email, phone, city or region, vehicle make and vehicle year for both.
+- **FR-013**: The seed MUST provide these fictitious fields, all required:
+  - **Colombia (10):** policyholder: document type (select: Cédula de ciudadanía, Cédula de extranjería), document number, full name, birth date, email, mobile phone, city (select). Vehicle: placa (format ABC123), make (select), year.
+  - **Chile (9):** policyholder: RUT (rule `rut`), full name, birth date, email, mobile phone, region (select). Vehicle: patente (format BBBB12 or AB1234), make (select), year.
+
+- **FR-014**: A field with the named rule `rut` MUST accept a Chilean RUT only when its format is valid (with or without dots, with a hyphen) and its check digit (0–9 or K, either case) matches the modulo-11 calculation; otherwise its configured error message is shown.
 
 ### Key Entities
 
@@ -124,11 +138,11 @@ The business team adds, removes, reorders or relabels fields, and changes their 
 - Copy is in Spanish. Field texts come from the content manager; the state messages (loading, empty, error) and the button texts are fixed application texts.
 - The plans step (US-02) does not exist yet, so step 2 is a placeholder (FR-012). The full-flow end-to-end test belongs to US-03.
 - Rules that cannot be expressed with fixed min, max or pattern values (legal age, vehicle year relative to today, and any document check digit) are named rules that the application implements. Their values (for example 20 years) are configured; new kinds of rule need a developer (ADR 0001, "Limits of configurability").
-- Plate and document formats are validated with configurable patterns. Whether the Chilean RUT check digit is validated is to be confirmed at clarify.
+- Plate and document formats are validated with configurable patterns. The Chilean RUT is also checked with its modulo-11 check digit, through the named rule `rut` (FR-014).
 - The data is fictitious, kept only in the tab's session, and never sent to a server in this story.
 
 ## Conflicts with ADR 0001 *(to resolve at Gate 2)*
 
-- **Legal age source:** ADR 0001 stores `legalAge` on Country; the story calls it a business rule. Both are kept: the age value lives on the country, and the field's rule references it.
+- **Legal age source:** resolved at clarify. The value lives on Country, as in ADR 0001, and the field's `legalAge` rule reads it (FR-007).
 - **Section:** ADR 0001 lists `step`/`section` on FormField; this story needs only a section (policyholder or vehicle) within step 1.
 - **Saving without a country:** ADR 0001 *recommends* rejecting it on save; this spec makes it a requirement (Edge Cases).
