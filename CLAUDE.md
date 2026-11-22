@@ -17,6 +17,7 @@ The full agentic flow (steps, gates, agents) is described in `FLOW.md`.
 - **Frontend build:** `npm --prefix frontend run build`
 - **Frontend e2e (Playwright):** `npm --prefix frontend run e2e`
 - **CMS build / typecheck:** `npm --prefix cms run build`
+- **CMS unit tests:** `npm --prefix cms test`
 - **CMS dev server:** `npm --prefix cms run develop`
 - **Full stack:** `docker compose up --build`
 

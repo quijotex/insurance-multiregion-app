@@ -18,7 +18,7 @@ Read `.specify/memory/constitution.md`, `CLAUDE.md` and the current feature fold
    - Spawn subagents in parallel for `[P]` task groups: `cms-developer` for `[CMS]`, `frontend-developer` for `[FE]`.
    - Execute tasks with dependencies sequentially.
    - When `cms-developer` reports a contract change, make sure the matching Angular models are updated in the same wave.
-4. At the end of each wave, run `npm --prefix frontend run verify` and `npm --prefix cms run build`. If anything fails, fix it before moving forward (max 3 attempts, then stop and ask — constitution §3.4).
+4. At the end of each wave, run `npm --prefix frontend run verify`, `npm --prefix cms run build` and `npm --prefix cms test`. If anything fails, fix it before moving forward (max 3 attempts, then stop and ask — constitution §3.4).
 5. Commit each verified wave as atomic Conventional Commits with the footer `Refs: US-XX`. Subagents never commit.
 6. **E2E (conditional):** only if `plan.md` has E2E candidates marked **Approved**, spawn `e2e-tester` with them. Treat reported defects as new fix tasks for the developer agents, then rerun.
 7. **Review:** spawn `code-reviewer` with the feature folder and the commit range. For each `Open` Blocker/Major finding, delegate the fix to the owning developer agent, verify, commit (`fix(...)`, `Refs: US-XX, R-NN`), then run review round 2. After round 2, anything still `Open` goes to the human.
