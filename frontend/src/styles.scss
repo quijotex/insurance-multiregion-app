@@ -142,3 +142,11 @@ body {
     cursor: not-allowed;
   }
 }
+
+/* Step 1 reveal: an item holding an open select list sits above its later
+   siblings, even while the reveal animation still runs. Global because the
+   open class lives inside the select-field component (view encapsulation). */
+.reveal:has(.select-field--open) {
+  position: relative;
+  z-index: 30;
+}
