@@ -77,6 +77,13 @@ body {
   }
 }
 
+/* Page width: Bootstrap's .container capped at 1140px on wide screens (ADR 0003). */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
 /* Shared utility: hidden visually, still read by screen readers. */
 .visually-hidden {
   position: absolute;

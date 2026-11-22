@@ -11,7 +11,7 @@ import { WizardCountry } from './wizard-country.service';
   selector: 'app-step1-placeholder',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="step">
+    <section class="step mx-auto py-4">
       <p class="step__counter">Paso 1 de 3</p>
       <h1 class="step__heading" tabindex="-1">Tus datos y los de tu carro</h1>
       @if (wizardCountry.country(); as country) {
@@ -23,8 +23,6 @@ import { WizardCountry } from './wizard-country.service';
   styles: `
     .step {
       max-width: 560px;
-      margin: 0 auto;
-      padding: var(--space-6) var(--space-4);
     }
     .step__counter {
       margin: 0 0 var(--space-2);

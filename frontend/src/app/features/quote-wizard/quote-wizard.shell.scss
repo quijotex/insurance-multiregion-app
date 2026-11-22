@@ -2,16 +2,6 @@
   background: var(--color-brand);
   color: var(--color-surface);
 
-  &__inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3);
-    max-width: 1120px;
-    margin: 0 auto;
-    padding: var(--space-3) var(--space-4);
-  }
-
   &__wordmark {
     font-size: 24px;
     font-weight: 700;
@@ -19,12 +9,6 @@
 
   &__plus {
     color: var(--color-cta);
-  }
-
-  &__actions {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
   }
 
   &__country {
