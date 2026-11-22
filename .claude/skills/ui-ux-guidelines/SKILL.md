@@ -30,7 +30,7 @@ Defined once as CSS custom properties in `frontend/src/styles.scss`. Components 
   --color-surface-highlight: #dfeaff; /* recommended plan, badges */
   --color-border: #cdced9;
   --color-disabled-bg: #e7e7e7;
-  --color-disabled-text: #878789;
+  --color-disabled-text: #666666;   /* 4.6:1 on disabled-bg (Sura's #878789 was 2.9:1) */
 
   /* Status (fg / bg) */
   --color-error: #d12d35;   --color-error-bg: #fff4f3;
@@ -84,7 +84,13 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 - `--cta`: yellow bg, navy text. One per screen: the step's main action (Continue, Pay).
 - `--primary`: action-blue bg, white text, hover `--color-action-hover`.
 - `--secondary`: white bg, 1px navy border (Back, Edit).
-- Disabled: `--color-disabled-bg` / `--color-disabled-text`, plus `aria-disabled` or `disabled`. Loading: keep width, show spinner + "Procesando…", `aria-busy="true"`.
+- Disabled: `--color-disabled-bg` / `--color-disabled-text` (≥ 4.5:1), plus `aria-disabled` or `disabled`. Loading: keep width, show spinner + "Procesando…", `aria-busy="true"`.
+
+**Choice tile** — `.choice-tile`, `--selected`: large single-choice option (e.g. country). Native radio inside a `<label>`.
+- Default: `--color-surface`, 2px `--color-border`, `--radius-md`, min-height 96px, flag above name, name 20px/700 `--color-text` (black, never brand or white).
+- Hover: border `--color-action` + bg `--color-surface-alt`. Never a dark fill.
+- Selected: 2px `--color-action` ring + bg `--color-surface-highlight` + check icon + "Seleccionado" text (not color alone).
+- Focus: `--focus-ring`. All text states ≥ 4.5:1.
 
 **Form field** — `.form-field`, `__label`, `__control`, `__help`, `__error`, `--invalid`
 - Label above the control, 14px/500; required marked with `*` and announced (`required` attribute).
