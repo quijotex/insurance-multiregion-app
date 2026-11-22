@@ -1,0 +1,21 @@
+<header class="wizard-header">
+  <div class="wizard-header__inner">
+    <span class="wizard-header__wordmark">Asegura<span class="wizard-header__plus">+</span></span>
+    <div class="wizard-header__actions">
+      @if (wizardCountry.country(); as country) {
+        <span class="wizard-header__country">
+          @if (country.iconUrl) {
+            <img class="wizard-header__flag" [src]="country.iconUrl" [alt]="country.iconAlt" />
+          }
+          <span class="wizard-header__country-name">{{ country.name }}</span>
+        </span>
+      }
+      <button type="button" class="wizard-header__change" (click)="changeCountry()">
+        Cambiar país
+      </button>
+    </div>
+  </div>
+</header>
+<main class="wizard-main">
+  <router-outlet />
+</main>
