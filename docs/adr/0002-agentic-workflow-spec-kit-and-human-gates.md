@@ -1,6 +1,6 @@
 # 0002 — Agentic workflow: Spec Kit and 3 human gates
 
-- **Status:** Accepted
+- **Status:** Accepted (amended 2026-11-22: automatic analyze check after tasks)
 - **Date:** 2026-11-22
 - **Related:** `FLOW.md`, `.specify/memory/constitution.md`, `CLAUDE.md`, all user stories
 
@@ -29,7 +29,9 @@ So we need to decide:
 - **Gate 2 — Plan** (plan, ADRs, design option, E2E candidates).
 - **Gate 3 — Handoff review** (before QA).
 
-Between Gate 2 and Gate 3 the agents run on autopilot (tasks → implementation → verify → conditional E2E → review → commit), bounded by the stop conditions of the constitution.
+Between Gate 2 and Gate 3 the agents run on autopilot (tasks → analyze → implementation → verify → conditional E2E → review → commit), bounded by the stop conditions of the constitution.
+
+**Amendment — automatic analyze after tasks:** right after `tasks.md` is generated, Spec Kit's `analyze` checks consistency between `spec.md`, `plan.md` and `tasks.md`: each Functional Requirement has tasks, and no task exists without a requirement. It is an automatic check, not a gate: gaps in `tasks.md` are fixed and analyze reruns; only a finding that needs a change to the approved spec or plan stops for the human. Without it, the only checks between tasks and review tested the code, not its coverage of the spec, so a missing requirement would only show up in review, after implementation.
 
 ### Why this one?
 
@@ -63,4 +65,4 @@ Between Gate 2 and Gate 3 the agents run on autopilot (tasks → implementation 
 - **Heavy for small stories:** for a small user story the full flow can be heavy and expensive.
 - **The human can become the bottleneck:** no story goes ahead without passing Gates 1 and 2.
 - **Built for one developer:** this setup was designed for a solo developer working with an agent, not for a team.
-- **No human in the loop from step 4 to step 9:** quality there depends on the reviewer agent and the automatic checks.
+- **No human in the loop from step 4 to step 9:** quality there depends on the automatic checks (analyze, verify, conditional E2E) and the reviewer agent.

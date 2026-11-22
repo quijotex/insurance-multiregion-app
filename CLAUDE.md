@@ -8,7 +8,7 @@ The full agentic flow (steps, gates, agents) is described in `FLOW.md`.
 - `frontend/`: Angular 22 app (TypeScript, ESLint), Vitest unit tests next to the code, Playwright e2e in `frontend/e2e/`.
 - `docs/user-stories/`: Functional user stories pasted verbatim by the human (`US-XX.md`). Never edited by AI.
 - `docs/adr/`: Architecture Decision Records (MADR), `NNNN-<slug>.md`.
-- `specs/NNN-us-XX-<slug>/`: `spec.md`, `plan.md`, `tasks.md`, `review.md` per user story (Spec Kit).
+- `specs/NNN-us-XX-<slug>/`: `spec.md`, `plan.md`, `tasks.md`, `analysis.md`, `review.md` per user story (Spec Kit).
 - `.claude/agents/`: subagent definitions. `.claude/skills/`: skills.
 - `ai-logs/`: exported agent sessions. Never edit.
 
