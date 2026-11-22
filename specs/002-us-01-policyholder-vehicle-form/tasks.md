@@ -124,6 +124,9 @@
 - [x] T022 [FE] US-01 FR-003 (Gate 3, human manual test): an open select list must sit above every later field and the "Continuar" button. The reveal animation's `both` fill kept a stacking context on each item; use `backwards` fill and lift the item that holds an open list — `frontend/src/app/features/quote-form/step1-form.page.scss`
 - [x] T023 [CMS] US-01 FR-013 (Gate 3): seed all 16 Chilean regions, north to south, in the CL `region` field; update the local database's existing field through the Document Service (the seed only runs on an empty table); data-model.md row 7 aligned. The vehicle makes stay at 6 (human decision) — `cms/src/seed/form-fields.ts`, `specs/002-us-01-policyholder-vehicle-form/data-model.md`
 - [x] T024 [FE] US-01 (Gate 3): SVG favicon with the Asegura+ brand (yellow "+" on brand blue), `favicon.ico` kept as fallback — `frontend/public/favicon.svg`, `frontend/src/index.html`
+- [x] T025 [CMS] US-01 FR-015 (Gate 3, human manual test): `FormValidations.allowedCharacters` (enumeration `digits`, `alphanumeric`, `rut`) and `FormValidations.maxLength` (integer, min 1) per data-model.md § Components; seed values per FR-015; update the local database's existing fields; regenerate types — `cms/src/components/form/validations.json`, `cms/src/seed/form-fields.ts`, `specs/002-us-01-policyholder-vehicle-form/contracts/form-fields-api.md`
+- [x] T026 [FE] US-01 FR-015: map the two settings (unknown set → ignored); pure `sanitizeInput` with unit tests (letters dropped, length capped, paste, caret); text input applies it and gets `inputmode="numeric"` for digits — `frontend/src/app/features/quote-form/{data,validation,components/form-field}/`
+- [x] T027 [FE] US-01 FR-011 (Gate 3, human manual test): the open select list scrolls the active option into view on arrow keys, Home and End, and on opening — `frontend/src/app/shared/ui/select-field/`
 
 ## Waves
 

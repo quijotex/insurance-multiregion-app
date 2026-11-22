@@ -17,6 +17,7 @@
 - Q: Which fictitious fields does the seed create? → A: The proposed set: 10 fields for Colombia and 9 for Chile, listed in FR-013.
 - Q: When are step 1 values saved to the tab's session? → A: As the person types, including incomplete or invalid values, so a reload or "Volver" never loses input. Restored invalid values follow the FR-005 timing.
 - Q (Gate 3, review R-04): Must the RUT include the hyphen and dots only as thousand separators? → A: No. Any spelling with digits, optional dots and an optional hyphen is accepted; the check digit decides validity.
+- Q (Gate 3, human manual test): Should a field stop characters it can never accept, instead of only showing an error? → A: Yes. A field can be configured with its allowed characters (digits; letters and digits; RUT characters) and a maximum length; other characters and extra length are dropped as the person types or pastes (FR-015).
 - Q: Where is the legal age configured? → A: On the Country (18 for Colombia and Chile), as ADR 0001 says. The birth-date field turns on the named rule `legalAge`, which reads the active country's value.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -118,9 +119,11 @@ The business team adds, removes, reorders or relabels fields, and changes their 
 
 - **FR-014**: A field with the named rule `rut` MUST accept a Chilean RUT only when its format is valid (digits with or without dots, with or without a hyphen) and its check digit (0–9 or K, either case) matches the modulo-11 calculation; otherwise its configured error message is shown.
 
+- **FR-015**: A text or number field MAY be configured with allowed characters (digits; letters and digits; or RUT characters: digits, dots, hyphen and K) and a maximum length. The field MUST drop any other character and any character beyond the maximum length as the person types or pastes. Seed: CO document number 10 digits, mobile phone 10 (CO) / 9 (CL) digits, plate 6 letters and digits, vehicle year 4 digits, RUT 12 RUT characters.
+
 ### Key Entities
 
-- **Form field**: one question of step 1 for one country. Attributes: technical key (unique per country), label, type, required, validations (min, max, pattern, named rules with a value), help text, error message, order, section, options (for selects), country, publication status.
+- **Form field**: one question of step 1 for one country. Attributes: technical key (unique per country), label, type, required, validations (min, max, pattern, named rules with a value, allowed characters, maximum length), help text, error message, order, section, options (for selects), country, publication status.
 - **Country** (from US-00): gains its **legal age** in this story.
 - **Quote session** (from US-00): now holds the step 1 values by field key.
 

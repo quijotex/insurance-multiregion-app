@@ -30,6 +30,7 @@ Option 1.
   - named, from a registry keyed by name: `rut`, `legalAge`, `maxYearsAgo`, `maxYearsAhead`.
   - An unknown name is skipped, with `console.warn`.
 - **Error display:** a field shows its single configured `errorMessage` when it is `invalid && (touched || submitted)`. Once shown, the message follows the value live (spec FR-005).
+- **Input limits (Gate 3 amendment, US-01 FR-015):** `validations.allowedCharacters` (`digits`, `alphanumeric`, `rut`) and `validations.maxLength` let editors stop impossible input, not only flag it. The text input drops other characters and extra length on every input event, paste included, and keeps the caret in place. The character sets are an enumeration, not a free regular expression, so editors pick from a list and cannot break typing with a wrong expression; a new set needs a developer, like a new named rule. An unknown value is ignored.
 - **Persistence:** every change is saved to the quote session (`data.step1`), and the values are restored when the form is rebuilt; keys that no longer exist are ignored. A valid "Continuar" sets `step1Completed`, which a guard on step 2 requires.
 
 ## Consequences
