@@ -48,6 +48,7 @@ From the human's manual test and the request to fix every open review finding.
 - [x] T018 [FE] US-00 R-09: after "Cambiar país" (and on every entry to `/`), focus moves to the selection heading (`tabindex="-1"`, `afterNextRender`), without a visible ring for programmatic focus; unit test (FR-009, SC-004) — `frontend/src/app/features/country-selection/**`
 - [x] T019 [FE] US-00 Manual test 1: on desktop (≥ 768 px) the selection block (title, subtitle, tiles, Continuar) is centered horizontally and vertically in the space below the brand bar; tile content (flag + name) is centered in every tile and aligned across tiles (FR-002) — `frontend/src/app/features/country-selection/**`
 - [x] T020 [FE] US-00 Manual test 2: remove the visible "Seleccionado" text (layout shift); selected = highlight background + border + check icon absolutely positioned in the tile's top-right corner, so selecting causes no layout shift; the checked state stays announced by the native radio (FR-003, FR-009) — `frontend/src/app/features/country-selection/**`, `.claude/skills/ui-ux-guidelines/SKILL.md` (choice-tile recipe)
+- [x] T021 [FE] US-00 Manual test 3 (human picked option B from an interactive mockup): split layout on desktop (≥ 768 px). The left half has a light brand background with a flat SVG illustration drawn for the project (car, shield with check, soft blobs in brand blue, yellow and cyan; decorative `alt=""`) and the brand phrase "Tu carro protegido, en el país donde manejas.". The right half holds the selection block (title, subtitle, alert, tiles, Continuar), left-aligned and vertically centered. On mobile the illustration shrinks to about 150 px above the centered title and the phrase is hidden (FR-002, FR-009) — `frontend/public/images/selection-hero.svg`, `frontend/src/app/features/country-selection/**`
 
 FR-008 (later content comes from the selected country) is enforced structurally by the country prefix and verified by US-01 to US-03.
 
@@ -58,4 +59,4 @@ FR-008 (later content comes from the selected country) is enforced structurally 
 | 1 | T001 → T004 · T003, T005, T006, T007 · T002 | cms-developer ∥ frontend-developer ∥ orchestrator |
 | 2 | T008 ∥ (T009 → T010 → T011 → T012) | frontend-developer ×2 |
 | 3 | T013, T014 | orchestrator |
-| 4 (Gate 3) | T015 → T020 | frontend-developer |
+| 4 (Gate 3) | T015 → T020, T021 | frontend-developer |
