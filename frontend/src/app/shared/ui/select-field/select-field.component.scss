@@ -40,7 +40,7 @@
       border-bottom-color: var(--color-error);
     }
 
-    &:disabled {
+    &[aria-disabled="true"] {
       background: var(--color-disabled-bg);
       color: var(--color-disabled-text);
       border-bottom-color: var(--color-disabled-text);

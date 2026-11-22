@@ -82,10 +82,16 @@ describe('US-01 · FR-011 select field keyboard', () => {
     expect(trigger.getAttribute('aria-activedescendant')).toBe('brand-option-2');
   });
 
-  it('is disabled with a message when there are no options', () => {
+  it('is aria-disabled, focusable and does not open when there are no options', () => {
     host.options.set([]);
     fixture.detectChanges();
-    expect(trigger.disabled).toBe(true);
+    expect(trigger.disabled).toBe(false);
+    expect(trigger.getAttribute('aria-disabled')).toBe('true');
     expect(trigger.textContent).toContain('Sin opciones disponibles');
+    trigger.focus();
+    expect(document.activeElement).toBe(trigger);
+    trigger.click();
+    key('ArrowDown');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
 });

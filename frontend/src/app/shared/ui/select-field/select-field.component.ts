@@ -38,7 +38,7 @@ export interface SelectOption {
         role="combobox"
         aria-haspopup="listbox"
         [id]="inputId()"
-        [disabled]="isDisabled()"
+        [attr.aria-disabled]="isDisabled() ? 'true' : null"
         [attr.aria-expanded]="open()"
         [attr.aria-controls]="listboxId()"
         [attr.aria-activedescendant]="open() ? optionId(activeIndex()) : null"
@@ -170,6 +170,7 @@ export class SelectFieldComponent implements ControlValueAccessor {
   }
 
   protected toggle(): void {
+    if (this.isDisabled()) return;
     if (this.open()) {
       this.close();
     } else {
@@ -198,7 +199,7 @@ export class SelectFieldComponent implements ControlValueAccessor {
 
   protected onKeydown(event: KeyboardEvent): void {
     const count = this.options().length;
-    if (count === 0) return;
+    if (this.isDisabled() || count === 0) return;
     if (!this.open()) {
       if (['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
         event.preventDefault();
