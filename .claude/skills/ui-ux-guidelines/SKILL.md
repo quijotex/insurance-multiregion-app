@@ -88,8 +88,8 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 
 **Choice tile** — `.choice-tile`, `--selected`: large single-choice option (e.g. country). Native radio inside a `<label>`.
 - Default: `--color-surface`, 2px `--color-border`, `--radius-md`, min-height 96px, flag above name, name 20px/700 `--color-text` (black, never brand or white).
-- Hover: border `--color-action` + bg `--color-surface-alt`. Never a dark fill.
-- Selected: 2px `--color-action` ring + bg `--color-surface-highlight` + check icon + "Seleccionado" text (not color alone).
+- Hover: border `--color-action` only. Never a background change or dark fill.
+- Selected: 2px `--color-action` border + bg `--color-surface-highlight` + check icon absolutely positioned in the top-right corner (not color alone; no extra text, so selecting causes no layout shift). The native radio announces the checked state.
 - Focus: `--focus-ring`. All text states ≥ 4.5:1.
 
 **Form field** — `.form-field`, `__label`, `__control`, `__help`, `__error`, `--invalid`

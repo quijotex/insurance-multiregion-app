@@ -38,6 +38,17 @@
 - [x] T013 [ORCH] US-00 Dev-only `ADMIN_EMAIL`/`ADMIN_PASSWORD` defaults in `docker-compose.yml`; README admin section (how to open the admin, toggle `active`, publish) — `docker-compose.yml`, `README.md` (depends on T004)
 - [x] T014 [ORCH] US-00 Run quickstart scenarios 1–9 on `docker compose up --build`; record results in the handoff summary (FR-001–FR-012, SC-001–SC-004)
 
+## Phase 7: Gate 3 corrections (human, 2026-11-22)
+
+From the human's manual test and the request to fix every open review finding.
+
+- [x] T015 [FE] US-00 R-05: replace raw colours in the wizard header with tokens (`--color-surface`, new overlay token in `styles.scss`) (FR-007) — `frontend/src/styles.scss`, `frontend/src/app/features/quote-wizard/quote-wizard.shell.scss`
+- [x] T016 [FE] US-00 R-06: loading state as tile-shaped skeletons with `aria-busy` and a visually hidden "Cargando países…" (FR-010) — `frontend/src/app/features/country-selection/**`
+- [x] T017 [FE] US-00 R-08: tests find buttons and controls by role / accessible name instead of CSS class (except the R-01 modifier assertion) — `frontend/src/app/features/**/*.spec.ts`
+- [x] T018 [FE] US-00 R-09: after "Cambiar país" (and on every entry to `/`), focus moves to the selection heading (`tabindex="-1"`, `afterNextRender`), without a visible ring for programmatic focus; unit test (FR-009, SC-004) — `frontend/src/app/features/country-selection/**`
+- [x] T019 [FE] US-00 Manual test 1: on desktop (≥ 768 px) the selection block (title, subtitle, tiles, Continuar) is centered horizontally and vertically in the space below the brand bar; tile content (flag + name) is centered in every tile and aligned across tiles (FR-002) — `frontend/src/app/features/country-selection/**`
+- [x] T020 [FE] US-00 Manual test 2: remove the visible "Seleccionado" text (layout shift); selected = highlight background + border + check icon absolutely positioned in the tile's top-right corner, so selecting causes no layout shift; the checked state stays announced by the native radio (FR-003, FR-009) — `frontend/src/app/features/country-selection/**`, `.claude/skills/ui-ux-guidelines/SKILL.md` (choice-tile recipe)
+
 FR-008 (later content comes from the selected country) is enforced structurally by the country prefix and verified by US-01 to US-03.
 
 ## Dependencies & waves
@@ -47,3 +58,4 @@ FR-008 (later content comes from the selected country) is enforced structurally 
 | 1 | T001 → T004 · T003, T005, T006, T007 · T002 | cms-developer ∥ frontend-developer ∥ orchestrator |
 | 2 | T008 ∥ (T009 → T010 → T011 → T012) | frontend-developer ×2 |
 | 3 | T013, T014 | orchestrator |
+| 4 (Gate 3) | T015 → T020 | frontend-developer |
