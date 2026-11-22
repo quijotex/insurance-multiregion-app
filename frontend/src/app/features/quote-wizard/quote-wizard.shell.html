@@ -3,9 +3,9 @@
     <span class="wizard-header__wordmark">Asegura<span class="wizard-header__plus">+</span></span>
     <div class="wizard-header__actions">
       @if (wizardCountry.country(); as country) {
-        <span class="wizard-header__country">
+        <span class="wizard-header__country" [class.wizard-header__country--with-icon]="!!country.iconUrl">
           @if (country.iconUrl) {
-            <img class="wizard-header__flag" [src]="country.iconUrl" [alt]="country.iconAlt" />
+            <img class="wizard-header__flag" [src]="country.iconUrl" alt="" />
           }
           <span class="wizard-header__country-name">{{ country.name }}</span>
         </span>

@@ -45,7 +45,16 @@ describe('US-00 · FR-007 header "Cambiar país"', () => {
   it('shows the active country flag and name', () => {
     const fixture = setup({});
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.querySelector('img')?.getAttribute('alt')).toBe('Bandera de Colombia');
+    expect(el.querySelector('img')?.getAttribute('alt')).toBe('');
+    expect(el.querySelector('.wizard-header__country-name')?.textContent).toContain('Colombia');
+  });
+
+  it('keeps the country name visible when the country has no icon', () => {
+    TestBed.inject(WizardCountry).set({ code: 'co', name: 'Colombia', iconUrl: null, iconAlt: '' });
+    const el = setup({}).nativeElement as HTMLElement;
+    const country = el.querySelector('.wizard-header__country');
+    expect(el.querySelector('img')).toBeNull();
+    expect(country?.classList.contains('wizard-header__country--with-icon')).toBe(false);
     expect(el.querySelector('.wizard-header__country-name')?.textContent).toContain('Colombia');
   });
 

@@ -42,7 +42,7 @@
   }
 
   /* Visually hidden on narrow screens, still read by assistive tech. */
-  &__country-name {
+  &__country--with-icon &__country-name {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -77,7 +77,7 @@
 }
 
 @media (min-width: 576px) {
-  .wizard-header__country-name {
+  .wizard-header__country--with-icon .wizard-header__country-name {
     position: static;
     width: auto;
     height: auto;
