@@ -130,6 +130,7 @@
 - [x] T028 [CMS] US-01 FR-001 (Gate 3, human manual test): saving or publishing a field from the admin without touching its country was rejected ("El campo debe tener un país.", HTTP 400), so changes such as unchecking `required` were lost. `readCountryPayload` now reads the admin's `{ connect: [], disconnect: [] }` as "no change"; checked live with an unchanged save of all 19 fields through the admin payload (the human retries `required: false` in the admin) — `cms/src/middlewares/form-field-integrity(.test).ts`
 - [x] T029 [FE] US-01 FR-009 (review R-13): a restored select value that is no longer one of the field's options is dropped, so `required` applies again — `frontend/src/app/features/quote-form/step1-form.page(.spec).ts`
 - [x] T030 [FE] US-01 FR-015 (review R-14): on a full field, the length cap removes the characters just typed or pasted, not the end of the value — `frontend/src/app/features/quote-form/validation/input-limits(.spec).ts`
+- [x] T031 [ORCH] US-01 (Gate 3, human request: fewer tests): seed pattern table trimmed to one valid and one invalid example per pattern (30 → 16 runs); US-00 tests fully exercised by every E2E run removed: country guard "lets an active country through" and session "start creates a session with empty data". US-00 states (loading, empty, error, alerts) kept, since no E2E covers the country page — `cms/src/seed/form-field-patterns.test.ts`, `frontend/src/app/features/quote-wizard/guards.spec.ts`, `frontend/src/app/core/session/quote-session.store.spec.ts`
 
 ## Waves
 

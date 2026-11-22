@@ -11,22 +11,23 @@ import {
 } from './form-field-patterns';
 import { BY_COUNTRY, countriesNeedingLegalAge } from './form-fields';
 
-const table: Array<[string, string, string[], string[]]> = [
-  ['cédula', CO_DOCUMENT_NUMBER_PATTERN, ['123456', '1020304050'], ['12345', '10203040501', '1.020.304', 'abc123']],
-  ['placa', CO_PLATE_PATTERN, ['ABC123', 'abc123'], ['AB123', 'ABC1234', 'AB-123']],
-  ['patente', CL_PLATE_PATTERN, ['BCDF12', 'AB1234'], ['BCD123', 'A12345']],
-  ['celular CO', CO_MOBILE_PATTERN, ['3001234567'], ['2001234567']],
-  ['celular CL', CL_MOBILE_PATTERN, ['912345678'], ['81234567']],
-  ['email', EMAIL_PATTERN, ['ana@correo.test'], ['ana@', 'ana correo.test']],
-  ['nombre', FULL_NAME_PATTERN, ['Ana María Pérez'], ['Ana2', 'Al']],
-  ['RUT permisivo', CL_RUT_PATTERN, ['12.345.678-5', '12345678-k', '123456785'], ['1-9', 'abc']],
+// One valid and one invalid example per seed pattern (trimmed at Gate 3 at the human's request).
+const table: Array<[string, string, string, string]> = [
+  ['cédula', CO_DOCUMENT_NUMBER_PATTERN, '1020304050', '1.020.304'],
+  ['placa', CO_PLATE_PATTERN, 'ABC123', 'AB-123'],
+  ['patente', CL_PLATE_PATTERN, 'BCDF12', 'BCD123'],
+  ['celular CO', CO_MOBILE_PATTERN, '3001234567', '2001234567'],
+  ['celular CL', CL_MOBILE_PATTERN, '912345678', '81234567'],
+  ['email', EMAIL_PATTERN, 'ana@correo.test', 'ana correo.test'],
+  ['nombre', FULL_NAME_PATTERN, 'Ana María Pérez', 'Ana2'],
+  ['RUT permisivo', CL_RUT_PATTERN, '12.345.678-5', 'abc'],
 ];
 
 describe('US-01 · FR-013 seed patterns', () => {
   for (const [name, pattern, valid, invalid] of table) {
     const re = new RegExp(pattern);
-    it.each(valid)(`${name} accepts %s`, (v) => expect(re.test(v)).toBe(true));
-    it.each(invalid)(`${name} rejects %s`, (v) => expect(re.test(v)).toBe(false));
+    it(`${name} accepts ${valid}`, () => expect(re.test(valid)).toBe(true));
+    it(`${name} rejects ${invalid}`, () => expect(re.test(invalid)).toBe(false));
   }
 });
 

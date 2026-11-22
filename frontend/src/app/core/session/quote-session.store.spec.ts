@@ -29,12 +29,6 @@ describe('US-00 · FR-011 / FR-012 quote session store', () => {
     expect(store.read()).toBeNull();
   });
 
-  it('start creates a session with empty data', () => {
-    store.start('co');
-    expect(store.read()).toEqual({ countryCode: 'co', data: {} });
-    expect(store.lastCountryCode()).toBe('co');
-  });
-
   // hasData now means "step 1 has user input" (US-01 FR-009), not "data has any key".
   it('hasData is true only when step 1 has user input', () => {
     seed({ countryCode: 'co', data: {} });

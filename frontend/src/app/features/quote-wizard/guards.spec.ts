@@ -9,7 +9,6 @@ import { ConfirmDialogService } from '../../shared/ui/confirm-dialog/confirm-dia
 import { countryGuard } from './country.guard';
 import { switchConfirmGuard } from './switch-confirm.guard';
 import { wizardEntryGuard } from './wizard-entry.guard';
-import { WizardCountry } from './wizard-country.service';
 
 const CO: Country = { code: 'co', name: 'Colombia', legalAge: 18, iconUrl: '/uploads/co.svg', iconAlt: 'Bandera de Colombia' };
 const CL: Country = { code: 'cl', name: 'Chile', legalAge: 18, iconUrl: '/uploads/cl.svg', iconAlt: 'Bandera de Chile' };
@@ -18,7 +17,6 @@ describe('US-00 · quote wizard entry guards', () => {
   let load: () => Observable<Country[]>;
   let confirm: ReturnType<typeof vi.fn>;
   let session: QuoteSessionStore;
-  let wizardCountry: WizardCountry;
 
   function route(country: string): ActivatedRouteSnapshot {
     return { paramMap: { get: () => country } } as unknown as ActivatedRouteSnapshot;
@@ -47,15 +45,9 @@ describe('US-00 · quote wizard entry guards', () => {
       ],
     });
     session = TestBed.inject(QuoteSessionStore);
-    wizardCountry = TestBed.inject(WizardCountry);
   });
 
   describe('FR-005 / FR-006 country guard', () => {
-    it('lets an active country through and exposes it', async () => {
-      expect(await run(countryGuard, 'co')).toBe(true);
-      expect(wizardCountry.country()).toEqual(CO);
-    });
-
     it('redirects an upper or mixed case code to the lower case URL', async () => {
       expect(url(await run(countryGuard, 'CO'))).toBe('/co/quote');
       expect(url(await run(countryGuard, 'Cl'))).toBe('/cl/quote');
