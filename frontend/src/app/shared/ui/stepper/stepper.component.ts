@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-stepper',
@@ -39,7 +39,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
           </span>
           <span class="stepper__label"
             >{{ step }}@if ($index + 1 < current()) {
-              <span class="visually-hidden-text"> (completado)</span>
+              <span class="visually-hidden"> (completado)</span>
             }</span
           >
         </li>
@@ -50,5 +50,4 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 export class StepperComponent {
   readonly steps = input.required<string[]>();
   readonly current = input<number>(1);
-  readonly total = computed(() => this.steps().length);
 }
