@@ -114,7 +114,7 @@
 
 ## Phase 7: Polish
 
-- [ ] T019 [ORCH] US-01 Run quickstart scenarios 1–13 on `docker compose up --build` (fresh volume) and record the results in the handoff summary (FR-001–FR-014, SC-001–SC-005)
+- [x] T019 [ORCH] US-01 Run quickstart scenarios 1–13 on `docker compose up --build` (fresh volume) and record the results in the handoff summary (FR-001–FR-014, SC-001–SC-005)
 
 ## Waves
 
@@ -125,3 +125,20 @@
 | 3 | T014, T015 | frontend-developer |
 | 4 | T016 · T017, T018 | orchestrator · e2e-tester |
 | 5 | Review (code-reviewer), fixes, T019 | — |
+
+## Quickstart results (T019, 2026-11-22, Docker stack)
+
+| # | Result | How |
+|---|--------|-----|
+| 1, 2 | ✅ CO 10 / CL 9 fields in order and sections | API + browser + E2E-1 |
+| 3 | ✅ RUT check digit | unit tests + E2E-2 |
+| 4 | ✅ all errors, focus on first, URL unchanged | browser + E2E-2 |
+| 5 | ✅ age / year rules | unit tests + E2E-2 (age) |
+| 6 | ✅ Continuar → plans → Volver keeps values | E2E-1 |
+| 7 | ✅ reload restores values, no errors shown | browser |
+| 8 | ✅ `/cl/quote/plans` without step 1 → `/cl/quote` | browser |
+| 9 | ✅ "Cambiar país" with data asks first; Esc keeps data | browser |
+| 10 | ⏳ publish/unpublish a field in the admin | for the human |
+| 11 | ✅ no-country and duplicate-key saves rejected | live Document Service script |
+| 12 | ✅ error state + Reintentar | unit tests (US-00 pattern verified live) |
+| 13 | ⏳ keyboard-only at 320 px and desktop, screen reader | for the human (unit tests cover keyboard) |
