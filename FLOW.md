@@ -30,7 +30,9 @@ flowchart TD
     S3b -- rejected --> S3a
     S3b -- approved --> S4
     subgraph AUTO ["Autopilot - /autopilot"]
-      S4["4. Tasks<br/>tasks.md tagged P, CMS, FE"] --> S5
+      S4["4a. Tasks<br/>tasks.md tagged P, CMS, FE"] --> S4b
+      S4b["4b. Analyze<br/>speckit-analyze: FR to task coverage"] -- "gaps in tasks.md (max 3)" --> S4
+      S4b -- "no CRITICAL/HIGH" --> S5
       S5["5. Implementation waves<br/>cms-developer + frontend-developer"] --> S7
       S7["7. Verify<br/>lint, typecheck, unit, build"] -- "fail (max 3)" --> S5
       S7 -- pass --> S6
@@ -46,6 +48,7 @@ flowchart TD
     AUTO -. "stop condition" .-> H[["Human escalation"]]
 ```
 
+- **Step 4b is an automatic check, not a gate:** it fixes `tasks.md` on its own, and only stops for the human when a finding needs a change to the approved `spec.md` or `plan.md`.
 - **Step 6 is conditional:** it runs only when `plan.md` has E2E candidates approved at Gate 2; otherwise the flow goes straight from 7 to 8.
 - **Stop conditions** (constitution §3) can interrupt the autopilot at any point: a new external dependency, a breaking API contract change, or a test/build still failing after 3 self-correction attempts.
 
@@ -62,13 +65,14 @@ Steps 2 and 3 each have an **AI substep (a)** followed by a **human, non-AI subs
 | 2b | **Gate 1 — Spec approval** | Human answers the questions and reviews the spec against the original story: right scope, no invented requirements, testable criteria. | **No** | — | `spec.md` Status → `Approved (Gate 1) — <date>` | **Human.** Approves, or rejects with comments → back to 1/2a with the feedback. Corrections stay visible in Clarifications and the session log. |
 | 3a | Plan | Designs the technical solution; writes ADRs for architectural decisions; proposes 2–3 design options per client-facing view; proposes E2E candidates (critical flows only). | Yes | Orchestrator, skills `speckit-plan`, `ui-ux-guidelines`, `angular-conventions`, `strapi-conventions` | `specs/.../plan.md`, `docs/adr/NNNN-*.md` (Proposed) | — (reviewed at 3b) |
 | 3b | **Gate 2 — Plan approval** | Human checks for over-engineering and real ADR alternatives, picks a design option, approves or rejects each E2E candidate. | **No** | — | `plan.md` Status → `Approved (Gate 2) — <date>`; ADRs → Accepted; E2E candidates marked Approved/Rejected | **Human.** Approves, or rejects with comments → back to 3a. Corrections stay visible in the plan's Revisions section and the session log. |
-| 4 | Tasks | Breaks the plan into tasks tagged `[P]` (parallel), `[CMS]`/`[FE]` (owner) and `US-XX`/`FR-XXX`. | Yes | Orchestrator, skill `autopilot` (Spec Kit `tasks-template.md`) | `specs/.../tasks.md` | None (autopilot). |
+| 4a | Tasks | Breaks the plan into tasks tagged `[P]` (parallel), `[CMS]`/`[FE]` (owner) and `US-XX`/`FR-XXX`. | Yes | Orchestrator, skill `autopilot` (Spec Kit `tasks-template.md`) | `specs/.../tasks.md` | None (autopilot). |
+| 4b | Analyze | Automatic consistency check across `spec.md`, `plan.md` and `tasks.md`: every FR has tasks, no task without an FR, no constitution conflicts. Gaps in `tasks.md` are fixed and analyze reruns (max 3). Implementation starts only with no CRITICAL/HIGH findings. | Yes | Orchestrator, skills `autopilot` + `speckit-analyze` | `specs/.../analysis.md` (one section per run) | None, unless a finding needs a change to the approved spec or plan → human decides (back to Gate 1 or 2). |
 | 5 | Implementation waves | Executes tasks; `[P]` groups run in parallel subagents, dependent tasks in sequence. Unit tests are written with the code. | Yes | Subagents `cms-developer` (Sonnet, skill `strapi-conventions`) and `frontend-developer` (Sonnet, skills `angular-conventions`, `ui-ux-guidelines`) | Code in `cms/` and `frontend/src/`, unit tests `*.spec.ts` | None, unless a stop condition fires. |
 | 6 | E2E tests — *conditional* | Writes Playwright tests from the spec's scenarios for the approved critical flows only. A spec mismatch is reported as a defect, never "fixed" in the test. | Yes | Subagent `e2e-tester` (Sonnet) | `frontend/e2e/*.spec.ts` | **Runs only if** E2E candidates were approved at Gate 2; skipped otherwise. |
 | 7 | Verify | Lint, typecheck, unit tests and CMS build after each wave; automatic fixes. | Yes | Orchestrator (Bash: `npm --prefix frontend run verify`, `npm --prefix cms run build`) | Green checks | Human only if still failing after 3 attempts. |
 | 8 | Review | Independent review of the diff against spec, plan, ADRs, constitution and conventions. Blocker/Major findings go back to the developer agents; round 2 verifies them. | Yes | Subagent `code-reviewer` (Opus — a different model from the implementers) | `specs/.../review.md` (findings, status, resolution commit) | Human only for findings still open after round 2. |
 | 9 | Commit | Atomic Conventional Commits per verified unit, with `Refs: US-XX` (plus `R-NN` for review fixes). Only the orchestrator commits. | Yes | Orchestrator | Git history | None. |
-| 10 | **Gate 3 — Handoff review** | Human runs the app, reads the handoff summary and `review.md`, checks the acceptance scenarios by hand. | **No** | — | `review.md` verdict line `Gate 3: Approved — <date>` | **Human.** Approves, or rejects: feedback becomes new tasks in `tasks.md` → back to 4. |
+| 10 | **Gate 3 — Handoff review** | Human runs the app, reads the handoff summary and `review.md`, checks the acceptance scenarios by hand. | **No** | — | `review.md` verdict line `Gate 3: Approved — <date>` | **Human.** Approves, or rejects: feedback becomes new tasks in `tasks.md` → back to 4a. |
 | 11 | Ready for QA | The increment is handed to QA. | No | — | Branch/PR ready | QA team. |
 
 ## Traceability
@@ -84,11 +88,11 @@ Steps 2 and 3 each have an **AI substep (a)** followed by a **human, non-AI subs
 | `frontend-developer` | Subagent | Angular features and unit tests | Sonnet |
 | `e2e-tester` | Subagent (conditional) | Playwright tests for approved critical flows | Sonnet |
 | `code-reviewer` | Subagent | Independent review → `review.md` | Opus |
-| `autopilot` | Custom skill | Procedure: tasks → waves → verify → e2e → review → commit | — |
+| `autopilot` | Custom skill | Procedure: tasks → analyze → waves → verify → e2e → review → commit | — |
 | `angular-conventions` | Custom skill | Angular project knowledge | — |
 | `strapi-conventions` | Custom skill | Strapi project knowledge | — |
 | `ui-ux-guidelines` | Custom skill | Brand-based UI/UX guidelines: tokens, components, a11y, design options | — |
-| `speckit-*` | Spec Kit skills | Specify, clarify, plan, tasks | — |
+| `speckit-*` | Spec Kit skills | Specify, clarify, plan, tasks, analyze | — |
 
 ## Questions
 
@@ -102,6 +106,8 @@ _Journal, filled as it happens:_
 - **2026-11-21** — The first design had no review step and no named subagents. Added `code-reviewer` with a two-round loop and versioned agent definitions.
 - **2026-11-22** — The handoff review already worked as a gate (approve/reject paths) but was not named as one, and only Gate 1 corrections were recorded in an artifact. Renamed it Gate 3 and added a Revisions section to `plan.md` for Gate 2 corrections, so every human correction leaves a trace.
 - **2026-11-22** — Before the first story we noticed that, without a permissions file, every command a subagent runs (npm, git) would stop for human approval, breaking the autopilot. Added `.claude/settings.json` with an allowlist for the flow's commands, and used deny rules to enforce the non-AI zones (user stories, constitution, logs, `.env`) at tool level.
+- **2026-11-22** — Between tasks (4) and review (8) the only automatic check was verify (7), which tests code but not whether the tasks cover the spec. A missing FR would only be caught by the reviewer, after implementation. Added step 4b: Spec Kit's `analyze` checks FR ↔ task coverage before any code is written, with no extra human gate.
+- **2026-11-22** — In the first Gate 1 run (US-00), the clarify question and its options were written as plain chat text and got collapsed in the desktop app: the human never saw them. Gate questions are now asked with the interactive question dialog (`AskUserQuestion`), one per call, recommended option first; the question and answer are repeated in text for the log (rule in `CLAUDE.md` › Asking the Human).
 
 ### At which points did we decide not to use AI and why?
 - **Constitution (0a):** the rules that govern the agents must come from the human, not from the agents.

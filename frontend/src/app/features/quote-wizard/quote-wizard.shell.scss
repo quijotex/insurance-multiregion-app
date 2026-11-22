@@ -1,0 +1,72 @@
+.wizard-header {
+  background: var(--color-brand);
+  color: var(--color-surface);
+
+  &__wordmark {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  &__plus {
+    color: var(--color-cta);
+  }
+
+  &__country {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 600;
+  }
+
+  &__flag {
+    width: 32px;
+    height: 24px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  /* Visually hidden on narrow screens, still read by assistive tech. */
+  &__country--with-icon &__country-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  &__change {
+    min-height: 48px;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-surface);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-surface);
+    font: inherit;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-on-brand-overlay);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-surface);
+      box-shadow: var(--focus-ring);
+    }
+  }
+}
+
+@media (min-width: 576px) {
+  .wizard-header__country--with-icon .wizard-header__country-name {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+  }
+}

@@ -1,20 +1,15 @@
-// import type { Core } from '@strapi/strapi';
+import type { Core } from '@strapi/strapi';
+import { seedAdmin } from './seed/admin';
+import { seedCountries } from './seed/countries';
+import { grantPublicPermissions } from './seed/permissions';
 
 export default {
-  /**
-   * An asynchronous register function that runs before
-   * your application is initialized.
-   *
-   * This gives you an opportunity to extend code.
-   */
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+  register() {},
 
-  /**
-   * An asynchronous bootstrap function that runs before
-   * your application gets started.
-   *
-   * This gives you an opportunity to set up your data model,
-   * run jobs, or perform some special logic.
-   */
-  bootstrap(/* { strapi }: { strapi: Core.Strapi } */) {},
+  // Idempotent: safe to run on every start.
+  async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    await grantPublicPermissions(strapi);
+    await seedCountries(strapi);
+    await seedAdmin(strapi);
+  },
 };

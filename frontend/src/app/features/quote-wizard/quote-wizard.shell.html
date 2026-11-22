@@ -1,0 +1,21 @@
+<header class="wizard-header">
+  <div class="container d-flex align-items-center justify-content-between gap-3 py-2">
+    <span class="wizard-header__wordmark">Asegura<span class="wizard-header__plus">+</span></span>
+    <div class="d-flex align-items-center gap-3">
+      @if (wizardCountry.country(); as country) {
+        <span class="wizard-header__country" [class.wizard-header__country--with-icon]="!!country.iconUrl">
+          @if (country.iconUrl) {
+            <img class="wizard-header__flag" [src]="country.iconUrl" alt="" />
+          }
+          <span class="wizard-header__country-name">{{ country.name }}</span>
+        </span>
+      }
+      <button type="button" class="wizard-header__change" (click)="changeCountry()">
+        Cambiar país
+      </button>
+    </div>
+  </div>
+</header>
+<main class="container">
+  <router-outlet />
+</main>

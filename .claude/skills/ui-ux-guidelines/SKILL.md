@@ -30,7 +30,7 @@ Defined once as CSS custom properties in `frontend/src/styles.scss`. Components 
   --color-surface-highlight: #dfeaff; /* recommended plan, badges */
   --color-border: #cdced9;
   --color-disabled-bg: #e7e7e7;
-  --color-disabled-text: #878789;
+  --color-disabled-text: #666666;   /* 4.6:1 on disabled-bg (Sura's #878789 was 2.9:1) */
 
   /* Status (fg / bg) */
   --color-error: #d12d35;   --color-error-bg: #fff4f3;
@@ -84,7 +84,13 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 - `--cta`: yellow bg, navy text. One per screen: the step's main action (Continue, Pay).
 - `--primary`: action-blue bg, white text, hover `--color-action-hover`.
 - `--secondary`: white bg, 1px navy border (Back, Edit).
-- Disabled: `--color-disabled-bg` / `--color-disabled-text`, plus `aria-disabled` or `disabled`. Loading: keep width, show spinner + "Procesando…", `aria-busy="true"`.
+- Disabled: `--color-disabled-bg` / `--color-disabled-text` (≥ 4.5:1), plus `aria-disabled` or `disabled`. Loading: keep width, show spinner + "Procesando…", `aria-busy="true"`.
+
+**Choice tile** — `.choice-tile`, `--selected`: large single-choice option (e.g. country). Native radio inside a `<label>`.
+- Default: `--color-surface`, 2px `--color-border`, `--radius-md`, min-height 96px, flag above name, name 20px/700 `--color-text` (black, never brand or white).
+- Hover: border `--color-action` only. Never a background change or dark fill.
+- Selected: 2px `--color-action` border + bg `--color-surface-highlight` + check icon absolutely positioned in the top-right corner (not color alone; no extra text, so selecting causes no layout shift). The native radio announces the checked state.
+- Focus: `--focus-ring`. All text states ≥ 4.5:1.
 
 **Form field** — `.form-field`, `__label`, `__control`, `__help`, `__error`, `--invalid`
 - Label above the control, 14px/500; required marked with `*` and announced (`required` attribute).
@@ -125,7 +131,13 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 
 ## 5. Layout
 
-- Mobile-first. Breakpoints: 576, 768, 992, 1200px. Gutter 16px mobile, 24px desktop; max content width 1120px.
+- Mobile-first. Breakpoints are Bootstrap's: sm 576, md 768, lg 992, xl 1200 px. Custom media queries use the same values.
+- **Layouts use Bootstrap 5.3 grid and utilities** ([ADR 0003](../../../docs/adr/0003-bootstrap-grid-for-layouts.md)) on every screen. Bootstrap is for layout only:
+  - Page width: every screen's content sits in a `.container`, capped at 1140 px (global override), with Bootstrap's gutters.
+  - Structure: `.row` / `.col-*` (`.col-12 .col-md-6`, …) for columns that stack on mobile.
+  - Alignment and spacing: `.d-flex`, `.flex-column`, `.justify-content-*`, `.align-items-*`, `.gap-*`, `m-*` / `p-*`, `.text-center` / `.text-md-start`, `.d-none .d-md-block`.
+  - Never use Bootstrap colour, typography, border, shadow or component classes (`.btn`, `.card`, `.bg-*`, `.text-primary`, `.fs-*`…). Those come from our tokens and BEM recipes.
+  - Component SCSS holds component styling only (look, states, internal spacing with `--space-*`), not page layout.
 - Plan cards: stacked < 768px, 3 columns ≥ 992px (2 columns in between).
 - Header: navy bar with text wordmark; no navigation beyond the wizard.
 

@@ -14,6 +14,9 @@ services:
       TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:-devOnlyTransferTokenSalt}
       JWT_SECRET: ${JWT_SECRET:-devOnlyJwtSecret}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:-devOnlyEncryptionKey}
+      # Dev-only admin created at first start (fictitious; see README)
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.test}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-DevOnly-Passw0rd}
     ports:
       - "1337:1337"
     volumes:

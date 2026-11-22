@@ -6,9 +6,22 @@ A single Angular app that quotes car insurance in **Colombia** and **Chile**, wi
 - **Architecture decisions:** [docs/adr/](docs/adr/)
 - **Specs per user story:** [specs/](specs/)
 
-> **Status:** project setup complete; the wizard, seed data and admin bootstrap are built story by story (US-01 → US-03). Sections marked _To be completed_ are filled as each story lands.
+> **Status:** project setup complete; the wizard, seed data and admin bootstrap are built story by story (US-00 → US-03). Sections marked _To be completed_ are filled as each story lands.
 
 > All data in this repository is fictitious. No real people, documents, plates, card data or credentials.
+
+## Wizard steps
+
+The brief asks for at least 3 steps and allows more if justified. We added one before them:
+
+| Step | Story | Screen |
+|------|-------|--------|
+| 0 | US-00 | Country selection (`/`). Needed because the country comes from the URL prefix ([ADR 0001](docs/adr/0001-multi-country-content-strategy.md)): it is the entry point that leads to `/co/...` or `/cl/...`. |
+| 1 | US-01 | Policyholder and vehicle data form |
+| 2 | US-02 | Plan list |
+| 3 | US-03 | Summary and payment |
+
+US-00 keeps its own number so US-01 to US-03 match the brief's IDs one to one.
 
 ## Quick start
 
@@ -20,6 +33,7 @@ docker compose up --build
 
 | URL | What |
 |-----|------|
+| http://localhost:4200/ | App, country selection |
 | http://localhost:4200/co/quote | App, Colombia |
 | http://localhost:4200/cl/quote | App, Chile |
 | http://localhost:1337/admin | Strapi admin panel |
@@ -67,7 +81,18 @@ npm --prefix frontend start    # Angular on http://localhost:4200 (proxies /api 
 
 ## Strapi admin user
 
-_To be completed with US-01: the admin user is created at bootstrap from environment variables with dev-only defaults, documented here._
+On the first start, Strapi creates a super admin from `ADMIN_EMAIL` / `ADMIN_PASSWORD` if no admin exists yet. The dev-only defaults set in `docker-compose.yml` are fictitious:
+
+| Field | Default (dev only) |
+|-------|--------------------|
+| Email | `admin@example.test` |
+| Password | `DevOnly-Passw0rd` |
+
+To use other values, put them in a root `.env` file, which is never committed. Locally (`npm --prefix cms run develop`), no admin is created unless both variables are set; Strapi then asks you to register one.
+
+### Managing countries (US-00)
+
+In the admin, go to **Content Manager › Country**. A country is offered on the selection screen when it is **published** and **Active** is on, and countries are listed by **Order**. To hide one, switch **Active** off or unpublish it. The seed includes Perú as published but inactive, so `/pe/quote` shows the "not available" message.
 
 ## Security notes
 

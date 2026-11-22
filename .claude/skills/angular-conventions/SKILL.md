@@ -10,7 +10,7 @@ description: Project conventions for Angular code in frontend/ — folder layout
 frontend/src/app/
   core/                 # app-wide singletons: country context, http, error handling
   shared/ui/            # reusable presentational components (no business logic)
-  features/<feature>/   # one folder per feature, e.g. quote-form, plan-list, summary
+  features/<feature>/   # one folder per feature, e.g. country-selection, quote-form, plan-list, summary
     <feature>.page.ts   # routed container component
     components/         # presentational components of this feature
     data/               # API service + models (*.model.ts) + mappers

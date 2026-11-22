@@ -1,0 +1,103 @@
+<div class="d-flex flex-column min-vh-100">
+<header class="brand-bar">
+  <div class="container py-3">
+    <span class="brand-bar__wordmark">Asegura<span class="brand-bar__plus">+</span></span>
+  </div>
+</header>
+
+<main class="container d-flex flex-column flex-grow-1">
+  <div class="row flex-grow-1 align-content-center align-content-md-stretch">
+  <aside class="country-page__hero col-12 col-md-6 d-flex flex-column align-items-center justify-content-center gap-3 gap-md-4 pt-4 pb-0 py-md-5">
+    <img
+      class="country-page__illustration"
+      src="images/selection-hero.svg"
+      alt=""
+      width="320"
+      height="200"
+    />
+    <p class="country-page__tagline d-none d-md-block text-center">Tu carro protegido, en el país donde manejas.</p>
+  </aside>
+  <section class="col-12 col-md-6 d-flex flex-column justify-content-center align-items-center align-items-md-start text-center text-md-start pt-3 pb-4 py-md-5">
+      <h1 class="country-page__title mb-2" tabindex="-1">¿Dónde quieres asegurar tu carro?</h1>
+      <p class="country-page__subtitle mb-4">Elige tu país para ver los planes y precios</p>
+
+      @if (unavailable) {
+        <p class="country-page__alert mb-4" role="alert">
+          El país seleccionado no está disponible. Elige uno de la lista.
+        </p>
+      }
+
+      @switch (status()) {
+        @case ('loading') {
+          <div class="country-page__tiles d-flex flex-wrap justify-content-center justify-content-md-start gap-3 w-100 mb-4" aria-busy="true">
+            <span class="visually-hidden">Cargando países…</span>
+            <span class="choice-tile choice-tile--skeleton" aria-hidden="true"></span>
+            <span class="choice-tile choice-tile--skeleton" aria-hidden="true"></span>
+          </div>
+        }
+        @case ('error') {
+          <div class="country-page__error mb-4" role="alert">
+            <p>No pudimos cargar los países.</p>
+            <button type="button" class="button button--secondary" (click)="retry()">Reintentar</button>
+          </div>
+        }
+        @default {
+          @if (isEmpty()) {
+            <p class="country-page__status">Por ahora no hay países disponibles.</p>
+          } @else {
+            <fieldset class="country-page__tiles d-flex flex-wrap justify-content-center justify-content-md-start gap-3 w-100 mb-4">
+              <legend class="visually-hidden">País</legend>
+              @for (country of countries(); track country.code) {
+                <label
+                  class="choice-tile"
+                  [class.choice-tile--selected]="selectedCode() === country.code"
+                >
+                  <input
+                    class="visually-hidden"
+                    type="radio"
+                    name="country"
+                    [value]="country.code"
+                    [checked]="selectedCode() === country.code"
+                    (change)="select(country.code)"
+                  />
+                  @if (country.iconUrl) {
+                    <img class="choice-tile__flag" [src]="country.iconUrl" alt="" />
+                  }
+                  <span class="choice-tile__name">{{ country.name }}</span>
+                  @if (selectedCode() === country.code) {
+                    <svg
+                      class="choice-tile__check"
+                      viewBox="0 0 16 16"
+                      width="20"
+                      height="20"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path
+                        d="M3 8.5l3.2 3.2L13 4.8"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  }
+                </label>
+              }
+            </fieldset>
+            <button
+              type="button"
+              class="button button--cta"
+              [disabled]="!canContinue()"
+              (click)="continue()"
+            >
+              Continuar
+            </button>
+          }
+        }
+      }
+  </section>
+  </div>
+</main>
+</div>
