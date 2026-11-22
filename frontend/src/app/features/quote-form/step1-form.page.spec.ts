@@ -7,7 +7,7 @@ import { QuoteSessionStore } from '../../core/session/quote-session.store';
 import { WizardCountry } from '../quote-wizard/wizard-country.service';
 import { FormFieldDescriptor, FormSections } from './data/form-field.model';
 import { FormFieldService } from './data/form-field.service';
-import { Step1FormPage } from './step1-form.page';
+import { restoredValue, Step1FormPage } from './step1-form.page';
 
 const COUNTRY: Country = { code: 'co', name: 'Colombia', legalAge: 18, iconUrl: null, iconAlt: '' };
 
@@ -144,6 +144,30 @@ describe('US-01 · FR-005/FR-006 step 1 form page', () => {
     expect(status()).toBe('Revisa el campo marcado.');
   });
 
+  it('a field configured as not required shows no asterisk and can stay empty, for every type (Gate 3)', async () => {
+    const optional = (f: FormFieldDescriptor): FormFieldDescriptor => ({
+      ...f,
+      required: false,
+      rules: { ...f.rules, required: false },
+    });
+    load.mockReturnValue(
+      of({
+        policyholder: SECTIONS.policyholder.map(optional),
+        vehicle: [
+          ...SECTIONS.vehicle.map(optional),
+          optional(field({ key: 'vehicleYear', label: 'Año', type: 'number', section: 'vehicle' })),
+          optional(field({ key: 'terms', label: 'Acepto', type: 'checkbox', section: 'vehicle' })),
+        ],
+      }),
+    );
+    await setup();
+    expect(el.querySelectorAll('.form-field__star').length).toBe(0);
+    expect(el.querySelectorAll('[aria-required="true"], [required]').length).toBe(0);
+    await submit();
+    expect(fieldErrors()).toEqual([]);
+    expect(navigate).toHaveBeenCalledWith(['plans'], { relativeTo: TestBed.inject(ActivatedRoute) });
+  });
+
   it('a valid form marks step 1 completed and navigates to plans', async () => {
     await setup();
     await type('Nombre completo', 'Ana Pérez');
@@ -219,5 +243,28 @@ describe('US-01 · FR-005/FR-006 step 1 form page', () => {
     expect(fieldErrors()).toContain('Error en birthDate');
     expect(status()).toBe('Revisa los 2 campos marcados.');
     expect(navigate).not.toHaveBeenCalled();
+  });
+});
+
+describe('US-01 · FR-009 restoring saved values (review R-13)', () => {
+  const region = field({
+    key: 'region',
+    label: 'Región',
+    type: 'select',
+    options: [{ label: 'Metropolitana de Santiago', value: 'Metropolitana de Santiago' }],
+  });
+
+  it('keeps a saved select value that is still an option', () => {
+    expect(restoredValue(region, 'Metropolitana de Santiago')).toBe('Metropolitana de Santiago');
+  });
+
+  it('drops a saved select value renamed or removed in the CMS, so required fails again', () => {
+    expect(restoredValue(region, 'Región Metropolitana')).toBe('');
+  });
+
+  it('falls back to empty on a wrong type, and keeps text values as typed', () => {
+    expect(restoredValue(field({ key: 'plate', label: 'Placa' }), true)).toBe('');
+    expect(restoredValue(field({ key: 'plate', label: 'Placa' }), 'abc1')).toBe('abc1');
+    expect(restoredValue(field({ key: 'ok', label: 'Acepto', type: 'checkbox' }), 'yes')).toBe(false);
   });
 });

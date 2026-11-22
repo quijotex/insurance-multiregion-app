@@ -46,9 +46,12 @@ export function readCountryPayload(value: unknown): { present: boolean; ref: Ref
   if (typeof value === 'string' || typeof value === 'number') return { present: true, ref: value };
   if (typeof value === 'object') {
     const v = value as Record<string, unknown>;
-    const list = v.set ?? v.connect;
-    if (Array.isArray(list)) return { present: true, ref: refOf(list[0]) };
+    // `set` replaces the relation: an empty set clears it.
+    if (Array.isArray(v.set)) return { present: true, ref: refOf(v.set[0]) };
+    if (Array.isArray(v.connect) && v.connect.length > 0) return { present: true, ref: refOf(v.connect[0]) };
     if (Array.isArray(v.disconnect) && v.disconnect.length > 0) return { present: true, ref: null };
+    // The admin sends `{ connect: [], disconnect: [] }` when the relation is left as is.
+    if (Array.isArray(v.connect) || Array.isArray(v.disconnect)) return { present: false, ref: null };
     if (v.documentId !== undefined || v.id !== undefined) return { present: true, ref: refOf(v) };
   }
   return { present: false, ref: null };

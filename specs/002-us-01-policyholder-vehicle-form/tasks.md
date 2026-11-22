@@ -127,6 +127,9 @@
 - [x] T025 [CMS] US-01 FR-015 (Gate 3, human manual test): `FormValidations.allowedCharacters` (enumeration `digits`, `alphanumeric`, `rut`) and `FormValidations.maxLength` (integer, min 1) per data-model.md § Components; seed values per FR-015; update the local database's existing fields; regenerate types — `cms/src/components/form/validations.json`, `cms/src/seed/form-fields.ts`, `specs/002-us-01-policyholder-vehicle-form/contracts/form-fields-api.md`
 - [x] T026 [FE] US-01 FR-015: map the two settings (unknown set → ignored); pure `sanitizeInput` with unit tests (letters dropped, length capped, paste, caret); text input applies it and gets `inputmode="numeric"` for digits — `frontend/src/app/features/quote-form/{data,validation,components/form-field}/`
 - [x] T027 [FE] US-01 FR-011 (Gate 3, human manual test): the open select list scrolls the active option into view on arrow keys, Home and End, and on opening — `frontend/src/app/shared/ui/select-field/`
+- [x] T028 [CMS] US-01 FR-001 (Gate 3, human manual test): saving or publishing a field from the admin without touching its country was rejected ("El campo debe tener un país.", HTTP 400), so changes such as unchecking `required` were lost. `readCountryPayload` now reads the admin's `{ connect: [], disconnect: [] }` as "no change"; checked live with `required: false` on every field — `cms/src/middlewares/form-field-integrity(.test).ts`
+- [x] T029 [FE] US-01 FR-009 (review R-13): a restored select value that is no longer one of the field's options is dropped, so `required` applies again — `frontend/src/app/features/quote-form/step1-form.page(.spec).ts`
+- [x] T030 [FE] US-01 FR-015 (review R-14): on a full field, the length cap removes the characters just typed or pasted, not the end of the value — `frontend/src/app/features/quote-form/validation/input-limits(.spec).ts`
 
 ## Waves
 

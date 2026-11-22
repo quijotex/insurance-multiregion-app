@@ -36,7 +36,22 @@ describe('US-01 · Edge Cases form field integrity', () => {
     expect(readCountryPayload('abc')).toEqual({ present: true, ref: 'abc' });
     expect(readCountryPayload({ connect: [{ documentId: 'abc' }] })).toEqual({ present: true, ref: 'abc' });
     expect(readCountryPayload({ set: ['abc'] })).toEqual({ present: true, ref: 'abc' });
-    expect(readCountryPayload({ connect: [] })).toEqual({ present: true, ref: null });
+    expect(readCountryPayload({ set: [] })).toEqual({ present: true, ref: null });
+    expect(readCountryPayload({ connect: [], disconnect: [{ id: 1 }] })).toEqual({ present: true, ref: null });
     expect(readCountryPayload(3)).toEqual({ present: true, ref: 3 });
   });
 });
+
+describe('US-01 · FR-001 admin edits keep the country (Gate 3 manual test)', () => {
+  it('reads the untouched relation from the admin as no change, so editing another attribute is allowed', () => {
+    expect(readCountryPayload({ connect: [], disconnect: [] })).toEqual({ present: false, ref: null });
+    expect(readCountryPayload({ connect: [] })).toEqual({ present: false, ref: null });
+  });
+
+  it('reads a country changed in the admin (disconnect old, connect new)', () => {
+    expect(
+      readCountryPayload({ connect: [{ id: 2, documentId: 'cl' }], disconnect: [{ id: 1, documentId: 'co' }] }),
+    ).toEqual({ present: true, ref: 'cl' });
+  });
+});
+
