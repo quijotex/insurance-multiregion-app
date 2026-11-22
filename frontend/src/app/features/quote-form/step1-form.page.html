@@ -1,0 +1,73 @@
+<section class="step1 py-4">
+  <app-stepper [steps]="steps" [current]="1" />
+
+  <div class="step1__card mx-auto">
+    <header class="step1__header reveal" style="--reveal-index: 0">
+      <h1 class="step1__heading" tabindex="-1">Cuéntanos de ti y de tu carro</h1>
+      <p class="step1__subtitle">Te toma menos de 2 minutos.</p>
+    </header>
+
+    @if (loading()) {
+      <div class="step1__skeleton" aria-busy="true">
+        <span class="visually-hidden">Cargando formulario…</span>
+        @for (n of [1, 2, 3, 4, 5, 6]; track n) {
+          <div class="step1__skeleton-field" aria-hidden="true">
+            <span class="step1__skeleton-label"></span>
+            <span class="step1__skeleton-control"></span>
+          </div>
+        }
+      </div>
+    } @else if (failed()) {
+      <div class="step1__error" role="alert">
+        <p>No pudimos cargar el formulario.</p>
+        <button type="button" class="button button--secondary" (click)="load()">Reintentar</button>
+      </div>
+    } @else if (isEmpty()) {
+      <p class="step1__empty">Por ahora no hay datos que pedir para este país.</p>
+    } @else if (form(); as formGroup) {
+      <form [formGroup]="formGroup" (ngSubmit)="submit()" novalidate>
+        @for (section of sections(); track section.id) {
+          <h2 class="step1__section reveal" [style.--reveal-index]="section.titleDelay">
+            @if (section.id === 'policyholder') {
+              <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2" />
+                <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+                <path d="M4 16v-4l2-5h12l2 5v4M4 16h16M4 16v2h3v-2M17 16v2h3v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="8" cy="13" r="1" fill="currentColor" />
+                <circle cx="16" cy="13" r="1" fill="currentColor" />
+              </svg>
+            }
+            {{ section.title }}
+          </h2>
+          <div class="row g-3">
+            @for (item of section.fields; track item.field.key) {
+              <div
+                class="reveal"
+                [class.col-12]="item.field.type === 'checkbox'"
+                [class.col-md-6]="item.field.type !== 'checkbox'"
+                [style.--reveal-index]="item.delay"
+              >
+                <app-form-field
+                  [field]="item.field"
+                  [control]="control(item.field.key)"
+                  [submitted]="submitted()"
+                />
+              </div>
+            }
+          </div>
+        }
+        <div class="step1__actions d-flex justify-content-end reveal" [style.--reveal-index]="buttonDelay()">
+          <button type="submit" class="button button--cta">
+            Continuar
+            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+              <path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</section>
