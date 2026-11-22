@@ -49,7 +49,7 @@ export function buildValidators(
   }
 
   for (const rule of rules.validators) {
-    const factory = NAMED_RULES[rule.name];
+    const factory = Object.hasOwn(NAMED_RULES, rule.name) ? NAMED_RULES[rule.name] : undefined;
     if (!factory) {
       console.warn(`[form] Unknown rule "${rule.name}" on field "${fieldKey}" – skipped`);
       continue;

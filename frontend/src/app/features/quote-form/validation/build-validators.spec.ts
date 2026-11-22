@@ -75,4 +75,9 @@ describe('US-01 · FR-014 named rules', () => {
     expect(errors({ validators: [{ name: 'nope', value: null }] }, 'x')).toBeNull();
     expect(warn).toHaveBeenCalledWith('[form] Unknown rule "nope" on field "f" – skipped');
   });
+  it('skips a rule named like an Object.prototype member without throwing', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    expect(errors({ validators: [{ name: 'toString', value: null }] }, 'x')).toBeNull();
+    expect(warn).toHaveBeenCalledWith('[form] Unknown rule "toString" on field "f" – skipped');
+  });
 });
