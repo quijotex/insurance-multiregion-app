@@ -68,7 +68,7 @@ Options keep their order in the component list.
 | 4 | `birthDate` · Fecha de nacimiento · date | same | `legalAge` |
 | 5 | `email` · Correo electrónico · text | same | email pattern |
 | 6 | `mobilePhone` · Celular · text | same | CO `^3[0-9]{9}$` · CL `^9[0-9]{8}$` |
-| 7 | `city` · Ciudad · select | `region` · Región · select | 5 fictitious-use options each |
+| 7 | `city` · Ciudad · select | `region` · Región · select | CO: 5 cities · CL: the 16 regions, north to south (Gate 3) |
 | 8 | `plate` · Placa · text | `plate` · Patente · text | CO `^[A-Za-z]{3}[0-9]{3}$` · CL `^([A-Za-z]{4}[0-9]{2}\|[A-Za-z]{2}[0-9]{4})$` |
 | 9 | `vehicleMake` · Marca · select | same | 6 common makes |
 | 10 | `vehicleYear` · Año del vehículo · number | same | `maxYearsAgo` 20, `maxYearsAhead` 1 |

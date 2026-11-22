@@ -34,6 +34,26 @@ interface SeedField {
 
 const opts = (labels: string[]): SeedOption[] => labels.map((l) => ({ label: l, value: l }));
 
+/** The 16 regions of Chile, north to south. */
+export const CL_REGIONS = [
+  'Arica y Parinacota',
+  'Tarapacá',
+  'Antofagasta',
+  'Atacama',
+  'Coquimbo',
+  'Valparaíso',
+  'Metropolitana de Santiago',
+  "Libertador General Bernardo O'Higgins",
+  'Maule',
+  'Ñuble',
+  'Biobío',
+  'La Araucanía',
+  'Los Ríos',
+  'Los Lagos',
+  'Aysén del General Carlos Ibáñez del Campo',
+  'Magallanes y de la Antártica Chilena',
+];
+
 const MAKES = opts(['Chevrolet', 'Renault', 'Toyota', 'Mazda', 'Kia', 'Nissan']);
 
 const fullName: Omit<SeedField, 'order'> = {
@@ -183,13 +203,7 @@ const CL_FIELDS: SeedField[] = withOrder([
     section: 'policyholder',
     helpText: 'Región donde vives.',
     errorMessage: 'Selecciona tu región.',
-    options: opts([
-      'Región Metropolitana',
-      'Valparaíso',
-      'Biobío',
-      'Araucanía',
-      'Los Lagos',
-    ]),
+    options: opts(CL_REGIONS),
   },
   {
     key: 'plate',
