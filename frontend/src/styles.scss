@@ -15,6 +15,7 @@
   --color-surface: #ffffff;
   --color-surface-alt: #f8f8f8;
   --color-surface-highlight: #dfeaff;
+  --color-surface-brand-soft: #f3f7ff;
   --color-border: #cdced9;
   --color-disabled-bg: #e7e7e7;
   --color-disabled-text: #666666;
@@ -74,4 +75,17 @@ body {
     transition: none !important;
     animation: none !important;
   }
+}
+
+/* Shared utility: hidden visually, still read by screen readers. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
