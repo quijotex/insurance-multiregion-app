@@ -57,6 +57,24 @@ describe('US-01 · FR-011 select field keyboard', () => {
     expect(trigger.getAttribute('aria-activedescendant')).toBe('brand-option-0');
   });
 
+  it('scrolls the active option into view as the arrows move (long lists)', async () => {
+    const scrolled: string[] = [];
+    const original = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function (this: Element) {
+      scrolled.push(this.id);
+    };
+    try {
+      key('ArrowDown');
+      await fixture.whenStable();
+      key('End');
+      await fixture.whenStable();
+      expect(scrolled).toContain('brand-option-0');
+      expect(scrolled.at(-1)).toBe('brand-option-2');
+    } finally {
+      Element.prototype.scrollIntoView = original;
+    }
+  });
+
   it('Enter picks the active option, emits the value and closes', () => {
     key('ArrowDown');
     key('ArrowDown');

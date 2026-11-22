@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  afterRenderEffect,
   computed,
   forwardRef,
   inject,
@@ -145,6 +146,15 @@ export class SelectFieldComponent implements ControlValueAccessor {
     if (this.options().length === 0) return 'Sin opciones disponibles';
     return this.selectedOption()?.label ?? this.placeholder();
   });
+
+  constructor() {
+    // Keep the active option visible in a list taller than its max height (arrows, Home, End, opening).
+    afterRenderEffect(() => {
+      if (!this.open()) return;
+      const option = this.host.nativeElement.querySelector<HTMLElement>(`#${CSS.escape(this.optionId(this.activeIndex()))}`);
+      option?.scrollIntoView?.({ block: 'nearest' });
+    });
+  }
 
   private onChange: (value: string) => void = () => undefined;
   private onTouched: () => void = () => undefined;
