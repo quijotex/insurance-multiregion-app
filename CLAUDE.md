@@ -32,11 +32,13 @@ The full agentic flow (steps, gates, agents) is described in `FLOW.md`.
 - **E2E candidates:** list only critical flows that deserve an e2e test, each with a one-line justification. The human marks each one **Approved** or **Rejected** at Gate 2. The `e2e-tester` agent runs only for approved candidates.
 - **Design options:** for every client-facing view, 2–3 design options based on the `ui-ux-guidelines` skill, with a recommendation. The human picks one at Gate 2.
 - **ADRs:** every architectural decision gets an ADR in `docs/adr/` (context, alternatives, consequences), linked from `plan.md`.
+- **Revisions:** when the human rejects or corrects the plan at Gate 2, append an entry to a `## Revisions` section at the end of `plan.md`: date, what the human asked to change, and what changed. Never delete entries.
 
 ## Traceability
 - The user story ID `US-XX` appears in: spec folder name, spec header, each task line, ADR "Related" field, test names (`describe('US-XX · FR-XXX …')`), and commit footer `Refs: US-XX`.
 - Requirements in `spec.md` are numbered `FR-XXX`; tasks and tests reference them.
-- Gate approvals are recorded in the artifact header: `**Status**: Approved (Gate 1|2) — <date>`.
+- Gate approvals are recorded in the artifact header: `**Status**: Approved (Gate 1|2) — <date>`. Gate 3 is recorded as the last line of `review.md`: `Gate 3: Approved — <date>`.
+- Human corrections: Gate 1 in `spec.md` › Clarifications, Gate 2 in `plan.md` › Revisions, Gate 3 as new tasks in `tasks.md`.
 
 ## Security & Workflow Hygiene
 - **NEVER** read, print, or commit `cms/.env` or any `.env` file (only read `.env.example` when checking required environment variables).
