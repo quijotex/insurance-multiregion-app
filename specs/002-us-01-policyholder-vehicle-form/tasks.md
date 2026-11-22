@@ -109,8 +109,8 @@
 
 ## Phase 6: E2E (approved at Gate 2)
 
-- [ ] T017 [E2E] US-01 E2E-1: on `/co/quote` the CMS fields render; fill in valid data; "Continuar" → step 2; "Volver" → values kept (FR-002, FR-009, FR-012) — `frontend/e2e/us-01-*.spec.ts` (depends on T007, T015)
-- [ ] T018 [E2E] US-01 E2E-2: on `/cl/quote` an invalid RUT and an underage birth date block "Continuar" with the configured messages, and focus moves to the first error (FR-005–FR-007, FR-014) — `frontend/e2e/us-01-*.spec.ts` (depends on T007, T015)
+- [x] T017 [E2E] US-01 E2E-1: on `/co/quote` the CMS fields render; fill in valid data; "Continuar" → step 2; "Volver" → values kept (FR-002, FR-009, FR-012) — `frontend/e2e/us-01-*.spec.ts` (depends on T007, T015)
+- [x] T018 [E2E] US-01 E2E-2: on `/cl/quote` an invalid RUT and an underage birth date block "Continuar" with the configured messages, and focus moves to the first error (FR-005–FR-007, FR-014) — `frontend/e2e/us-01-*.spec.ts` (depends on T007, T015)
 
 ## Phase 7: Polish
 
