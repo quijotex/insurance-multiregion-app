@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  OnInit,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -20,6 +30,7 @@ export class CountrySelectionPage implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly status = signal<LoadStatus>('loading');
   protected readonly countries = signal<Country[]>([]);
@@ -30,6 +41,10 @@ export class CountrySelectionPage implements OnInit {
     () => this.status() === 'ready' && this.countries().length === 0,
   );
   protected readonly canContinue = computed(() => this.selectedCode() !== null);
+
+  constructor() {
+    afterNextRender(() => this.host.nativeElement.querySelector<HTMLElement>('h1')?.focus());
+  }
 
   ngOnInit(): void {
     this.fetch(this.countryService.load());

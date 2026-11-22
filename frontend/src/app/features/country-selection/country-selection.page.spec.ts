@@ -41,25 +41,32 @@ function setup(opts: {
 }
 
 function continueButton(el: HTMLElement): HTMLButtonElement {
-  return el.querySelector<HTMLButtonElement>('.button--cta') as HTMLButtonElement;
+  return Array.from(el.querySelectorAll('button')).find(
+    (b) => b.textContent?.trim() === 'Continuar',
+  ) as HTMLButtonElement;
 }
 
 function radio(el: HTMLElement, index: number): HTMLInputElement {
   return el.querySelectorAll<HTMLInputElement>('input[type="radio"]')[index];
 }
 
+function radioByName(el: HTMLElement, name: string): HTMLInputElement | undefined {
+  const label = Array.from(el.querySelectorAll('label')).find((l) => l.textContent?.trim() === name);
+  return label?.querySelector<HTMLInputElement>('input[type="radio"]') ?? undefined;
+}
+
 describe('US-00 · FR-003 / FR-004 continue button and navigation', () => {
   it('is disabled until a country is selected, then enabled', async () => {
     const { fixture, el } = setup({});
     expect(continueButton(el).disabled).toBe(true);
-    radio(el, 0).click();
+    radioByName(el, 'Chile')?.click();
     fixture.detectChanges();
     expect(continueButton(el).disabled).toBe(false);
   });
 
   it('navigates to /cl/quote after selecting Chile', () => {
     const { fixture, el, navigateByUrl } = setup({});
-    radio(el, 0).click();
+    radioByName(el, 'Chile')?.click();
     fixture.detectChanges();
     continueButton(el).click();
     expect(navigateByUrl).toHaveBeenCalledWith('/cl/quote');
@@ -75,7 +82,7 @@ describe('US-00 · FR-003 / FR-004 continue button and navigation', () => {
 describe('US-00 · FR-011 preselect last country', () => {
   it('preselects the session country when it is in the list', () => {
     const { el } = setup({ last: 'co' });
-    expect(radio(el, 1).checked).toBe(true);
+    expect(radioByName(el, 'Colombia')?.checked).toBe(true);
     expect(continueButton(el).disabled).toBe(false);
   });
 
@@ -111,7 +118,7 @@ describe('US-00 · FR-010 loading, empty and error states', () => {
   it('shows the empty message when there are no countries', () => {
     const { el } = setup({ load: of([]) });
     expect(el.textContent).toContain('Por ahora no hay países disponibles.');
-    expect(continueButton(el)).toBeNull();
+    expect(continueButton(el)).toBeUndefined();
   });
 
   it('shows the error and Reintentar reloads the countries', () => {
@@ -127,5 +134,26 @@ describe('US-00 · FR-010 loading, empty and error states', () => {
     fixture.detectChanges();
     expect(reload).toHaveBeenCalledTimes(1);
     expect(el.querySelectorAll('input[type="radio"]').length).toBe(2);
+  });
+});
+
+describe('US-00 · FR-003 selected tile', () => {
+  it('shows no "Seleccionado" text and marks the tile with the modifier', () => {
+    const { fixture, el } = setup({});
+    radioByName(el, 'Chile')?.click();
+    fixture.detectChanges();
+    expect(el.textContent).not.toContain('Seleccionado');
+    expect(radioByName(el, 'Chile')?.checked).toBe(true);
+    expect(el.querySelectorAll('.choice-tile--selected').length).toBe(1);
+    expect(el.querySelector('.choice-tile--selected svg')?.getAttribute('aria-hidden')).toBe('true');
+  });
+});
+
+describe('US-00 · FR-009 focus on the selection heading', () => {
+  it('focuses the heading after render', async () => {
+    const { fixture, el } = setup({});
+    await fixture.whenStable();
+    expect(document.activeElement).toBe(el.querySelector('h1'));
+    expect(el.querySelector('h1')?.getAttribute('tabindex')).toBe('-1');
   });
 });

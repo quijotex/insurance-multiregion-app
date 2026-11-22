@@ -38,9 +38,8 @@ import { WizardCountry } from './wizard-country.service';
       font-weight: 700;
       color: var(--color-brand);
     }
-    .step__heading:focus-visible {
+    .step__heading:focus {
       outline: none;
-      box-shadow: var(--focus-ring);
     }
     .step__country {
       margin: 0 0 var(--space-4);

@@ -3,7 +3,7 @@
 </header>
 
 <main class="country-page">
-  <h1 class="country-page__title">¿Dónde quieres asegurar tu carro?</h1>
+  <h1 class="country-page__title" tabindex="-1">¿Dónde quieres asegurar tu carro?</h1>
   <p class="country-page__subtitle">Elige tu país para ver los planes y precios</p>
 
   @if (unavailable) {
@@ -14,7 +14,11 @@
 
   @switch (status()) {
     @case ('loading') {
-      <p class="country-page__status" aria-busy="true">Cargando países…</p>
+      <div class="country-page__tiles" aria-busy="true">
+        <span class="visually-hidden">Cargando países…</span>
+        <span class="choice-tile choice-tile--skeleton" aria-hidden="true"></span>
+        <span class="choice-tile choice-tile--skeleton" aria-hidden="true"></span>
+      </div>
     }
     @case ('error') {
       <div class="country-page__error" role="alert">
@@ -46,19 +50,23 @@
               }
               <span class="choice-tile__name">{{ country.name }}</span>
               @if (selectedCode() === country.code) {
-                <span class="choice-tile__selected">
-                  <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
-                    <path
-                      d="M3 8.5l3.2 3.2L13 4.8"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  Seleccionado
-                </span>
+                <svg
+                  class="choice-tile__check"
+                  viewBox="0 0 16 16"
+                  width="20"
+                  height="20"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M3 8.5l3.2 3.2L13 4.8"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
               }
             </label>
           }

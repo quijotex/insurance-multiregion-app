@@ -18,9 +18,9 @@ describe('US-00 · FR-007 header "Cambiar país"', () => {
   }
 
   async function clickChange(fixture: ReturnType<typeof setup>) {
-    const button = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
-      '.wizard-header__change',
-    );
+    const button = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
+    ).find((b) => b.textContent?.trim() === 'Cambiar país');
     button?.click();
     await fixture.whenStable();
     await Promise.resolve();
