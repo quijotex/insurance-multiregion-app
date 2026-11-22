@@ -44,14 +44,14 @@ describe('US-01 · FR-005 form field error visibility and a11y', () => {
   });
 
   it('hides the error before blur', () => {
-    expect(el.querySelector('[role="alert"]')).toBeNull();
+    expect(el.querySelector('.form-field__error')).toBeNull();
     expect(input().getAttribute('aria-invalid')).toBeNull();
   });
 
   it('shows the configured error after blur, wired with aria-describedby', async () => {
     input().dispatchEvent(new Event('blur'));
     await fixture.whenStable();
-    const alert = el.querySelector('[role="alert"]')!;
+    const alert = el.querySelector('.form-field__error')!;
     expect(alert.textContent).toContain('Ingresa tu nombre completo.');
     expect(input().getAttribute('aria-invalid')).toBe('true');
     const ids = input().getAttribute('aria-describedby')!.split(' ');
@@ -64,7 +64,7 @@ describe('US-01 · FR-005 form field error visibility and a11y', () => {
     input().value = 'Ana Pérez';
     input().dispatchEvent(new Event('input'));
     await fixture.whenStable();
-    expect(el.querySelector('[role="alert"]')).toBeNull();
+    expect(el.querySelector('.form-field__error')).toBeNull();
     expect(input().getAttribute('aria-invalid')).toBeNull();
     expect(input().getAttribute('aria-describedby')).toBe('field-fullName-help');
   });
@@ -72,7 +72,7 @@ describe('US-01 · FR-005 form field error visibility and a11y', () => {
   it('shows the error without blur when submitted', async () => {
     host.submitted.set(true);
     await fixture.whenStable();
-    expect(el.querySelector('[role="alert"]')).not.toBeNull();
+    expect(el.querySelector('.form-field__error')).not.toBeNull();
   });
 
   it('links the visible label, marks required and hides the asterisk from AT', () => {
@@ -101,7 +101,7 @@ describe('US-01 · FR-005 form field error visibility and a11y', () => {
     expect(input().type).toBe('checkbox');
     input().dispatchEvent(new Event('blur'));
     await fixture.whenStable();
-    expect(el.querySelector('[role="alert"]')).not.toBeNull();
+    expect(el.querySelector('.form-field__error')).not.toBeNull();
   });
 
   it('renders a select as a combobox linked to the label', async () => {

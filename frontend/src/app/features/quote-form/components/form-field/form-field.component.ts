@@ -82,7 +82,7 @@ export function fieldInputId(key: string): string {
         <p class="form-field__help" [id]="helpId()">{{ field().helpText }}</p>
       }
       @if (showError()) {
-        <p class="form-field__error" role="alert" [id]="errorId()">
+        <p class="form-field__error" [id]="errorId()">
           <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
             <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
             <path d="M8 4.5v4.2M8 11v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />

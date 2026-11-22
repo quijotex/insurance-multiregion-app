@@ -1,7 +1,9 @@
 <section class="step1 py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
   <app-stepper [steps]="steps" [current]="1" />
 
-  <div class="step1__card mx-auto">
+  <div class="step1__card">
     <header class="step1__header reveal" style="--reveal-index: 0">
       <h1 class="step1__heading" tabindex="-1">Cuéntanos de ti y de tu carro</h1>
       <p class="step1__subtitle">Te toma menos de 2 minutos.</p>
@@ -19,13 +21,24 @@
       </div>
     } @else if (failed()) {
       <div class="step1__error" role="alert">
-        <p>No pudimos cargar el formulario.</p>
+        <p class="step1__error-title">
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+            <path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          No pudimos cargar el formulario.
+        </p>
+        <p class="step1__error-hint">Revisa tu conexión e inténtalo de nuevo.</p>
         <button type="button" class="button button--secondary" (click)="load()">Reintentar</button>
       </div>
     } @else if (isEmpty()) {
-      <p class="step1__empty">Por ahora no hay datos que pedir para este país.</p>
+      <div class="step1__empty-state">
+        <p class="step1__empty">Por ahora no hay datos que pedir para este país.</p>
+        <button type="button" class="button button--secondary" (click)="load()">Reintentar</button>
+      </div>
     } @else if (form(); as formGroup) {
       <form [formGroup]="formGroup" (ngSubmit)="submit()" novalidate>
+        <p class="visually-hidden" aria-live="polite" data-testid="submit-status">{{ statusMessage() }}</p>
         @for (section of sections(); track section.id) {
           <h2 class="step1__section reveal" [style.--reveal-index]="section.titleDelay">
             @if (section.id === 'policyholder') {
@@ -70,4 +83,6 @@
       </form>
     }
   </div>
+  </div>
+    </div>
 </section>

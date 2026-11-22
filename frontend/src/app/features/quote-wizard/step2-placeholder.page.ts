@@ -14,17 +14,20 @@ import { StepperComponent } from '../../shared/ui/stepper/stepper.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="step py-4">
-      <app-stepper [steps]="steps" [current]="2" />
-      <div class="step__card mx-auto">
-        <h1 class="step__heading" tabindex="-1">Elige tu plan</h1>
-        <p class="step__text">Los planes llegan con US-02.</p>
-        <button type="button" class="button button--secondary" (click)="back()">Volver</button>
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+          <app-stepper [steps]="steps" [current]="2" />
+          <div class="step__card">
+            <h1 class="step__heading" tabindex="-1">Elige tu plan</h1>
+            <p class="step__text">Los planes llegan con US-02.</p>
+            <button type="button" class="button button--secondary" (click)="back()">Volver</button>
+          </div>
+        </div>
       </div>
     </section>
   `,
   styles: `
     .step__card {
-      max-width: 620px;
       margin-top: var(--space-4);
       padding: var(--space-6);
       border-radius: var(--radius-md);
@@ -43,21 +46,6 @@ import { StepperComponent } from '../../shared/ui/stepper/stepper.component';
     .step__text {
       margin: 0 0 var(--space-6);
       color: var(--color-text-muted);
-    }
-    .button {
-      min-height: 48px;
-      padding: var(--space-3) var(--space-6);
-      border: 1px solid var(--color-brand);
-      border-radius: var(--radius-pill);
-      background: var(--color-surface);
-      color: var(--color-brand);
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .button:focus-visible {
-      outline: none;
-      box-shadow: var(--focus-ring);
     }
     @media (min-width: 768px) {
       .step__heading {

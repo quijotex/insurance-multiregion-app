@@ -88,6 +88,9 @@ describe('US-01 · FR-005/FR-006 step 1 form page', () => {
     await fixture.whenStable();
   };
   const alerts = () => Array.from(el.querySelectorAll('[role="alert"]')).map((a) => a.textContent?.trim());
+  const fieldErrors = () =>
+    Array.from(el.querySelectorAll('.form-field__error')).map((a) => a.textContent?.trim());
+  const status = () => el.querySelector('[aria-live="polite"]')?.textContent?.trim();
   const isoYearsAgo = (years: number) => {
     const d = new Date();
     d.setFullYear(d.getFullYear() - years);
@@ -115,13 +118,16 @@ describe('US-01 · FR-005/FR-006 step 1 form page', () => {
     ]);
     expect(control('Nombre completo')).toBeTruthy();
     expect(el.querySelector('[role="combobox"]')).not.toBeNull();
-    expect(alerts()).toEqual([]);
+    expect(fieldErrors()).toEqual([]);
+    expect(el.querySelector('[role="alert"]')).toBeNull();
   });
 
   it('Continuar with an empty form shows every error and focuses the first field', async () => {
     await setup();
     await submit();
-    expect(alerts()).toHaveLength(4);
+    expect(fieldErrors()).toHaveLength(4);
+    expect(el.querySelector('[role="alert"]')).toBeNull();
+    expect(status()).toBe('Revisa los 4 campos marcados.');
     expect(document.activeElement).toBe(control('Nombre completo'));
     expect(navigate).not.toHaveBeenCalled();
     expect(session.isStep1Completed()).toBe(false);
@@ -134,6 +140,7 @@ describe('US-01 · FR-005/FR-006 step 1 form page', () => {
     await type('Placa', 'ABC123');
     await submit();
     expect(document.activeElement).toBe(el.querySelector('[role="combobox"]'));
+    expect(status()).toBe('Revisa el campo marcado.');
   });
 
   it('a valid form marks step 1 completed and navigates to plans', async () => {
@@ -197,6 +204,9 @@ describe('US-01 · FR-005/FR-006 step 1 form page', () => {
     await setup();
     expect(el.textContent).toContain('Por ahora no hay datos que pedir para este país.');
     expect(el.textContent).not.toContain('Continuar');
+    Array.from(el.querySelectorAll('button')).find((b) => b.textContent?.includes('Reintentar'))!.click();
+    await fixture.whenStable();
+    expect(load).toHaveBeenCalledTimes(2);
   });
 
   it('FR-007 uses the legalAge of the active country', async () => {
@@ -205,7 +215,8 @@ describe('US-01 · FR-005/FR-006 step 1 form page', () => {
     await type('Fecha de nacimiento', isoYearsAgo(20));
     await type('Placa', 'ABC123');
     await submit();
-    expect(alerts()).toContain('Error en birthDate');
+    expect(fieldErrors()).toContain('Error en birthDate');
+    expect(status()).toBe('Revisa los 2 campos marcados.');
     expect(navigate).not.toHaveBeenCalled();
   });
 });

@@ -55,6 +55,7 @@ export class Step1FormPage {
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
   protected readonly submitted = signal(false);
+  protected readonly statusMessage = signal('');
   protected readonly form = signal<Step1Group | null>(null);
   private readonly loaded = signal<FormSections | null>(null);
   private loadSub: Subscription | null = null;
@@ -143,6 +144,14 @@ export class Step1FormPage {
     this.submitted.set(true);
     form.markAllAsTouched();
     if (form.invalid) {
+      const count = Object.values(form.controls).filter((c) => c.invalid).length;
+      // Same text twice in a row is not re-announced: clear first, then set on the next tick.
+      this.statusMessage.set('');
+      queueMicrotask(() =>
+        this.statusMessage.set(
+          count === 1 ? 'Revisa el campo marcado.' : `Revisa los ${count} campos marcados.`,
+        ),
+      );
       this.focusFirstInvalid(form);
       return;
     }

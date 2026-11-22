@@ -93,8 +93,8 @@ test.describe('US-01', () => {
     await page.getByRole('button', { name: 'Continuar' }).click();
     await expect(page).toHaveURL(/\/cl\/quote$/);
 
-    await expect(page.getByRole('alert').filter({ hasText: messages['rut'] })).toBeVisible();
-    await expect(page.getByRole('alert').filter({ hasText: messages['birthDate'] })).toBeVisible();
+    await expect(page.locator('.form-field__error').filter({ hasText: messages['rut'] })).toBeVisible();
+    await expect(page.locator('.form-field__error').filter({ hasText: messages['birthDate'] })).toBeVisible();
     await expect(page.getByLabel('RUT')).toHaveAttribute('aria-invalid', 'true');
     await expect(page.getByLabel('Fecha de nacimiento')).toHaveAttribute('aria-invalid', 'true');
     await expect(page.getByLabel('RUT')).toBeFocused();
