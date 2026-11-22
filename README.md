@@ -81,7 +81,18 @@ npm --prefix frontend start    # Angular on http://localhost:4200 (proxies /api 
 
 ## Strapi admin user
 
-_To be completed with US-00: the admin user is created at bootstrap from environment variables with dev-only defaults, documented here._
+On the first start, Strapi creates a super admin from `ADMIN_EMAIL` / `ADMIN_PASSWORD` if no admin exists yet. The dev-only defaults set in `docker-compose.yml` are fictitious:
+
+| Field | Default (dev only) |
+|-------|--------------------|
+| Email | `admin@example.test` |
+| Password | `DevOnly-Passw0rd` |
+
+To use other values, put them in a root `.env` file, which is never committed. Locally (`npm --prefix cms run develop`), no admin is created unless both variables are set; Strapi then asks you to register one.
+
+### Managing countries (US-00)
+
+In the admin, go to **Content Manager › Country**. A country is offered on the selection screen when it is **published** and **Active** is on, and countries are listed by **Order**. To hide one, switch **Active** off or unpublish it. The seed includes Perú as published but inactive, so `/pe/quote` shows the "not available" message.
 
 ## Security notes
 
