@@ -27,7 +27,7 @@ The existing fields are unchanged: `name`, `code`, `icon`, `order`, `active`.
 | `validations` | component `form.validations` (single) | optional |
 | `options` | component `form.option` (repeatable) | used when `type = select` |
 
-### Component `form.validations`
+### Component `form.validations` (`FormValidations`)
 | Field | Type | Notes |
 |-------|------|-------|
 | `min` | decimal | for numbers |
@@ -35,13 +35,13 @@ The existing fields are unchanged: `name`, `code`, `icon`, `order`, `active`.
 | `pattern` | string | a regular expression, applied anchored (whole value) |
 | `validators` | component `form.validator` (repeatable) | named rules |
 
-### Component `form.validator`
+### Component `form.validator` (`FormValidator`)
 | Field | Type | Notes |
 |-------|------|-------|
 | `name` | string | required. One of `rut`, `legalAge`, `maxYearsAgo`, `maxYearsAhead` (R6). An unknown name is skipped |
 | `value` | integer | optional, e.g. 20 for `maxYearsAgo` |
 
-### Component `form.option`
+### Component `form.option` (`FormOption`)
 | Field | Type | Notes |
 |-------|------|-------|
 | `label` | string | required, shown to the person |
