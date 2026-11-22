@@ -121,6 +121,9 @@
 - [x] T020 [FE] US-01 R-09: neutral copy valid in both countries: "Cuéntanos de ti y de tu vehículo" and the section "Tu vehículo" (the human chose neutral copy at Gate 3) — `frontend/src/app/features/quote-form/step1-form.page.*`, `frontend/e2e/us-01-*.spec.ts`
 - [x] T021 [ORCH] US-01 R-04: record in spec.md › Clarifications that the RUT is accepted with or without a hyphen and dots, and validated by its check digit (the human kept the lenient format at Gate 3); FR-014 wording aligned — `specs/002-us-01-policyholder-vehicle-form/spec.md`
 - R-10 (fields half width from 768 px): accepted as is by the human at Gate 3, no task.
+- [x] T022 [FE] US-01 FR-003 (Gate 3, human manual test): an open select list must sit above every later field and the "Continuar" button. The reveal animation's `both` fill kept a stacking context on each item; use `backwards` fill and lift the item that holds an open list — `frontend/src/app/features/quote-form/step1-form.page.scss`
+- [x] T023 [CMS] US-01 FR-013 (Gate 3): seed all 16 Chilean regions, north to south, in the CL `region` field; update the local database's existing field through the Document Service (the seed only runs on an empty table); data-model.md row 7 aligned. The vehicle makes stay at 6 (human decision) — `cms/src/seed/form-fields.ts`, `specs/002-us-01-policyholder-vehicle-form/data-model.md`
+- [x] T024 [FE] US-01 (Gate 3): SVG favicon with the Asegura+ brand (yellow "+" on brand blue), `favicon.ico` kept as fallback — `frontend/public/favicon.svg`, `frontend/src/index.html`
 
 ## Waves
 
