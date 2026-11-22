@@ -28,3 +28,33 @@ Range reviewed: `706529f..HEAD` (11 commits). Verification: `npm --prefix fronte
 5. **Mobile header without icon (R-01):** after the fix, create a country with no icon and check the header at 320px.
 
 **Verdict: Changes requested** (R-01 Major; R-02–R-09 Minor, fix or justify as Won't fix in round 2).
+
+## Round 2 — 2026-11-22
+
+Range reviewed: fix commits `144e6aa`, `16d7eb2`, `dc3f7df`, `5d7c771` (full feature range `706529f..HEAD` re-checked for regressions). Verification: `npm --prefix frontend run verify` passed (lint, typecheck, 43 tests in 6 files). `npm --prefix cms run build` passed.
+
+| ID | Severity | Location | Finding | Rule/FR | Status | Resolution |
+|----|----------|----------|---------|---------|--------|------------|
+| R-01 | Major | quote-wizard.shell.html:6, quote-wizard.shell.scss:45, 80 | Country name hidden on mobile even without an icon. | FR-007, Edge Case "no icon" | Resolved (144e6aa) | The name is hidden only under `wizard-header__country--with-icon`, a class added only when `iconUrl` is set, and the `min-width: 576px` reset uses the same selector. A new shell test covers the no-icon case. |
+| R-02 | Minor | cms/src/api/country/controllers/country.ts:11 | `?status=draft` could list unpublished countries. | Research R1, ADR 0001 | Resolved (5d7c771) | `find` now forces `status: 'published'` after spreading the client query, so the client value is overwritten. The orchestrator checked at runtime that a draft-only country is no longer listed. |
+| R-03 | Minor | country-selection.page.scss:106 | Tile hover changed the background. | plan.md › Design options › Chosen | Resolved (16d7eb2) | Hover now changes only the border colour. |
+| R-04 | Minor | country-selection.page.html:45; quote-wizard.shell.html:8 | Decorative flags had a non-empty alt, so names were read twice. | ui-ux-guidelines §6, FR-009 | Resolved (144e6aa, 16d7eb2) | Both images use `alt=""`. The name is always in the DOM next to them (visually hidden at most). The shell test was updated. |
+| R-05 | Minor | quote-wizard.shell.scss:59-75 | Raw colours (`#fff`, `rgba(255,255,255,0.12)`) in a component. | ui-ux-guidelines §1 | Open | Not fixed. It does not block the gate. Fix it in a follow-up (Gate 3 task or the next story touching the header): use `var(--color-surface)` and add an overlay token. |
+| R-06 | Minor | country-selection.page.html:16-18 | Loading state is text, not a skeleton. | ui-ux-guidelines §3 States › Loading | Open | Not fixed. It does not block the gate, because the loading, error and empty states all exist and work. Use the skeleton when a shared skeleton component is introduced. |
+| R-08 | Minor | quote-wizard.shell.spec.ts:21-23, 55-58; country-selection.page.spec.ts:44-46 | Tests query by CSS class instead of role or label. The new R-01 test also relies on the BEM class, which is unavoidable there because it asserts the hiding modifier. | angular-conventions › Testing | Open | Not fixed. It does not block the gate. Change the button lookups to find by accessible name when these specs are next edited. |
+| R-09 | Minor | country-selection.page.ts:34-36 | After "Cambiar país", focus is left on `body` instead of the heading. | angular-conventions › Accessibility, SC-004 | Open | Not fixed. It is the most user-relevant of the open items (keyboard and screen-reader users). I recommend adding it as a Gate 3 task: `h1 tabindex="-1"` plus `afterNextRender` focus, as in `step1-placeholder.page.ts`. |
+
+R-07 (Minor, `app.ts` OnPush): **Resolved (dc3f7df)**. `App` now declares `ChangeDetectionStrategy.OnPush`.
+
+No new Blocker or Major findings. The fixes are small and scoped, and none of them introduced a regression. The Public role, token-free frontend and relative URLs are unchanged.
+
+### For the human to check by hand
+1. **Scenario 8 (not run):** in the admin, switch Chile's **Active** off, reload `/` (Chile gone) and `/cl/quote` (redirect with the "not available" message). Then unpublish Colombia and confirm the same behaviour. Restore both afterwards.
+2. **Confirm dialog paths (FR-007 / FR-012):** still reachable only once US-01 writes session data. Re-test then: a same-tab link to the other country (confirm and cancel), "Cambiar país" with data, Esc to cancel, and focus returning to the trigger.
+3. **Screen reader pass:** the radio group should read as legend "País" plus the tile names, with no "Bandera de…" prefix now. Also check the header chip (name only) and the `role="alert"` "not available" message.
+4. **Mobile header without icon (R-01):** create a country with no icon and check at 320px that its name is visible. A country with an icon should show only the flag below 576px.
+5. **Focus after "Cambiar país" (R-09, open):** note that focus currently stays on `body`. Decide whether to add it as a Gate 3 task.
+
+(The `?status=draft` check from round 1 has been dropped because the orchestrator verified it at runtime for R-02.)
+
+**Verdict: Approved** (all Blocker and Major findings resolved; R-05, R-06, R-08 and R-09 remain Open as Minor follow-ups, R-09 recommended as a Gate 3 task).
