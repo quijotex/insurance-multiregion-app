@@ -13,33 +13,33 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 [P] [FE] US-02 Add `swiper` (latest stable major, approved at Gate 2) as a frontend dependency, and import its core CSS only where the slider is used (R13) — `frontend/package.json`, `frontend/package-lock.json`
+- [x] T001 [P] [FE] US-02 Add `swiper` (latest stable major, approved at Gate 2) as a frontend dependency, and import its core CSS only where the slider is used (R13) — `frontend/package.json`, `frontend/package-lock.json`
 
 ## Phase 2: Foundational — CMS (blocks the stories)
 
-- [ ] T002 [P] [CMS] US-02 Components per [data-model.md](data-model.md):
+- [x] T002 [P] [CMS] US-02 Components per [data-model.md](data-model.md):
   - `plan.item`: `text` (string, required, maxLength 120).
   - `pricing.age-band`: `fromAge` and `toAge` (integer, required, min 0), `factor` (decimal, required, min 0.01).
   - The component `description` states the rule for editors (R12).
   (FR-001, FR-005) — `cms/src/components/plan/item.json`, `cms/src/components/pricing/age-band.json`
-- [ ] T003 [CMS] US-02 Country gains:
+- [x] T003 [CMS] US-02 Country gains:
   - `currency` (required, `^[A-Z]{3}$`)
   - `numberLocale` (required, `^[a-z]{2}-[A-Z]{2}$`)
   - `driverAgeBands` and `vehicleAgeBands` (repeatable `pricing.age-band`), with descriptions per data-model (R12)
   (FR-004, FR-005, R2, R4) — `cms/src/api/country/content-types/country/schema.json` (depends on T002)
-- [ ] T004 [CMS] US-02 `Plan` collection per [data-model.md](data-model.md):
+- [x] T004 [CMS] US-02 `Plan` collection per [data-model.md](data-model.md):
   - Attributes: `name`, `shortDescription` (maxLength 160), `basePrice` (integer, min 0), `coverages` and `benefits` (repeatable `plan.item`), `order` (min 1), `recommended`, `active`, and `country` (manyToOne → Country).
   - Draft & publish enabled.
   - The `find` controller forces `status: 'published'` (R7).
   (FR-001, FR-002) — `cms/src/api/plan/**` (depends on T002)
-- [ ] T005 [CMS] US-02 Save check (R6):
+- [x] T005 [CMS] US-02 Save check (R6):
   - Rename `form-field-integrity` to `country-integrity`, keeping the FormField rules unchanged.
   - Add Plan: `create`, `update` and `publish` without a country fail with "El plan debe tener un país."
   - `readCountryPayload` is reused.
   - Move the existing tests with the module.
   - **UT-09:** rejects a missing country on create, update and publish; accepts a save that leaves the country untouched.
   (FR-001, Edge Cases) — `cms/src/middlewares/country-integrity*.ts`, `cms/src/index.ts` (depends on T004)
-- [ ] T006 [CMS] US-02 Seed, backfill and permissions:
+- [x] T006 [CMS] US-02 Seed, backfill and permissions:
   - Countries get `currency`, `numberLocale` and bands (CO COP/es-CO, CL CLP/es-CL, PE PEN/es-PE; the bands from data-model).
   - A backfill fills them only when missing.
     - **UT-10:** fills only the missing values and never overwrites an edited one.
@@ -49,10 +49,10 @@
 
 ## Phase 2: Foundational — Frontend (parallel with the CMS phase; the contract is fixed)
 
-- [ ] T007 [FE] US-02 Country: the DTO, model and mapper gain `currency`, `numberLocale`, `driverAgeBands` and `vehicleAgeBands` (`AgeBand { fromAge, toAge, factor }`). `CountryService` populates both band components.
+- [x] T007 [FE] US-02 Country: the DTO, model and mapper gain `currency`, `numberLocale`, `driverAgeBands` and `vehicleAgeBands` (`AgeBand { fromAge, toAge, factor }`). `CountryService` populates both band components.
   - **UT-05:** maps the fields; drops a band with from > to or factor ≤ 0; missing bands → [].
   (FR-004, FR-005) — `frontend/src/app/core/country/**`
-- [ ] T008 [FE] US-02 Pricing (pure functions):
+- [x] T008 [FE] US-02 Pricing (pure functions):
   - `simulatePrice(basePrice, driverAge, vehicleAge, country)`. Its doc comment states the rule and links ADR 0005 (R12).
     - **UT-01:** 8 examples (band edges 24/25, 65/66, 5/6, 10/11; no band and unknown age → factor 1; overlap → first wins; rounding).
   - `agesFromStep1(values, today)`, reading the keys `birthDate` and `vehicleYear`.
@@ -60,30 +60,30 @@
   - `formatPrice(amount, country)` with `Intl.NumberFormat` and 0 decimals, followed by " / mes".
     - **UT-03:** CO and CL.
   (FR-004, FR-005, R1, R3, R4) — `frontend/src/app/features/plan-list/pricing/**` (depends on T007)
-- [ ] T009 [P] [FE] US-02 Plan data layer per [contracts/plans-api.md](contracts/plans-api.md): the DTOs, the `Plan` model, `mapPlans` and `PlanService.load(countryCode)` (filters, sort, populate).
+- [x] T009 [P] [FE] US-02 Plan data layer per [contracts/plans-api.md](contracts/plans-api.md): the DTOs, the `Plan` model, `mapPlans` and `PlanService.load(countryCode)` (filters, sort, populate).
   - **UT-04:** only the first recommended plan is highlighted; empty coverages or benefits → []; a bad `basePrice` drops the plan.
   (FR-002, FR-003, FR-006) — `frontend/src/app/features/plan-list/data/**`
-- [ ] T010 [P] [FE] US-02 Session: `savePlan(id)`, `readPlanId()` and `clearPlan()`. `saveStep1` keeps `planId`; `discardData` and `start(otherCountry)` drop it.
+- [x] T010 [P] [FE] US-02 Session: `savePlan(id)`, `readPlanId()` and `clearPlan()`. `saveStep1` keeps `planId`; `discardData` and `start(otherCountry)` drop it.
   - **UT-06:** these cases.
   (FR-009, R9) — `frontend/src/app/core/session/quote-session.store*.ts`
 
 ## Phase 3: Stories S1–S4 (Frontend)
 
-- [ ] T011 [FE] US-02 Guards and routes:
+- [x] T011 [FE] US-02 Guards and routes:
   - `step1CompleteGuard` becomes async. It loads the country's form fields and checks the saved values with `buildValidators` on a throw-away `FormGroup`, with `restoredValue` for selects.
     - Values invalid, or fields fail to load → clear `step1Completed` and redirect to step 1.
   - New `planChosenGuard`: no `planId` → redirect to `plans`.
   - Routes: `plans` → `PlanListPage`; `summary` → `SummaryPlaceholderPage` behind both guards.
   - **UT-07:** these cases.
   (FR-011, FR-008, R8) — `frontend/src/app/features/quote-wizard/step1-complete.guard*.ts`, `plan-chosen.guard*.ts`, `frontend/src/app/app.routes.ts`, `frontend/src/app/core/session/quote-session.store.ts` (a `clearStep1Completed` helper if needed) (depends on T010)
-- [ ] T012 [FE] US-02 `PlanCardComponent` per the plan's "Chosen" design and the ui-ux-guidelines plan-card recipe:
+- [x] T012 [FE] US-02 `PlanCardComponent` per the plan's "Chosen" design and the ui-ux-guidelines plan-card recipe:
   - White S1 card with a 1px ring.
   - Recommended: a 5px brand top border and a large yellow "Recomendado" pill on the top border; a visually hidden ", plan recomendado" in the label.
   - A custom radio with a check, and a 2px inset ring when selected. No "Seleccionado" text, no layout shift.
   - The name and description, the price after a divider, and Coberturas and Beneficios, with empty lists hidden.
   - The rows go in subgrid slots.
   (FR-003, FR-006, FR-007) — `frontend/src/app/features/plan-list/components/plan-card/**` (depends on T008, T009)
-- [ ] T013 [FE] US-02 `PlanListPage`:
+- [x] T013 [FE] US-02 `PlanListPage`:
   - **Data and states:** loads the country and the plans, and computes `PlanOffer`s from the step 1 values. Loading (skeleton cards, `aria-busy`), empty ("Volver a tus datos", no Continuar) and error (`role="alert"`, "Reintentar") states.
   - **Selection:** a native radio group, `<fieldset>` + `<legend>`; the arrow keys change the choice. It restores `planId`, or drops it when the plan is not offered. Choosing saves it.
   - **Layout:**
@@ -98,12 +98,12 @@
   - No price help text.
   - **UT-08:** restore and drop; Continuar disabled → enabled → navigates; empty and error with retry.
   (FR-002–FR-010, FR-013) — `frontend/src/app/features/plan-list/plan-list.page.*` (depends on T001, T011, T012)
-- [ ] T014 [P] [FE] US-02 `SummaryPlaceholderPage`: the stepper on "Resumen", the text "El resumen llega con US-03." and "Volver" → `plans`. Delete `step2-placeholder.page.ts` (FR-012) — `frontend/src/app/features/plan-list/summary-placeholder.page.ts`, `frontend/src/app/features/quote-wizard/step2-placeholder.page.ts`
+- [x] T014 [P] [FE] US-02 `SummaryPlaceholderPage`: the stepper on "Resumen", the text "El resumen llega con US-03." and "Volver" → `plans`. Delete `step2-placeholder.page.ts` (FR-012) — `frontend/src/app/features/plan-list/summary-placeholder.page.ts`, `frontend/src/app/features/quote-wizard/step2-placeholder.page.ts`
 
 ## Phase 4: E2E, review, docs
 
-- [ ] T015 [E2E] US-02 E2E-3 (CO choose-plan flow) and E2E-4 (CL price adjustment) per plan.md (FR-002–FR-009, SC-002) — `frontend/e2e/us-02-*.spec.ts` (depends on T006, T013, T014)
-- [ ] T016 [ORCH] US-02 Update the README (plans in the admin, the price bands) and check the quickstart (SC-001) — `README.md`
+- [x] T015 [E2E] US-02 E2E-3 (CO choose-plan flow) and E2E-4 (CL price adjustment) per plan.md (FR-002–FR-009, SC-002) — `frontend/e2e/us-02-*.spec.ts` (depends on T006, T013, T014)
+- [x] T016 [ORCH] US-02 Update the README (plans in the admin, the price bands) and check the quickstart (SC-001) — `README.md`
 - [ ] T017 [ORCH] US-02 Code review rounds recorded in `review.md`, then the handoff
 
 ## Dependencies
