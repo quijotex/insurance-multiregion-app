@@ -108,8 +108,8 @@
 
 ## Phase 5: Gate 3 corrections (human manual test, 2026-11-22)
 
-- [ ] T018 [FE] US-02 Slider arrows sit at the slider's left and right edges, vertically centred on the cards. They sit in the side gutters from 768px and overlay the track edges (white fill, action ring, 48px) below that. The dots stay centred below the slider (FR-013) — `frontend/src/app/features/plan-list/plan-list.page.*`
-- [ ] T019 [FE] US-02 More than 3 plans → a slider on desktop as well:
+- [x] T018 [FE] US-02 Slider arrows sit at the slider's left and right edges, vertically centred on the cards. They sit in the side gutters from 768px and overlay the track edges (white fill, action ring, 48px) below that. The dots stay centred below the slider (FR-013) — `frontend/src/app/features/plan-list/plan-list.page.*`
+- [x] T019 [FE] US-02 More than 3 plans → a slider on desktop as well:
   - **Up to 3 plans from 992px:** the 3-column grid stays as it is.
   - **More than 3 plans from 992px:** Swiper with 3 visible slides, arrows and dots, no loop, no autoplay.
   - **Below 992px:** always the slider.

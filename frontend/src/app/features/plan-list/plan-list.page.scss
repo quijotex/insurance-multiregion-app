@@ -102,22 +102,13 @@
     cursor: pointer;
     transform: translateY(-50%);
 
+    /* Very edges of the track, inside the peek area, so they never cover card content (R-17). */
     &--prev {
-      left: var(--space-1);
+      left: 0;
     }
 
     &--next {
-      right: var(--space-1);
-    }
-
-    @media (min-width: 768px) {
-      &--prev {
-        left: 0;
-      }
-
-      &--next {
-        right: 0;
-      }
+      right: 0;
     }
 
     &:hover:not(:disabled) {
