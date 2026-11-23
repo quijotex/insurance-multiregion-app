@@ -170,4 +170,6 @@ monthly price = base price × driver-age factor × vehicle-age factor   (rounded
 
 ## Requirements not met
 
-None. The payment is simulated in the browser by design, as agreed for US-03 ([ADR 0006](docs/adr/0006-simulated-payment-and-receipt.md)): no card data is asked for and nothing is charged.
+- **Currency per plan (US-02):** the story lists currency as a plan attribute, but the currency is configured once per **Country**, not on each Plan. A plan can never be sold in a currency different from its country's, so a per-plan field would only let editors create inconsistent plans (for example a Chilean plan in COP). Every plan uses its country's currency and number format, so prices still show in Colombian or Chilean pesos ([ADR 0001](docs/adr/0001-multi-country-content-strategy.md), agreed at US-02 Gate 1).
+
+The payment is simulated in the browser by design, as the brief allows ([ADR 0006](docs/adr/0006-simulated-payment-and-receipt.md)): no card data is asked for and nothing is charged.
