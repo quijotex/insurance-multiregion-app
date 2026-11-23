@@ -2,7 +2,12 @@
 
 ## Overview
 
-**Tool:** Claude Code. Its native subagents (`.claude/agents/`), skills (`.claude/skills/`) and context file (`CLAUDE.md`) map 1:1 to the brief's requirements and are versioned as plain Markdown in the repo.
+**Tool:** Claude Code. Its native subagents (`.claude/agents/`), skills (`.claude/skills/`) and context file (`CLAUDE.md`) map 1:1 to the brief's requirements and are versioned as plain Markdown in the repo. Why it over the other tools:
+- **Subagents as files:** each agent's instructions, allowed tools and model sit in one versioned Markdown file, so separate responsibilities are explicit and reviewable, and the reviewer can run on a different model from the implementers.
+- **Rules that are enforced, not only written:** `.claude/settings.json` allows, asks for or denies commands and paths, which keeps the non-AI zones (user stories, constitution, logs, `.env`) out of the agents' reach.
+- **Spec Kit support:** Spec Kit installs its commands as Claude Code skills, so the SDD steps run in the same session as the agents.
+- **Not tied to an IDE:** it runs from the terminal or the desktop app, so every developer can run the same flow whatever editor they use.
+- **What was not tried:** Cursor, GitHub Copilot, Codex and OpenCode were not tried, so the flow is only proven in Claude Code. ADR 0002 records the alternatives considered.
 
 **Method:** Spec-Driven Development with [GitHub Spec Kit](https://github.com/github/spec-kit), adapted to **three human gates** only. Standard Spec Kit invites a human review after every phase; we cut that to the three points where a human adds the most value — *what* to build (spec), *how* to build it (plan), and whether the result is ready for QA (handoff). Everything between the plan and the handoff runs on autopilot, bounded by explicit stop conditions. Goal: as little friction as possible without losing control. The decision and its alternatives are recorded in `docs/adr/0002-agentic-workflow-spec-kit-and-human-gates.md`.
 
