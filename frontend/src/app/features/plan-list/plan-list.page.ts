@@ -166,9 +166,6 @@ export class PlanListPage {
     // From 992px 3 slides are visible and not centred: clamp so the last 3 fill the track.
     const start = Math.max(0, chosen >= 0 ? chosen : highlighted);
     const initialSlide = this.narrow() ? start : Math.min(start, Math.max(0, offers.length - 3));
-    // R-16: dots are positions (one per snap), not plans: label them with the real count.
-    const bulletMessage = (swiper: Swiper) =>
-      `Ir a la posición {{index}} de ${swiper.snapGrid.length}`;
     this.swiper = new Swiper(container, {
       modules: [Navigation, Pagination, A11y, Keyboard],
       initialSlide,
@@ -190,21 +187,15 @@ export class PlanListPage {
       pagination: {
         el: root.querySelector<HTMLElement>('.plan-list__dots'),
         clickable: true,
-        // R-07: real buttons with a Spanish name.
+        // R-07: real buttons with a Spanish name. R-16: dots are positions (one per snap), not plans.
+        // A11y leaves the labels alone when renderBullet is set (R-18), so they are set only here and below.
         bulletElement: 'button',
         renderBullet: (index, className) =>
           `<button type="button" class="${className}" aria-label="Ir a la posición ${index + 1} de ${this.swiper?.snapGrid.length ?? offers.length}"></button>`,
       },
-      on: {
-        // Keep the A11y bullet label in step with the number of positions (changes per breakpoint).
-        snapGridLengthChange: (swiper) => {
-          if (swiper.params.a11y) swiper.params.a11y.paginationBulletMessage = bulletMessage(swiper);
-        },
-      },
       a11y: {
         prevSlideMessage: 'Plan anterior',
         nextSlideMessage: 'Plan siguiente',
-        paginationBulletMessage: 'Ir a la posición {{index}}',
         firstSlideMessage: 'Este es el primer plan',
         lastSlideMessage: 'Este es el último plan',
         slideLabelMessage: 'Plan {{index}} de {{slidesLength}}',
@@ -212,7 +203,6 @@ export class PlanListPage {
     });
     // The first render ran before `this.swiper` existed: set the labels with the final count.
     const swiper = this.swiper;
-    if (swiper.params.a11y) swiper.params.a11y.paginationBulletMessage = bulletMessage(swiper);
     swiper.pagination.bullets.forEach((bullet, index) =>
       bullet.setAttribute('aria-label', `Ir a la posición ${index + 1} de ${swiper.snapGrid.length}`),
     );
