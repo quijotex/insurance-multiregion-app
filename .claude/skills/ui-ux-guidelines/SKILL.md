@@ -102,14 +102,15 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 
 **Form card** — `.form-card`: `--color-surface`, `--radius-md`, `--shadow-card`, padding `--space-6`, max-width 560px, centered. Title 20px/700 `--color-action`.
 
-**Plan card** — `.plan-card`, `__badge`, `__name`, `__price`, `__section`, `__item`, `__item--excluded`, `--recommended`, `--selected`
-- `--color-surface-alt`, `--radius-md`, padding `--space-6`, 1px ring `--color-border`.
-- Badge: pill, 14px, `--color-surface-highlight` bg, `--color-brand` text, top-right.
-- `--recommended`: `--color-surface-highlight` background + 1px ring `--color-action` + badge text from CMS.
-- `--selected`: 2px ring `--color-action` + check icon + "Seleccionado" text (not color alone).
-- Sections: Coberturas, Beneficios, and optionally "No incluye" with a muted cross icon.
-- Price: large, formatted in country currency, with period ("/año").
-- Selectable as a native radio group (`role` comes from `<input type="radio">` inside a `<label>`), one choice only.
+**Plan card** — `.plan-card`, `__badge`, `__radio`, `__name`, `__price`, `__section`, `__item`, `--recommended`, `--selected` (agreed at US-02 Gate 2)
+- White `--color-surface`, 14px radius, padding `--space-4`/`--space-6`, 1px inset ring `--color-border`. No top stripe and no grey background.
+- `--recommended`: a 5px `--color-brand` top border, a 1px brand ring, and a large `__badge` pill ("Recomendado" with a star icon; 16px bold text, an 18px icon, 6px × 18px padding; `--color-cta` bg, `--color-on-cta` text) centred **on the top border**. Only the first recommended plan in order.
+- `--selected`: a `__radio` circle filled with `--color-action` and a white check, plus a 2px **inset** `--color-action` ring. No "Seleccionado" text: nothing may change size or position (no layout shift). The radio state is the non-colour cue.
+- The cards share one CSS subgrid, so the name and description, the price (after a divider), Coberturas and Beneficios start on the same line in every card.
+- Price: large, `--color-brand`, formatted in the country's currency with no decimals, followed by "/ mes". No text explaining how the price is calculated.
+- Sections: Coberturas and Beneficios with check icons; an empty list is hidden.
+- Selectable as a radio group, one choice only; the arrow keys move the choice.
+- The "Continuar" pill is disabled (`--color-disabled-bg` / `--color-disabled-text`) until a plan is chosen, with no hint text.
 
 **Stepper** — `.stepper`, `__step`, `--current`, `--done`: numbered steps with text labels in an `<ol>`, above the form card; current step has `aria-current="step"`. Current and done circles (32px): `--color-surface-highlight` fill, 2px `--color-action` ring, `--color-brand` number (check icon when done); upcoming: white, 1.5px `--color-border` ring, `--color-text-muted`. Current label bold `--color-brand`; connector lines 2px, `--color-action` up to a done step, else `--color-border`. On mobile show only the current circle + "Paso 2 de 3" + current label.
 
@@ -141,7 +142,7 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
   - Alignment and spacing: `.d-flex`, `.flex-column`, `.justify-content-*`, `.align-items-*`, `.gap-*`, `m-*` / `p-*`, `.text-center` / `.text-md-start`, `.d-none .d-md-block`.
   - Never use Bootstrap colour, typography, border, shadow or component classes (`.btn`, `.card`, `.bg-*`, `.text-primary`, `.fs-*`…). Those come from our tokens and BEM recipes.
   - Component SCSS holds component styling only (look, states, internal spacing with `--space-*`), not page layout.
-- Plan cards: stacked < 768px, 3 columns ≥ 992px (2 columns in between).
+- Plan cards: a Swiper slider below 992px (about 1.2 cards on mobile, 2.2 on tablet) and also from 992px when there are more than 3 plans (3 visible); a 3-column grid from 992px with 3 plans or fewer. The slider opens on the chosen or recommended plan, has no loop and no autoplay (only the load animation), keeps the card rows aligned across slides, and has previous/next arrows vertically centred at its left and right edges, with dots centred below.
 - Header: navy bar with text wordmark; no navigation beyond the wizard.
 
 ## 6. Imagery

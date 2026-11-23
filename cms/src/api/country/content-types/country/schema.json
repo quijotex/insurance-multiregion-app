@@ -7,14 +7,66 @@
     "displayName": "Country",
     "description": "Country available in the quote wizard"
   },
-  "options": { "draftAndPublish": true },
+  "options": {
+    "draftAndPublish": true
+  },
   "pluginOptions": {},
   "attributes": {
-    "name": { "type": "string", "required": true },
-    "code": { "type": "string", "required": true, "unique": true, "regex": "^[A-Z]{2}$" },
-    "icon": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] },
-    "order": { "type": "integer", "required": true, "min": 1 },
-    "active": { "type": "boolean", "required": true, "default": true },
-    "legalAge": { "type": "integer", "required": true, "min": 0, "default": 18 }
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "code": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^[A-Z]{2}$"
+    },
+    "icon": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "order": {
+      "type": "integer",
+      "required": true,
+      "min": 1
+    },
+    "active": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "legalAge": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "default": 18
+    },
+    "currency": {
+      "type": "string",
+      "required": true,
+      "regex": "^[A-Z]{3}$"
+    },
+    "numberLocale": {
+      "type": "string",
+      "required": true,
+      "regex": "^[a-z]{2}-[A-Z]{2}$"
+    },
+    "driverAgeBands": {
+      "type": "component",
+      "repeatable": true,
+      "component": "pricing.age-band",
+      "description": "Monthly price = base price × driver-age factor × vehicle-age factor. The first band that covers the age applies; no band → factor 1. Not shown to customers (ADR 0005)."
+    },
+    "vehicleAgeBands": {
+      "type": "component",
+      "repeatable": true,
+      "component": "pricing.age-band",
+      "description": "Monthly price = base price × driver-age factor × vehicle-age factor. The first band that covers the age applies; no band → factor 1. Not shown to customers (ADR 0005)."
+    }
   }
 }

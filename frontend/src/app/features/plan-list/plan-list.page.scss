@@ -1,0 +1,296 @@
+.plan-list {
+  /* Swiper theme */
+  --swiper-theme-color: var(--color-action);
+
+  &__header {
+    margin: var(--space-6) 0 var(--space-4);
+  }
+
+  &__heading {
+    margin: 0;
+    color: var(--color-brand);
+    font-size: 24px;
+    font-weight: 700;
+
+    &:focus {
+      outline: none;
+    }
+
+    @media (min-width: 768px) {
+      font-size: 32px;
+    }
+  }
+
+  &__group {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  /* Room above for the "Recomendado" pill that sits on the top border, and for the focus ring. */
+  &__viewport {
+    padding: var(--space-6) var(--space-1) var(--space-1);
+  }
+
+  &__stage {
+    position: relative;
+
+    @media (min-width: 768px) {
+      &--slider {
+        padding-inline: calc(48px + var(--space-2));
+      }
+    }
+  }
+
+  &__item.swiper-slide {
+    display: flex;
+    height: auto;
+  }
+
+  /*
+   * Layout exception (ADR 0003): from 992px the grid (3 plans or fewer) is a CSS grid whose items
+   * subgrid 4 rows, so name, price, coverages and benefits align across cards (Gate 2).
+   */
+  @media (min-width: 992px) {
+    &__track:not(.swiper-wrapper) {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: var(--space-6);
+    }
+
+    &__item:not(.swiper-slide) {
+      display: grid;
+      grid-row: span 4;
+      grid-template-rows: subgrid;
+    }
+  }
+
+  /* Slider: each row takes the tallest height across slides (--plan-row-N, set by the page). */
+  &__viewport.swiper .plan-card {
+    grid-row: auto;
+    grid-template-rows:
+      minmax(var(--plan-row-1, 0px), auto) minmax(var(--plan-row-2, 0px), auto)
+      minmax(var(--plan-row-3, 0px), auto) minmax(var(--plan-row-4, 0px), auto);
+
+    > * {
+      align-self: start;
+    }
+  }
+
+  &__controls {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-4);
+  }
+
+  /* Arrows: centred on the cards (the viewport has more room above than below). */
+  &__nav {
+    position: absolute;
+    top: calc(50% + (var(--space-6) - var(--space-1)) / 2);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 2px solid var(--color-action);
+    border-radius: 50%;
+    background: var(--color-surface);
+    color: var(--color-brand);
+    cursor: pointer;
+    transform: translateY(-50%);
+
+    /* Very edges of the track, inside the peek area, so they never cover card content (R-17). */
+    &--prev {
+      left: 0;
+    }
+
+    &--next {
+      right: 0;
+    }
+
+    &:hover:not(:disabled) {
+      background: var(--color-surface-highlight);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    &:disabled,
+    &.swiper-button-disabled {
+      border-color: var(--color-border);
+      background: var(--color-disabled-bg);
+      color: var(--color-disabled-text);
+      cursor: not-allowed;
+    }
+  }
+
+  &__dots {
+    display: flex;
+    align-items: center;
+  }
+
+  /* R-07: each dot is a real button with a 48x48 hit area; the small dot is drawn by ::before. */
+  &__dots .swiper-pagination-bullet {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    opacity: 1;
+    cursor: pointer;
+
+    &::before {
+      content: '';
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-border);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+  }
+
+  &__dots .swiper-pagination-bullet-active::before {
+    background: var(--color-action);
+  }
+  &__actions {
+    margin-top: var(--space-8);
+
+    .button {
+      width: 100%;
+
+      @media (min-width: 576px) {
+        width: auto;
+      }
+    }
+  }
+
+  /* States */
+  /* The skeleton lays out with Bootstrap row/col in the template; only its top spacing lives here. */
+  &__skeleton {
+    padding-top: var(--space-6);
+  }
+
+  &__skeleton-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    background: var(--color-surface);
+  }
+
+  &__skeleton-line {
+    display: block;
+    height: 14px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-field-focus);
+    animation: plan-list-pulse 1.4s ease-in-out infinite;
+
+    &--title {
+      width: 50%;
+      height: 20px;
+    }
+
+    &--price {
+      width: 60%;
+      height: 32px;
+    }
+  }
+
+  &__error {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: flex-start;
+    padding: var(--space-4);
+    border: 1px solid var(--color-error);
+    border-radius: var(--radius-sm);
+    background: var(--color-error-bg);
+    color: var(--color-error);
+    font-weight: 500;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__error-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  &__error-hint {
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-8) var(--space-4);
+    color: var(--color-brand);
+    text-align: center;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__empty-title {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  &__empty-hint {
+    color: var(--color-text-muted);
+  }
+
+  /* Same load animation as step 1: first render only, one item after another. */
+  &__reveal {
+    animation: plan-list-reveal 600ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+    animation-delay: calc(var(--reveal-index, 0) * 110ms);
+  }
+}
+
+@keyframes plan-list-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes plan-list-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plan-list__reveal,
+  .plan-list__skeleton-line {
+    animation: none;
+  }
+}

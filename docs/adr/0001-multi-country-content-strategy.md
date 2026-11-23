@@ -3,7 +3,7 @@
 - **Status:** Accepted (Gate 2, US-00 — 2026-11-22)
 - **Date:** 2026-11-21
 - **Related:** US-00, US-01, US-02, US-03
-- **Amended:** Gate 2, US-01 — 2026-11-22 (FormField `section`, save validation, `legalAge`, published-only FormField `find`)
+- **Amended:** Gate 2, US-01 — 2026-11-22 (FormField `section`, save validation, `legalAge`, published-only FormField `find`); Gate 2, US-02 — 2026-11-22 (Plan save check and published-only `find`, `plan.item` component, Country `currency`, `numberLocale` and age bands, ADR 0005)
 
 ## Context and problem
 
@@ -35,6 +35,7 @@ Let's take a **Country as collection** approach, and **FormField** and **Plan** 
   - `key` is the stable technical name of the field (e.g. `documentNumber`, `vehicleYear`, `birthDate`). Angular uses it as the form control name, and the summary (masking) and the price rule use it to find values. Labels can't play this role because the business edits them. Unique per country.
   - `type` is an enumeration: `text`, `number`, `select`, `date`, `checkbox`.
 - **Plan** saves `name`, `shortDescription`, `basePrice`, `order`, `recommended`, `active`, and `coverages` and `benefits` as repeatable components.
+  - `coverages` and `benefits` use one component, `plan.item` (`text`). The recommended badge text is fixed in Angular (US-02).
   - **No `currency` on Plan, on purpose:** the user story lists currency as a plan attribute, but a plan can never be sold in a currency different from its country's. Keeping it only on Country removes a source of inconsistency (a Chilean plan in COP) and one field editors could get wrong. The plan's currency is always `plan.country.currency`.
 
 The queries would be:
@@ -51,6 +52,8 @@ GET /api/plans?filters[country][code][$eq]=CO&filters[active][$eq]=true&sort=ord
 ```
 
 Strapi's REST API returns only published documents by default, but `?status=draft` would override it, so the Country and FormField `find` controllers force `status: 'published'`. Components aren't returned unless populated, so `populate` is explicit (never `populate=*`).
+
+`currency` (ISO 4217) and `numberLocale` (e.g. `es-CO`) live on Country (US-02), together with the price factors as two repeatable `pricing.age-band` components, `driverAgeBands` and `vehicleAgeBands` (see [ADR 0005](0005-simulated-price-rule-age-bands.md)). The Plan `find` controller also forces `status: 'published'` (US-02).
 
 `legalAge` lives on Country (US-01). The birth-date field enables the named validator `legalAge`, which reads the active country's value, so the age is set once per country.
 
@@ -81,7 +84,7 @@ Nothing else: no `findOne` (the filtered list is enough), no `create`/`update`/`
 
 - **Duplication:** each common field, like email, exists as many times as there are countries. On the other hand, that also gives a clear separation of data per country.
 - **No atomic publication:** everything has to be published one by one, not all at once for a country. Mitigation: Strapi's Releases (only on paid subscriptions).
-- **Risk of forgetting to assign new fields to their country:** Strapi 5 can't mark a relation as required, so it doesn't force fields or plans to be assigned to a Country. An unassigned field just never shows up anywhere, silently. Mitigation (implemented for FormField in US-01): a Document Service middleware rejects, on create, update and publish, a FormField without a country or with a `key` already used in its country. Plan gets the same check in US-02.
+- **Risk of forgetting to assign new fields to their country:** Strapi 5 can't mark a relation as required, so it doesn't force fields or plans to be assigned to a Country. An unassigned field just never shows up anywhere, silently. Mitigation (implemented for FormField in US-01): a Document Service middleware rejects, on create, update and publish, a FormField without a country or with a `key` already used in its country. The same middleware rejects a Plan without a country (US-02).
 - **Extra code for validations:** Angular must parse Strapi data into code validations, because Strapi only sends data, and Angular should apply strict, typed validations in code, especially for forms and input values.
 - **Named validators need code:** rules relative to today (legal age, vehicle year) and algorithms (RUT check digit) can't be expressed with fixed `min`/`max`/`pattern`, so they are named validators with a value, e.g. `{ name: "maxYearsAgo", value: 20 }`. Each name has a function in Angular.
 

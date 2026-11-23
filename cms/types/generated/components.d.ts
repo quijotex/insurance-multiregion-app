@@ -48,12 +48,63 @@ export interface FormValidator extends Struct.ComponentSchema {
   };
 }
 
+export interface PlanItem extends Struct.ComponentSchema {
+  collectionName: 'components_plan_items';
+  info: {
+    description: 'Coverage or benefit line of a plan';
+    displayName: 'Item';
+  };
+  attributes: {
+    text: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
+  };
+}
+
+export interface PricingAgeBand extends Struct.ComponentSchema {
+  collectionName: 'components_pricing_age_bands';
+  info: {
+    description: 'Monthly price = base price \u00D7 driver-age factor \u00D7 vehicle-age factor. The first band that covers the age applies; no band \u2192 factor 1. Not shown to customers (ADR 0005).';
+    displayName: 'Age band';
+  };
+  attributes: {
+    factor: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0.01;
+        },
+        number
+      >;
+    fromAge: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    toAge: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+  };
+}
+
 declare module '@strapi/strapi' {
   export namespace Public {
     export interface ComponentSchemas {
       'form.option': FormOption;
       'form.validations': FormValidations;
       'form.validator': FormValidator;
+      'plan.item': PlanItem;
+      'pricing.age-band': PricingAgeBand;
     }
   }
 }

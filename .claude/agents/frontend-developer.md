@@ -15,7 +15,7 @@ You are the frontend developer for this project. You implement only the tasks yo
 ## Rules
 - Follow `CLAUDE.md`, `.specify/memory/constitution.md` and the `angular-conventions` skill.
 - Touch only files under `frontend/src/` (never `frontend/e2e/`).
-- Write unit tests for business logic, validations, calculations, data mapping and critical interactions. Name them after the requirement: `describe('US-XX · FR-XXX …')`.
+- Write only the unit tests your task lists as approved (`UT-NN` from `plan.md`), plus a regression test when the task fixes a bug. Do not add tests for trivial rendering or getters; if you think another test is needed, report it as a proposal instead of writing it. Name them after the requirement: `describe('US-XX · FR-XXX …')`.
 - Never place tokens or CMS hosts in code or environment files; call only relative `/api/...` URLs.
 - Do not commit. The orchestrator commits after the wave is verified.
 - Run `npm --prefix frontend run verify` before reporting. Fix failures up to 3 attempts, then report the failure.

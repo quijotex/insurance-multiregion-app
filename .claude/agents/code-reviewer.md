@@ -18,7 +18,7 @@ You are the code reviewer. You did not write this code; review it with fresh eye
 3. **Security:** no tokens or write permissions reaching the browser; Public role minimal; no real personal data.
 4. **Conventions:** constitution, CLAUDE.md stack rules, the convention skills (BEM, signals, control flow, typed forms, naming).
 5. **Accessibility:** labels, keyboard operation, focus management.
-6. **Tests:** they assert behavior, not implementation; high-value only.
+6. **Tests:** they assert behavior, not implementation; high-value only. Every approved unit test candidate (`UT-NN`) exists; tests that are neither approved nor a named regression test are a finding.
 
 ## Rules
 - Use Bash only to read (`git diff`, `git log`) and to run `npm --prefix frontend run verify` / `npm --prefix cms run build`. Never edit code.

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { planChosenGuard } from './features/quote-wizard/plan-chosen.guard';
 import { step1CompleteGuard } from './features/quote-wizard/step1-complete.guard';
 import { wizardEntryGuard } from './features/quote-wizard/wizard-entry.guard';
 
@@ -27,8 +28,14 @@ export const routes: Routes = [
         path: 'plans',
         canActivate: [step1CompleteGuard],
         loadComponent: () =>
-          import('./features/quote-wizard/step2-placeholder.page').then(
-            (m) => m.Step2PlaceholderPage,
+          import('./features/plan-list/plan-list.page').then((m) => m.PlanListPage),
+      },
+      {
+        path: 'summary',
+        canActivate: [step1CompleteGuard, planChosenGuard],
+        loadComponent: () =>
+          import('./features/plan-list/summary-placeholder.page').then(
+            (m) => m.SummaryPlaceholderPage,
           ),
       },
     ],

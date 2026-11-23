@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  Injector,
   ElementRef,
   afterNextRender,
   computed,
@@ -18,8 +19,11 @@ import { WizardCountry } from '../quote-wizard/wizard-country.service';
 import { FormFieldComponent, fieldInputId } from './components/form-field/form-field.component';
 import { FormFieldDescriptor, FormSections } from './data/form-field.model';
 import { FormFieldService } from './data/form-field.service';
+import { restoredValue } from './validation/restored-value';
 import { buildValidators } from './validation/build-validators';
 import { FieldValue } from './validation/validation.model';
+
+export { restoredValue };
 
 type Step1Group = FormGroup<Record<string, FormControl<FieldValue>>>;
 
@@ -34,17 +38,6 @@ const SECTION_TITLES: Record<SectionView['id'], string> = {
   policyholder: 'Tus datos',
   vehicle: 'Tu vehículo',
 };
-
-/**
- * Value restored from the session for a field: the wrong type falls back to empty, and a select
- * value that is no longer one of its options (renamed or removed in the CMS) is dropped (R-13).
- */
-export function restoredValue(field: FormFieldDescriptor, saved: FieldValue | undefined): FieldValue {
-  if (field.type === 'checkbox') return typeof saved === 'boolean' ? saved : false;
-  if (typeof saved !== 'string') return '';
-  if (field.type === 'select' && !field.options.some((o) => o.value === saved)) return '';
-  return saved;
-}
 
 @Component({
   selector: 'app-step1-form-page',
@@ -61,6 +54,7 @@ export class Step1FormPage {
   private readonly route = inject(ActivatedRoute);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
 
   protected readonly steps = ['Tus datos', 'Elige tu plan', 'Resumen'];
   protected readonly loading = signal(true);
@@ -112,6 +106,8 @@ export class Step1FormPage {
         this.form.set(this.buildForm(sections, country.legalAge));
         this.loaded.set(sections);
         this.loading.set(false);
+        // R-02: the guard sent us back because the saved values are no longer valid.
+        if (this.session.consumeStep1Review()) afterNextRender(() => this.showErrors(), { injector: this.injector });
       },
       error: () => {
         this.failed.set(true);
@@ -145,6 +141,15 @@ export class Step1FormPage {
   protected submit(): void {
     const form = this.form();
     if (!form) return;
+    if (this.showErrors()) return;
+    this.session.markStep1Completed();
+    void this.router.navigate(['plans'], { relativeTo: this.route });
+  }
+
+  /** Marks everything touched; when invalid, announces and focuses the first bad field. */
+  private showErrors(): boolean {
+    const form = this.form();
+    if (!form) return false;
     this.submitted.set(true);
     form.markAllAsTouched();
     if (form.invalid) {
@@ -157,10 +162,9 @@ export class Step1FormPage {
         ),
       );
       this.focusFirstInvalid(form);
-      return;
+      return true;
     }
-    this.session.markStep1Completed();
-    void this.router.navigate(['plans'], { relativeTo: this.route });
+    return false;
   }
 
   private focusFirstInvalid(form: Step1Group): void {

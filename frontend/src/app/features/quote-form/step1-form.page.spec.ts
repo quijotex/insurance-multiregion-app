@@ -9,7 +9,7 @@ import { FormFieldDescriptor, FormSections } from './data/form-field.model';
 import { FormFieldService } from './data/form-field.service';
 import { restoredValue, Step1FormPage } from './step1-form.page';
 
-const COUNTRY: Country = { code: 'co', name: 'Colombia', legalAge: 18, iconUrl: null, iconAlt: '' };
+const COUNTRY: Country = { code: 'co', name: 'Colombia', legalAge: 18, currency: 'COP', numberLocale: 'es-CO', driverAgeBands: [], vehicleAgeBands: [], iconUrl: null, iconAlt: '' };
 
 function field(partial: Partial<FormFieldDescriptor> & { key: string }): FormFieldDescriptor {
   const type = partial.type ?? 'text';
@@ -132,6 +132,17 @@ describe('US-01 · FR-005/FR-006 step 1 form page', () => {
     expect(document.activeElement).toBe(control('Nombre completo'));
     expect(navigate).not.toHaveBeenCalled();
     expect(session.isStep1Completed()).toBe(false);
+  });
+
+  it('R-02 after the guard flags the saved values as invalid, step 1 shows the errors once and focuses the first bad field', async () => {
+    session.start('co');
+    session.saveStep1({ fullName: 'Ana Pérez', brand: 'renamed' });
+    session.flagStep1Review();
+    await setup();
+    expect(fieldErrors().length).toBeGreaterThan(0);
+    expect(status()).toMatch(/^Revisa /);
+    expect(document.activeElement).toBe(control('Fecha de nacimiento'));
+    expect(session.consumeStep1Review()).toBe(false);
   });
 
   it('focuses the select trigger when it is the first invalid control', async () => {

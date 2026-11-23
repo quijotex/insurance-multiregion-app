@@ -63,7 +63,7 @@ npm --prefix frontend start    # Angular on http://localhost:4200 (proxies /api 
 | `npm --prefix frontend run e2e` | Playwright e2e; starts Strapi and Angular itself |
 | `npm --prefix frontend run e2e:docker` | Playwright e2e against the running Docker stack |
 | `npm --prefix cms run build` | Strapi build and typecheck |
-| `npm --prefix cms test` | CMS unit tests (Vitest): seed patterns, form field save rules |
+| `npm --prefix cms test` | CMS unit tests (Vitest): seed patterns, field and plan save rules, country pricing backfill |
 
 ## Repository structure
 
@@ -120,6 +120,30 @@ Go to **Content Manager › Form Field**. Each entry is one question of step 1 f
 | `maxYearsAhead` | years, e.g. `1` | Year no later than current year + value |
 
 A validator name the app does not know is skipped, with a warning in the browser console, so the form keeps working. A new kind of rule needs a developer ([ADR 0001](docs/adr/0001-multi-country-content-strategy.md), "Limits of configurability"). The legal age is set once per country in the Country entry (seed: 18).
+
+### Managing plans and prices (US-02)
+
+Go to **Content Manager › Plan**. Each entry is one plan for one country. Changes show on step 2 after a reload, with no deployment.
+
+- **Add a plan:** set the following, then **Publish** it:
+  - **Country** (required; a plan without a country is rejected on save);
+  - **Name**, **Short description** and **Base price** (whole pesos per month, in the country's currency);
+  - **Coverages** and **Benefits** (one text each);
+  - **Order**, **Recommended** and **Active**.
+- **Hide a plan:** untick **Active**, or unpublish it.
+- **Recommended:** only the first recommended plan in order gets the "Recomendado" badge.
+
+**Prices** are simulated ([ADR 0005](docs/adr/0005-simulated-price-rule-age-bands.md)) and are not explained to customers:
+
+```text
+monthly price = base price × driver-age factor × vehicle-age factor   (rounded to a whole peso)
+```
+
+- Each country sets its **Currency** (e.g. `COP`), **Number locale** (e.g. `es-CO`) and two lists of age bands in **Content Manager › Country**: **Driver age bands** and **Vehicle age bands**. Each band has **From age**, **To age** and **Factor**.
+- The first band that covers the age applies. With no band, the factor is 1.
+- The seed uses these bands for both countries:
+  - Driver age: under 25 → 1.20; 25–65 → 1.00; over 65 → 1.15.
+  - Vehicle age: 0–5 years → 1.00; 6–10 → 1.10; 11–20 → 1.20.
 
 ## Security notes
 
