@@ -192,3 +192,13 @@ Commit reviewed: `9339f79` (`plan-list.page.ts`, `plan-list.page.scss`). `npm --
 | R-18 | Minor | plan-list.page.ts:169-171, 198-202, 206, 213-214 | Dead code. In Swiper 14.4, A11y `updatePagination` sets bullet labels only when `renderBullet` is **not** set (`a11y.mjs:182`). So `paginationBulletMessage`, the `bulletMessage` helper, the `snapGridLengthChange` handler and the post-construction `paginationBulletMessage` assignment have no effect, and their comments are misleading. The visible labels come only from `renderBullet` and the `forEach` after construction. The R-16 note in Round 5, which said A11y overrides the label, was wrong for this version. | Correctness (misleading code) | Open | Remove the A11y bullet message, the helper and the handler. Keep `renderBullet` and the post-construction `forEach`. Or accept it as Won't fix. |
 
 **Verdict: Approved.** R-16 and R-17 are fixed. R-18 is Minor. There are no new Blocker or Major findings.
+
+## Round 7 — Gate 3 fix batch (R-18)
+
+Commit reviewed: `d963b84` (`plan-list.page.ts`). `npm --prefix frontend run verify` passed (188 tests, 18 files).
+
+- **R-18: Resolved (d963b84).** The commit removes only code that never ran. In Swiper 14.4, A11y `updatePagination` skips bullet labels when `renderBullet` is set (`a11y.mjs:182`). `renderBullet`, the post-init `forEach` and the other A11y messages are kept.
+- **Breakpoint changes:** Pagination's own `snapGridLengthChange` handler (`pagination.mjs:459-462`) re-renders through `renderBullet`. By then `this.swiper` is set, so the label is "Ir a la posición N de M" with the new `snapGrid.length`.
+- No new findings.
+
+**Verdict: Approved.**
