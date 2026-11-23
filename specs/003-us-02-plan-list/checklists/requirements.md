@@ -32,4 +32,4 @@
 ## Notes
 
 - Iteration 1 fixes: FR-006 cross-reference reworded; field keys removed from Assumptions (business wording); User Story 4 got its narrative.
-- Open for `/speckit-clarify` (not markers, defaults stated): the simulated price rule and its factors (Assumptions), whether its factors are editable in the content manager (Conflicts with ADR 0001), currency on Country vs. Plan (Conflicts with ADR 0001).
+- Clarify session 2026-11-22: price rule inputs, factors per country, currency on Country, monthly price display. All checklist items still pass (16/16).
