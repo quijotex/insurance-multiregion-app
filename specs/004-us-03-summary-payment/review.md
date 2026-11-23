@@ -130,3 +130,5 @@ Scope: commit c15654a (T018 [FE]). The human said the payment failure dialog tit
 - **Traceability:** T018 describes the new layout and the 18px rule, and the commit footer has `Refs: US-03, T018`.
 
 **Verdict: Approved.**
+
+Gate 3: Approved — 2026-11-22

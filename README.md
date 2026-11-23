@@ -6,7 +6,7 @@ A single Angular app that quotes car insurance in **Colombia** and **Chile**, wi
 - **Architecture decisions:** [docs/adr/](docs/adr/)
 - **Specs per user story:** [specs/](specs/)
 
-> **Status:** project setup complete; the wizard, seed data and admin bootstrap are built story by story (US-00 → US-03). Sections marked _To be completed_ are filled as each story lands.
+> **Status:** complete. All four stories (US-00 → US-03) are built, reviewed and approved at Gate 3.
 
 > All data in this repository is fictitious. No real people, documents, plates, card data or credentials.
 
@@ -170,4 +170,4 @@ monthly price = base price × driver-age factor × vehicle-age factor   (rounded
 
 ## Requirements not met
 
-_None so far. Any requirement left out will be listed here with the reason._
+None. The payment is simulated in the browser by design, as agreed for US-03 ([ADR 0006](docs/adr/0006-simulated-payment-and-receipt.md)): no card data is asked for and nothing is charged.
