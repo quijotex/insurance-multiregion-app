@@ -72,9 +72,10 @@ test.describe('US-02 · plan list', () => {
 
     await page.getByRole('button', { name: 'Continuar' }).click();
     await expect(page).toHaveURL(/\/co\/quote\/summary$/);
-    await expect(page.getByRole('heading', { level: 1, name: 'Resumen' })).toBeVisible();
+    // US-03 replaced the summary placeholder: "Cambiar plan" is the way back to step 2.
+    await expect(page.getByRole('heading', { level: 1, name: 'Revisa y asegúrate' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Volver' }).click();
+    await page.getByRole('button', { name: 'Cambiar plan' }).click();
     await expect(page).toHaveURL(/\/co\/quote\/plans$/);
     await expect(page.getByRole('radio', { name: /^Total/ })).toBeChecked();
     await expect(page.getByRole('radio', { checked: true })).toHaveCount(1);
