@@ -36,7 +36,8 @@
     text-align: center;
     color: var(--color-text-muted);
 
-    &--current {
+    &--current,
+    &--shown {
       display: flex;
     }
 

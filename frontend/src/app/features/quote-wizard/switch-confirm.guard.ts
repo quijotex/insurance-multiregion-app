@@ -32,6 +32,7 @@ export const switchConfirmGuard: CanActivateFn = async (): Promise<boolean | Url
     });
     if (!confirmed) return router.createUrlTree(['/', previous, 'quote']);
   }
-  session.start(active.code);
+  // A reload on the confirmation keeps its receipt (FR-011); noReceiptGuard handles the other steps.
+  if (previous !== active.code || !session.readReceipt()) session.start(active.code);
   return true;
 };

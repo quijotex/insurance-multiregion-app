@@ -1,0 +1,207 @@
+<section class="summary py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <app-stepper [steps]="steps" [current]="3" />
+    </div>
+  </div>
+
+  <header class="summary__header summary__reveal" style="--reveal-index: 0">
+    <h1 class="summary__heading" tabindex="-1">Revisa y asegúrate</h1>
+  </header>
+
+  @if (loading()) {
+    <div class="summary__skeleton row g-3 g-lg-4" aria-busy="true">
+      <span class="visually-hidden">Cargando tu resumen…</span>
+      @for (n of [1, 2]; track n) {
+        <div class="col-12 col-lg-6" aria-hidden="true">
+          <div class="summary__skeleton-card">
+            <span class="summary__skeleton-line summary__skeleton-line--title"></span>
+            <span class="summary__skeleton-line"></span>
+            <span class="summary__skeleton-line"></span>
+            <span class="summary__skeleton-line"></span>
+          </div>
+        </div>
+      }
+      <div class="col-12" aria-hidden="true">
+        <div class="summary__skeleton-card">
+          <span class="summary__skeleton-line summary__skeleton-line--title"></span>
+          <span class="summary__skeleton-line"></span>
+          <span class="summary__skeleton-line summary__skeleton-line--price"></span>
+        </div>
+      </div>
+    </div>
+  } @else if (failed()) {
+    <div class="summary__error" role="alert">
+      <p class="summary__error-title">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        No pudimos cargar tu resumen.
+      </p>
+      <p class="summary__error-hint">Revisa tu conexión e inténtalo de nuevo.</p>
+      <button type="button" class="button button--secondary" (click)="load()">Reintentar</button>
+    </div>
+  } @else {
+    <div class="row g-3 g-lg-4">
+      <div class="col-12 col-lg-6 summary__reveal" style="--reveal-index: 1">
+        <section class="summary-section" aria-labelledby="summary-holder-title">
+          <div class="summary-section__header">
+            <h2 id="summary-holder-title" class="summary-section__title">Tus datos</h2>
+            <button type="button" class="button button--secondary summary-section__action" (click)="edit()">
+              Editar mis datos
+            </button>
+          </div>
+          <dl class="summary-section__rows">
+            @for (row of rows().policyholder; track row.key) {
+              <div class="summary-section__row">
+                <dt class="summary-section__label">{{ row.label }}</dt>
+                <dd class="summary-section__value">{{ row.display }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+      </div>
+
+      <div class="col-12 col-lg-6 summary__reveal" style="--reveal-index: 2">
+        <section class="summary-section" aria-labelledby="summary-vehicle-title">
+          <div class="summary-section__header">
+            <h2 id="summary-vehicle-title" class="summary-section__title">Tu vehículo</h2>
+            <button type="button" class="button button--secondary summary-section__action" (click)="edit()">
+              Editar mis datos
+            </button>
+          </div>
+          <dl class="summary-section__rows">
+            @for (row of rows().vehicle; track row.key) {
+              <div class="summary-section__row">
+                <dt class="summary-section__label">{{ row.label }}</dt>
+                <dd class="summary-section__value">{{ row.display }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+      </div>
+
+      @if (chosen(); as plan) {
+        <div class="col-12 summary__reveal" style="--reveal-index: 3">
+          <section class="summary-section summary-section--plan" aria-labelledby="summary-plan-title">
+            <div class="summary-section__header">
+              <h2 id="summary-plan-title" class="summary-section__title">Tu plan</h2>
+              <button type="button" class="button button--secondary summary-section__action" (click)="changePlan()">
+                Cambiar plan
+              </button>
+            </div>
+            <p class="summary-section__plan-name">{{ plan.plan.name }}</p>
+            <p class="summary-section__plan-description">{{ plan.plan.shortDescription }}</p>
+            <hr class="summary-section__divider" />
+            <p class="summary-section__price">
+              <span class="summary-section__amount">{{ plan.amount }}<span aria-hidden="true">*</span></span>
+              <span class="summary-section__period">/ mes</span>
+            </p>
+          </section>
+        </div>
+      }
+    </div>
+
+    <div class="summary__accept summary__reveal mx-auto" style="--reveal-index: 4">
+      @if (paymentState() === 'rejected') {
+        <div class="summary__error summary__error--payment" role="alert">
+          <p class="summary__error-title">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            No pudimos procesar tu pago.
+          </p>
+          <p class="summary__error-hint">
+            Revisa tus datos con «Editar mis datos» o vuelve a intentarlo. No perdiste nada de lo que ingresaste.
+          </p>
+        </div>
+      }
+
+      @if (hasTerms()) {
+        <div class="checkbox">
+          <span class="checkbox__control">
+            <input
+              id="terms-accepted"
+              class="checkbox__input"
+              type="checkbox"
+              aria-labelledby="terms-accepted-label terms-link"
+              [checked]="accepted()"
+              [disabled]="processing()"
+              (change)="toggleTerms($event)"
+            />
+            <span class="checkbox__box" aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="16" height="16" focusable="false">
+                <path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </span>
+          <span class="checkbox__text">
+            <label id="terms-accepted-label" class="checkbox__label" for="terms-accepted">*Acepto</label>
+            <button
+              #termsLink
+              id="terms-link"
+              type="button"
+              class="checkbox__link"
+              aria-haspopup="dialog"
+              (click)="openTerms()"
+            >
+              términos y condiciones
+            </button>
+          </span>
+        </div>
+      } @else {
+        <div class="summary__error" role="alert">
+          <p class="summary__error-title">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            No pudimos cargar los términos y condiciones.
+          </p>
+          <p class="summary__error-hint">No puedes continuar sin aceptarlos. Inténtalo de nuevo más tarde.</p>
+        </div>
+      }
+
+      <button
+        type="button"
+        class="button button--cta summary__pay"
+        [disabled]="!canPay()"
+        [attr.aria-busy]="processing() ? 'true' : null"
+        (click)="pay()"
+      >
+        @if (processing()) {
+          <span class="summary__spinner" aria-hidden="true"></span>
+          Procesando…
+        } @else {
+          Quiero mi seguro
+        }
+      </button>
+    </div>
+
+    <dialog
+      #termsDialog
+      class="terms-dialog"
+      aria-labelledby="terms-dialog-title"
+      (close)="termsClosed()"
+    >
+      <div class="terms-dialog__content">
+        <div class="terms-dialog__header">
+          <h2 id="terms-dialog-title" class="terms-dialog__title">Términos y condiciones</h2>
+          <button type="button" class="terms-dialog__close" aria-label="Cerrar" (click)="closeTerms()">
+            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+              <path d="M3 3l10 10M13 3 3 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="terms-dialog__body">
+          <app-rich-text [blocks]="terms()" />
+        </div>
+        <div class="terms-dialog__footer">
+          <button type="button" class="button button--cta" (click)="closeTerms()">Entendido</button>
+        </div>
+      </div>
+    </dialog>
+  }
+</section>

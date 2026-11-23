@@ -150,3 +150,109 @@ body {
   position: relative;
   z-index: 30;
 }
+
+/* Shared recipe (ui-ux-guidelines › Checkbox), global to keep component styles within budget. */
+/* Checkbox recipe: a native input drawn as a 24px box inside a 48px hit area. */
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  &__control {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-left: calc(-1 * var(--space-3));
+  }
+
+  &__input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &__box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 2px var(--color-text-muted);
+    color: transparent;
+    pointer-events: none;
+  }
+
+  &__input:checked + &__box {
+    background: var(--color-action);
+    box-shadow: inset 0 0 0 2px var(--color-action);
+    color: var(--color-surface);
+  }
+
+  &__input:focus-visible + &__box {
+    box-shadow:
+      inset 0 0 0 2px var(--color-text-muted),
+      var(--focus-ring);
+  }
+
+  &__input:checked:focus-visible + &__box {
+    box-shadow:
+      inset 0 0 0 2px var(--color-action),
+      var(--focus-ring);
+  }
+
+  &__input:disabled + &__box {
+    opacity: 0.6;
+  }
+
+  &__text {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--space-1);
+  }
+
+  &__label {
+    color: var(--color-text);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  &__link {
+    min-height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: none;
+    color: var(--color-action);
+    font: inherit;
+    font-weight: 500;
+    text-align: left;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-action-hover);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+  }
+}
+
+/* Terms dialog (native <dialog>, showModal). */
