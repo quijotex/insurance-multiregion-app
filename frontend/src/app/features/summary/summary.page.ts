@@ -199,11 +199,6 @@ export class SummaryPage {
     this.payButton()?.nativeElement.focus();
   }
 
-  protected editFromPaymentDialog(): void {
-    this.closePaymentDialog();
-    this.edit();
-  }
-
   private approve(
     countryCode: string,
     chosen: ChosenPlan,
