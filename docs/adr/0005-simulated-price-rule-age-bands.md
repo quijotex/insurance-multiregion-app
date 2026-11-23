@@ -36,6 +36,11 @@ Chosen option: **1**.
   - A missing value, or no matching band, gives factor 1.
 - The price is formatted with `Intl.NumberFormat(country.numberLocale, { style: 'currency', currency: country.currency })` with 0 decimals.
 
+**The rule is not explained to the person** (Gate 2): the page shows only the final monthly price. It is documented as an explicit decision in:
+- this ADR;
+- a doc comment on `simulatePrice` that links here;
+- the Strapi `description` of the band fields and of the `pricing.age-band` component, so editors know what a factor does.
+
 This meets every driver: editors change numbers in the admin, and nothing personal is sent. The function is pure and has a table of examples.
 
 ## Consequences

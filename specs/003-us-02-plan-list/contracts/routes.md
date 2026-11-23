@@ -12,6 +12,6 @@ This adds to the [US-01 routes contract](../../002-us-01-policyholder-vehicle-fo
 Rules:
 - **"Continuar":**
   - With a chosen plan, it goes to `summary`.
-  - Without one, it shows an error and focuses the first plan (FR-008).
+  - Without one, it is disabled, with the hint "Elige un plan para continuar." (FR-008).
 - **Empty state:** it offers "Volver a tus datos" (back to step 1) and no "Continuar" (FR-010, User Story 4).
 - **Focus:** on each step change, focus moves to the step heading.

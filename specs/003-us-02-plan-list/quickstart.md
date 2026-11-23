@@ -7,13 +7,13 @@
 
 | # | Scenario | Expected |
 |---|----------|----------|
-| 1 | Complete step 1 for Colombia (driver aged 30, vehicle 3 years old) → Continuar | The 3 CO plans in order. Prices equal the base, in the format "$ 145.000 / mes", and the help text is visible |
+| 1 | Complete step 1 for Colombia (driver aged 30, vehicle 3 years old) → Continuar | The 3 CO plans in order. Prices equal the base, in the format "$ 145.000 / mes", with no text explaining the price |
 | 2 | Do the same for Chile | The 3 CL plans in CLP ("$ 39.990 / mes"), and no Colombian plan |
 | 3 | Go back to step 1, enter a birth date for age 22 and a vehicle 8 years old → Continuar | Each price is × 1.20 × 1.10, rounded |
 | 4 | Look at the recommended plan | A "Recomendado" badge with text, not colour only, on one plan only |
 | 5 | Admin: mark a second CO plan as recommended, then reload | Still one badge, on the first in order |
-| 6 | Press Continuar with no plan chosen | The message "Elige un plan para continuar." appears, and focus moves to the first plan |
-| 7 | Choose a plan, then another | Only the last one shows "Seleccionado" |
+| 6 | Open step 2 with no plan chosen | Continuar is disabled, and the hint "Elige un plan para continuar." is visible |
+| 7 | Choose a plan, then another | Only the last one has the filled radio and the ring; nothing on the page moves |
 | 8 | Continuar → summary placeholder → Volver, then reload | The same plan is still chosen |
 | 9 | Admin: unpublish the chosen plan, then reload step 2 | The plan is gone, and no plan is chosen |
 | 10 | Admin: deactivate every CL plan, then reload | The empty state with "Volver a tus datos", and no Continuar |

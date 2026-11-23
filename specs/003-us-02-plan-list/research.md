@@ -78,7 +78,8 @@
   - A `<fieldset>` with a `<legend>`, and one `<input type="radio">` inside each card's `<label>`.
   - The arrow keys move between plans.
   - The chosen card shows "Seleccionado" with a check icon.
-  - "Continuar" with no choice shows an error under the group (`role="alert"`) and focuses the first radio (FR-008).
+  - "Continuar" is disabled until a plan is chosen. A hint, "Elige un plan para continuar.", is linked to it with `aria-describedby` (FR-008, Gate 2).
+  - Selection needs no text: the custom radio and the ring change, and nothing moves (no layout shift).
 - **Alternatives:** buttons with `aria-pressed`. They have no arrow-key behaviour and need more ARIA to get right.
 
 ## R11 — Recommended badge
@@ -86,3 +87,9 @@
   - The mapper highlights only the first `recommended` plan in order (Edge Cases).
   - The badge text is fixed, "Recomendado". The radio label adds a visually hidden ", plan recomendado" (FR-006).
 - **Alternatives:** badge text from the CMS. The recipe allows it, but the story doesn't need it, so it is not added.
+
+## R12 — Where the price rule is documented
+- **Decision:** the rule is not shown to the person (Gate 2). It is documented in three places:
+  - [ADR 0005](../../docs/adr/0005-simulated-price-rule-age-bands.md).
+  - A doc comment on `simulatePrice`, linking ADR 0005.
+  - The Strapi `description` of the Country band fields and of the `pricing.age-band` component, so editors see what a factor does.

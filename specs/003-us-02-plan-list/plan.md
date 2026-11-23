@@ -9,19 +9,14 @@
 ## Summary
 
 **Strapi.**
-- New `Plan` collection (draft & publish). Coverages and benefits are `plan.item` components.
+- New `Plan` collection (draft & publish) with `plan.item` coverages and benefits. Public gets only `find`, which returns published plans only.
 - Country gains `currency`, `numberLocale`, `driverAgeBands` and `vehicleAgeBands`.
-- The US-01 save check now also rejects a plan with no country.
-- The Plan `find` returns published plans only, and Public gets `find`.
+- The US-01 save check also rejects a plan with no country.
 - The seed adds 3 CO + 3 CL plans and 1 inactive one. A backfill fills the new Country fields on existing databases.
 
 **Angular.**
-- Step 2 replaces its placeholder with the plan list:
-  - prices from the simulated rule (ADR 0005), in the country's currency;
-  - a recommended badge;
-  - a radio-group choice saved to the tab session;
-  - loading, empty and error states.
-- The step 1 guard also re-checks the saved values against the current fields (R-19).
+- Step 2 replaces its placeholder with the plan list: simulated prices (ADR 0005) in the country's currency, a recommended badge, a radio choice saved to the tab session, and loading, empty and error states.
+- The step 1 guard also re-checks the saved values (R-19).
 - "Continuar" opens a summary placeholder with "Volver".
 
 ## Technical Context
@@ -76,41 +71,30 @@ frontend/src/app/
 ```
 
 **Structure Decision**: the same layout as US-01. The step 2 placeholder is deleted.
+
 ## ADR changes
 
 - **New:** [ADR 0005 — Simulated price rule with age bands on Country](../../docs/adr/0005-simulated-price-rule-age-bands.md) (Proposed; Accepted with this Gate 2).
-- **ADR 0001 amended:**
-  - The Plan save check is implemented, and the Plan `find` returns published plans only.
-  - Coverages and benefits use the `plan.item` component.
-  - Country gains `currency`, `numberLocale` and the age bands.
+- **ADR 0001 amended:** the Plan save check is implemented; the Plan `find` returns published plans only; coverages and benefits use `plan.item`; Country gains `currency`, `numberLocale` and the age bands.
 
 ## Design options — plan list (`/:country/quote/plans`)
 
-All three options share the same frame:
-- **Shell and stepper:** the existing navy header and stepper ("Elige tu plan" is current), in a Bootstrap `.container`.
-- **Heading:** "Elige tu plan", with the help text "El precio mensual se ajusta según tu edad y la antigüedad de tu carro."
-- **Cards:** the `.plan-card` recipe, as a native radio group.
-- **Buttons:** "Volver" (secondary) and "Continuar" (the yellow pill).
+All options use the navy header and stepper, a `.container`, the `.plan-card` recipe as a native radio group, and "Volver" / "Continuar". Interactive mockups were shown at Gate 2.
 
-Interactive mockups are shown at Gate 2.
+- **Option A — Card grid (recommended):** `col-12 col-md-6 col-lg-4`; each card has the badge, name, description, the price with " / mes", Coberturas and Beneficios; the buttons sit below. *Pros:* easy side-by-side comparison; it matches the recipe. *Cons:* long cards on mobile.
+- **Option B — Compact list:** one row per plan, with the price and radio on the right and the lists behind "Ver coberturas y beneficios". *Pros:* short on mobile. *Cons:* comparing needs extra clicks.
+- **Option C — Grid with a sticky bar** showing the chosen plan, its price and "Continuar". *Pros:* the CTA is always in reach. *Cons:* the bar covers content at 320 px.
 
-**Option A — Card grid (recommended).**
-- Layout: `row g-4`, `col-12 col-md-6 col-lg-4`, as the recipe says (stacked, then 2, then 3 columns).
-- Each card shows the badge, name, short description, a large price with " / mes", the Coberturas list (check icons) and the Beneficios list.
-- The whole card is the radio label. The chosen card shows a 2 px blue ring, a check and "Seleccionado".
-- The buttons sit below the grid.
-- *Pros:* easy to compare side by side; matches the recipe. *Cons:* long cards on mobile.
+**Recommendation:** A. It is the simplest, follows the recipe, and has one keyboard path.
 
-**Option B — Compact list with details on demand.**
-- Layout: one card per row (`col-12 col-lg-10`), with the name and description on the left and the price and radio on the right.
-- "Ver coberturas y beneficios" expands the lists (a disclosure button).
-- *Pros:* short on mobile. *Cons:* comparing coverages needs extra clicks; more interaction to make accessible.
-
-**Option C — Grid with a sticky selection bar.**
-- The grid from A, plus a bar fixed at the bottom on mobile (sticky on desktop) that shows the chosen plan, its price and "Continuar".
-- *Pros:* the CTA is always in reach. *Cons:* the bar covers content at 320 px and needs extra focus and scroll care.
-
-**Recommendation:** A. It is the simplest, follows the plan-card recipe exactly, and keeps one keyboard path (arrows inside the group, then Tab to the buttons).
+**Chosen (Gate 2, rounds 1–3): option A, refined with the human:**
+- **Frame:** the US-01 navy header (Asegura+), the numbered stepper (S3: the done step shows a check, "Elige tu plan" is current; on mobile only the current circle and "Paso 2 de 3 · Elige tu plan"), and no help text about the price.
+- **Cards (S1):** white with a 1 px `--color-border` ring, 14 px radius, no top stripe.
+  - The recommended plan gets a 5 px `--color-brand` top border, a 1 px brand ring, and a yellow "Recomendado" pill with a star, sitting on the top border.
+- **Aligned rows:** the cards share one CSS subgrid, so the name and description, the price (after a divider), Coberturas and Beneficios start on the same line in every card.
+- **Selection without layout shift:** a custom radio circle (it fills `--color-action` with a white check) plus a 2 px inset `--color-action` ring. There is no "Seleccionado" text, and nothing changes size.
+- **Layout:** a 3-column grid from 992 px. Below that, a scroll-snap slider (82 % cards on mobile, 46 % on tablet) that shows the next card, with previous/next buttons and dots, opening on the recommended plan. The arrows inside the radio group move the choice and scroll to it.
+- **Buttons:** "Volver" (outlined secondary) and "Continuar" (the yellow pill), which is disabled (`--color-disabled-bg` / `--color-disabled-text`) until a plan is chosen. The hint "Elige un plan para continuar." is linked by `aria-describedby`, and its line keeps its space when hidden.
 
 **Summary placeholder:** the US-01 placeholder card with the stepper on "Resumen", the text "El resumen llega con US-03." and "Volver". There are no options: it is temporary.
 
@@ -127,24 +111,36 @@ Each candidate needs the human's Approved or Rejected at Gate 2. Names follow `d
 | UT-05 | Country mapper (bands) | Maps `currency`, locale and bands; drops an invalid band (from > to, factor ≤ 0); missing bands → [] | Bad CMS data must not crash pricing or produce absurd prices | Pending |
 | UT-06 | `quote-session.store` | Saves and reads `planId`; `saveStep1` keeps it; `discardData` and a country change drop it | FR-009 / SC-004 persistence, plus the "step 1 edited" edge case | Pending |
 | UT-07 | Guards | `step1CompleteGuard`: valid values pass; values invalid against the current fields → step 1 with `step1Completed` cleared; fields fail to load → step 1. `planChosenGuard`: no plan → plans | FR-011 / R-19: invalid data must never reach plans or the summary | Pending |
-| UT-08 | Plan list page | Restores the choice, or drops it when the plan is not offered; Continuar without a choice → message and focus; with a choice → summary; empty and error states with retry | The page's critical interactions (FR-007–FR-010) | Pending |
+| UT-08 | Plan list page | Restores the choice, or drops it when the plan is not offered; Continuar disabled with its hint until a choice, then → summary; empty and error states with retry | The page's critical interactions (FR-007–FR-010) | Pending |
 | UT-09 | CMS middleware (Plan) | Rejects a plan with no country on create, update and publish; accepts a save that leaves the country untouched | ADR 0001 mitigation; a plan without a country silently disappears | Pending |
 | UT-10 | CMS country backfill | Fills currency, locale and bands only when they are missing; never overwrites an edited value | Existing databases must get the new fields without losing editors' changes | Pending |
 
-Not proposed:
-- Card rendering, and the static texts and getters.
-- The Plan controller's `status` override (one line; quickstart 9 covers it).
-- The plan seed contents.
+Not proposed: card rendering, static texts and getters, the one-line Plan controller `status` override (quickstart 9 covers it), and the plan seed contents.
 
 ## E2E candidates
 
 | ID | Flow | Justification | Decision |
 |----|------|---------------|----------|
-| E2E-3 | `/co/quote`: fill in step 1 → the plans show in order, in COP, with the badge → Continuar without a choice shows the message → choose → summary → Volver keeps the choice | The story's core promise: CMS plans, the price, the choice and the session together, which only the real stack proves | Pending |
+| E2E-3 | `/co/quote`: fill in step 1 → the plans show in order, in COP, with the badge → Continuar disabled → choose → summary → Volver keeps the choice | The story's core promise: CMS plans, the price, the choice and the session together, which only the real stack proves | Pending |
 | E2E-4 | `/cl/quote` with a driver aged 22 and a vehicle 8 years old → the CLP prices equal base × 1.20 × 1.10 | The price rule reading the CMS bands and step 1 data end to end, in the second country | Pending |
 
 Not proposed: the empty and error states, admin edits, and reloads (unit tests and the quickstart cover them). The full-flow E2E belongs to US-03.
 
 ## Revisions
 
-_No revisions yet._
+### 2026-11-22 — Gate 2, round 1 (not approved)
+- **Asked:** reuse the agreed US-01 stepper and header; brand colours instead of grey cards; a mobile slider; "Recomendado" on the top border; prices and lists aligned across cards; no "Seleccionado" text (it causes layout shift).
+- **Changed:** a new mockup with the stepper and header, subgrid-aligned cards, a badge on the top border, selection by radio and ring, a mobile slider, and two card styles (S1 white, S2 tinted).
+
+### 2026-11-22 — Gate 2, round 2 (not approved)
+- **Asked:** S1 without the cyan stripe; the slider couldn't be moved; use the slider on tablet too; remove the price help text.
+- **Changed:** white cards, with a navy top border on the recommended plan only; a slider below 992 px with drag, previous/next buttons and dots.
+
+### 2026-11-22 — Gate 2, round 3 (not approved yet)
+- **Asked:**
+  - "Continuar" should work only after a plan is chosen, in the agreed colours.
+  - The price rule still applies, but customers needn't know how prices are estimated. Document it as a clear decision in the docs, the code and Strapi.
+- **Changed:**
+  - The spec is updated (Clarifications, FR-004, FR-005, FR-008, User Story 3).
+  - ADR 0005 and R12 record where the rule is documented.
+  - The chosen design is recorded, and UT-08 and E2E-3 are adjusted.

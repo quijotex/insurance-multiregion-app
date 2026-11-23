@@ -34,6 +34,8 @@ The source of truth is `cms/src/api/**/schema.json`. The Angular models in `feat
 
 A band covers an age when `fromAge ≤ age ≤ toAge`.
 
+The schema `description` of `driverAgeBands`, `vehicleAgeBands` and `pricing.age-band` explains the rule to editors: "Monthly price = base price × driver-age factor × vehicle-age factor. The first band that covers the age applies; no band → factor 1. Not shown to customers (ADR 0005)."
+
 **Seed bands (both countries):**
 
 | Band | Ages | Factor |
