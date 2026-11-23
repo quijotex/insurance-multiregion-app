@@ -97,7 +97,11 @@ Steps 2 and 3 each have an **AI substep (a)** followed by a **human, non-AI subs
 ## Questions
 
 ### What would we do differently with a team of 5 developers?
-_To be completed._
+- **Own the shared rules.** The constitution, skills and subagent definitions go under CODEOWNERS and change only through a reviewed PR. Model versions and agent settings are pinned in the repo, so every developer's flow behaves the same.
+- **Agree on shared contracts first.** Country context, wizard state and Strapi content types are defined in a base spec/ADR with a single owner before stories run in parallel. Specs are keyed by story ID, and ADRs are numbered at merge to avoid collisions.
+- **Move verification and review to CI.** Lint, unit tests, CMS build and E2E run on every PR. The `code-reviewer` agent comments on the PR, and branch protection requires a human review. A PR template carries the traceability links.
+- **Add a lightweight path** for small changes (no schema, architecture or critical-flow impact) that skips Clarify and Gate 2.
+- **Feed recurring review findings back** into the skills and the constitution in a regular review, so the flow improves for everyone.
 
 ### Which part of the flow did not work as expected and how was it adjusted?
 _Journal, filled as it happens:_
@@ -107,10 +111,11 @@ _Journal, filled as it happens:_
 - **2026-11-22** — The handoff review already worked as a gate (approve/reject paths) but was not named as one, and only Gate 1 corrections were recorded in an artifact. Renamed it Gate 3 and added a Revisions section to `plan.md` for Gate 2 corrections, so every human correction leaves a trace.
 - **2026-11-22** — Before the first story we noticed that, without a permissions file, every command a subagent runs (npm, git) would stop for human approval, breaking the autopilot. Added `.claude/settings.json` with an allowlist for the flow's commands, and used deny rules to enforce the non-AI zones (user stories, constitution, logs, `.env`) at tool level.
 - **2026-11-22** — Between tasks (4) and review (8) the only automatic check was verify (7), which tests code but not whether the tasks cover the spec. A missing FR would only be caught by the reviewer, after implementation. Added step 4b: Spec Kit's `analyze` checks FR ↔ task coverage before any code is written, with no extra human gate.
+- **2026-11-22** — Step 3a offered only E2E test candidates, not unit tests. That created re-tests, because some unit tests repeated what the E2E tests already covered. Also, not controlling unit tests increased the number of tests hugely, which could get worse over time. Step 3a now also proposes unit test candidates (what each one checks and why it matters), and the human approves or rejects each one at Gate 2, like the E2E candidates.
 - **2026-11-22** — In the first Gate 1 run (US-00), the clarify question and its options were written as plain chat text and got collapsed in the desktop app: the human never saw them. Gate questions are now asked with the interactive question dialog (`AskUserQuestion`), one per call, recommended option first; the question and answer are repeated in text for the log (rule in `CLAUDE.md` › Asking the Human).
 
 ### At which points did we decide not to use AI and why?
 - **Constitution (0a):** the rules that govern the agents must come from the human, not from the agents.
 - **Story intake (0b):** the business wording must stay untouched to be a reliable source of truth.
 - **Gates 1, 2 and 3 (2b, 3b, 10):** approval is a human responsibility by definition.
-- _More to be added as they happen._
+- **Manual testing after the autopilot (10):** besides the three gates, I decided to test by hand that everything in Strapi and in the wizard works as expected. This extra, non-AI step caught many issues (all already solved). I did it because once the AI assumes everything is OK, it just goes on to the next step, leaving errors along the way.
