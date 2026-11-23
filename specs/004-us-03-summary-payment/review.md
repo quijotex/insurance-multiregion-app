@@ -82,3 +82,20 @@ Scope: commit e3b0a64 and the uncommitted T016 FR fix in tasks.md (now FR-002, F
 - Observation, not a finding: `confirmation.page.ts:13` still has its own private `formatAmount(receipt)` with a slightly shorter fallback chain. It predates this commit and is out of scope. It could reuse the shared helper the next time it is touched.
 
 **Verdict: Approved.** R-10 and R-11 are resolved, and no new Blocker or Major was found.
+
+## Round 4 (Gate 3 corrections) — 2026-11-22
+Scope: commit af84917 (T017 [CMS], T018 [FE]). The orchestrator already ran these checks: frontend verify (228 tests), build, CMS build, CMS tests (52), e2e (5/5) and a browser check on desktop and mobile.
+
+| ID | Severity | Location | Finding | Rule/FR | Status | Resolution |
+|----|----------|----------|---------|---------|--------|------------|
+| — | — | — | No new findings. | — | — | — |
+
+### Checks
+- **Terms (Gate 3 items 1 and 2):** the CO and CL `TERMS_BY_COUNTRY` no longer have their own heading or the "datos ficticios" line. Nothing else changed in the blocks. The removed blocks appear only in `LEGACY_TERMS_LEAD`, which is used to recognise old rows. `termsUpgradePatch` changes a row only when its terms deep-equal (`isDeepStrictEqual`) `[...lead, ...current]`. Terms that an editor edited, extended, emptied or already upgraded are left as they are. PE and unknown codes get `{}`.
+- **One-shot passes:** `patchTermsOnce` keeps the R-01 and R5 rules for both markers. It patches the draft and publishes only when the draft is clean (`shouldPublishAfterBackfill`), and otherwise logs a warning. It sets the marker after the loop. A fresh seed sets both markers before it creates any country. On an old DB without terms, the first pass adds the current terms, so the upgrade pass then does nothing. No double write.
+- **Confirmation (Gate 3 item 3):** the `h1` reads "¡Listo, ya estás asegurado!". The ui-ux-guidelines skill (Receipt recipe) and the E2E-5 assertions were updated to match. FR-009 is unaffected.
+- **Payment error (Gate 3 item 4, FR-010):** the inline alert and its `.summary__error--payment` hook were removed. The `.summary__error*` styles remain, because the load-error and no-terms states still use them. `<dialog role="alertdialog">` has `aria-labelledby` set to its title and `aria-describedby` set to its hint, so it is announced when it opens. `showDialog` and `closeDialog` are shared with the terms dialog, and the terms dialog behaves as before (`showDialog` now also does nothing on a dialog that is already open). Esc, "Cerrar" and "Entendido" all lead to `paymentDialogClosed()`, through `(close)` or the fallback, and focus returns to `#payButton`. "Editar mis datos" closes the dialog, then calls `edit()` (`router.navigate(['..'])`, step 1). Data, plan and acceptance are kept, and retrying from `rejected` still works. `host` and `injector` are still used (heading focus at line 93, and `afterNextRender` in `reject`), so nothing is left unused.
+- **Styles:** the only additions are `--error`, `--alert`, `__text` and footer `gap`/`flex-wrap`. They are tokens only, use no Bootstrap colour or component classes, and the footer wraps on narrow screens. The build passes within the `anyComponentStyle` budget.
+- **Tests:** the CMS regression test "Gate 3 · replaces only the untouched first seed (heading and mock-data line) with the current terms" is named in T017. It checks the behaviour with 1 positive case and 3 negative ones. The UT-07 FR-010 test only changed its selector to the alertdialog (`open` and text). E2E-5 only changed its heading text. No unapproved cases were added. T017 and T018 include `US-03`, the FR IDs and the files.
+
+**Verdict: Approved.**
