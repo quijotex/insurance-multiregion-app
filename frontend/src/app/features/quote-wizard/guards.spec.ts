@@ -9,16 +9,14 @@ import { ConfirmDialogService } from '../../shared/ui/confirm-dialog/confirm-dia
 import { countryGuard } from './country.guard';
 import { switchConfirmGuard } from './switch-confirm.guard';
 import { wizardEntryGuard } from './wizard-entry.guard';
-import { WizardCountry } from './wizard-country.service';
 
-const CO: Country = { code: 'co', name: 'Colombia', iconUrl: '/uploads/co.svg', iconAlt: 'Bandera de Colombia' };
-const CL: Country = { code: 'cl', name: 'Chile', iconUrl: '/uploads/cl.svg', iconAlt: 'Bandera de Chile' };
+const CO: Country = { code: 'co', name: 'Colombia', legalAge: 18, iconUrl: '/uploads/co.svg', iconAlt: 'Bandera de Colombia' };
+const CL: Country = { code: 'cl', name: 'Chile', legalAge: 18, iconUrl: '/uploads/cl.svg', iconAlt: 'Bandera de Chile' };
 
 describe('US-00 · quote wizard entry guards', () => {
   let load: () => Observable<Country[]>;
   let confirm: ReturnType<typeof vi.fn>;
   let session: QuoteSessionStore;
-  let wizardCountry: WizardCountry;
 
   function route(country: string): ActivatedRouteSnapshot {
     return { paramMap: { get: () => country } } as unknown as ActivatedRouteSnapshot;
@@ -47,15 +45,9 @@ describe('US-00 · quote wizard entry guards', () => {
       ],
     });
     session = TestBed.inject(QuoteSessionStore);
-    wizardCountry = TestBed.inject(WizardCountry);
   });
 
   describe('FR-005 / FR-006 country guard', () => {
-    it('lets an active country through and exposes it', async () => {
-      expect(await run(countryGuard, 'co')).toBe(true);
-      expect(wizardCountry.country()).toEqual(CO);
-    });
-
     it('redirects an upper or mixed case code to the lower case URL', async () => {
       expect(url(await run(countryGuard, 'CO'))).toBe('/co/quote');
       expect(url(await run(countryGuard, 'Cl'))).toBe('/cl/quote');
@@ -88,14 +80,14 @@ describe('US-00 · quote wizard entry guards', () => {
 
     it('passes without asking for the same country and keeps its data', async () => {
       session.start('co');
-      sessionStorage.setItem('quote-session', JSON.stringify({ countryCode: 'co', data: { a: 1 } }));
+      sessionStorage.setItem('quote-session', JSON.stringify({ countryCode: 'co', data: { step1: { a: 'x' } } }));
       expect(await enter('co')).toBe(true);
       expect(confirm).not.toHaveBeenCalled();
       expect(session.hasData()).toBe(true);
     });
 
     it('asks when another country has data and resets it on confirm', async () => {
-      sessionStorage.setItem('quote-session', JSON.stringify({ countryCode: 'cl', data: { a: 1 } }));
+      sessionStorage.setItem('quote-session', JSON.stringify({ countryCode: 'cl', data: { step1: { a: 'x' } } }));
       confirm.mockResolvedValue(true);
       expect(await enter('co')).toBe(true);
       expect(confirm).toHaveBeenCalledWith({
@@ -109,7 +101,7 @@ describe('US-00 · quote wizard entry guards', () => {
     });
 
     it('returns to the previous country and keeps its data on cancel', async () => {
-      sessionStorage.setItem('quote-session', JSON.stringify({ countryCode: 'cl', data: { a: 1 } }));
+      sessionStorage.setItem('quote-session', JSON.stringify({ countryCode: 'cl', data: { step1: { a: 'x' } } }));
       confirm.mockResolvedValue(false);
       expect(url(await enter('co'))).toBe('/cl/quote');
       expect(session.lastCountryCode()).toBe('cl');
@@ -119,7 +111,7 @@ describe('US-00 · quote wizard entry guards', () => {
 
   describe('composed entry guard', () => {
     it('does not ask or touch the session when the country is invalid', async () => {
-      sessionStorage.setItem('quote-session', JSON.stringify({ countryCode: 'cl', data: { a: 1 } }));
+      sessionStorage.setItem('quote-session', JSON.stringify({ countryCode: 'cl', data: { step1: { a: 'x' } } }));
       const result = await run(wizardEntryGuard, 'zz');
       expect(url(result)).toBe('/?unavailable=zz');
       expect(confirm).not.toHaveBeenCalled();

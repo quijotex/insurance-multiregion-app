@@ -11,6 +11,7 @@ export interface CountryDto {
   documentId: string;
   name: string;
   code: string;
+  legalAge: number | null;
   icon: CountryIconDto | null;
 }
 
@@ -23,6 +24,8 @@ export interface CountriesResponseDto {
 export interface Country {
   code: string;
   name: string;
+  /** Minimum age to hold a policy (FR-007). Defaults to 18 when the CMS has none. */
+  legalAge: number;
   iconUrl: string | null;
   iconAlt: string;
 }

@@ -3,6 +3,7 @@
 - **Status:** Accepted (Gate 2, US-00 — 2026-11-22)
 - **Date:** 2026-11-21
 - **Related:** US-00, US-01, US-02, US-03
+- **Amended:** Gate 2, US-01 — 2026-11-22 (FormField `section`, save validation, `legalAge`, published-only FormField `find`)
 
 ## Context and problem
 
@@ -28,7 +29,7 @@ So we need to decide two things:
 Let's take a **Country as collection** approach, and **FormField** and **Plan** as collections too, with a many-to-one relation towards Country. All three use native draft/published.
 
 - **Country** saves `code`, `name`, `icon` (media), `order`, `active`, `currency`, `numberLocale` (e.g. `es-CO`), `legalAge` and `termsAndConditions`. Each story adds the fields it uses (US-00: `code`, `name`, `icon`, `order`, `active`).
-- **FormField** saves `key`, `label`, `type`, `required`, `helpText`, `errorMessage`, `order` and `step`/`section`, plus two components:
+- **FormField** saves `key`, `label`, `type`, `required`, `helpText`, `placeholder`, `errorMessage`, `order` and `section` (`policyholder` | `vehicle`; no `step`, because only step 1 is a configurable form), plus two components:
   - `validations`: `min`, `max`, `pattern`, and `validators` with name and value.
   - `options`: for selects.
   - `key` is the stable technical name of the field (e.g. `documentNumber`, `vehicleYear`, `birthDate`). Angular uses it as the form control name, and the summary (masking) and the price rule use it to find values. Labels can't play this role because the business edits them. Unique per country.
@@ -49,7 +50,9 @@ GET /api/plans?filters[country][code][$eq]=CO&filters[active][$eq]=true&sort=ord
     &populate[coverages]=true&populate[benefits]=true
 ```
 
-Strapi's REST API returns only published documents by default, so "only published" needs no extra filter. Components aren't returned unless populated, so `populate` is explicit (never `populate=*`).
+Strapi's REST API returns only published documents by default, but `?status=draft` would override it, so the Country and FormField `find` controllers force `status: 'published'`. Components aren't returned unless populated, so `populate` is explicit (never `populate=*`).
+
+`legalAge` lives on Country (US-01). The birth-date field enables the named validator `legalAge`, which reads the active country's value, so the age is set once per country.
 
 A country is **available** when it is published **and** `active`. The `active` filter is enforced by the Country `find` controller, not sent by the browser, so no client can list inactive countries by omitting it.
 
@@ -78,7 +81,7 @@ Nothing else: no `findOne` (the filtered list is enough), no `create`/`update`/`
 
 - **Duplication:** each common field, like email, exists as many times as there are countries. On the other hand, that also gives a clear separation of data per country.
 - **No atomic publication:** everything has to be published one by one, not all at once for a country. Mitigation: Strapi's Releases (only on paid subscriptions).
-- **Risk of forgetting to assign new fields to their country:** Strapi 5 can't mark a relation as required, so it doesn't force fields or plans to be assigned to a Country. An unassigned field just never shows up anywhere, silently. Mitigation (recommended): validate in Strapi on save, using Document Service middleware, rejecting a FormField or Plan without a country.
+- **Risk of forgetting to assign new fields to their country:** Strapi 5 can't mark a relation as required, so it doesn't force fields or plans to be assigned to a Country. An unassigned field just never shows up anywhere, silently. Mitigation (implemented for FormField in US-01): a Document Service middleware rejects, on create, update and publish, a FormField without a country or with a `key` already used in its country. Plan gets the same check in US-02.
 - **Extra code for validations:** Angular must parse Strapi data into code validations, because Strapi only sends data, and Angular should apply strict, typed validations in code, especially for forms and input values.
 - **Named validators need code:** rules relative to today (legal age, vehicle year) and algorithms (RUT check digit) can't be expressed with fixed `min`/`max`/`pattern`, so they are named validators with a value, e.g. `{ name: "maxYearsAgo", value: 20 }`. Each name has a function in Angular.
 

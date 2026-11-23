@@ -38,37 +38,3 @@
     }
   }
 }
-
-.button {
-  min-height: 48px;
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius-pill);
-  border: 1px solid transparent;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-
-  &:focus-visible {
-    outline: none;
-    box-shadow: var(--focus-ring);
-  }
-
-  &--primary {
-    background: var(--color-action);
-    color: var(--color-surface);
-
-    &:hover {
-      background: var(--color-action-hover);
-    }
-  }
-
-  &--secondary {
-    background: var(--color-surface);
-    color: var(--color-brand);
-    border-color: var(--color-brand);
-
-    &:hover {
-      background: var(--color-surface-alt);
-    }
-  }
-}

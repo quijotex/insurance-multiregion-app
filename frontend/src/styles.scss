@@ -16,6 +16,7 @@
   --color-surface-alt: #f8f8f8;
   --color-surface-highlight: #dfeaff;
   --color-surface-brand-soft: #f3f7ff;
+  --color-surface-field-focus: #e8f0ff;
   --color-border: #cdced9;
   --color-disabled-bg: #e7e7e7;
   --color-disabled-text: #666666;
@@ -84,3 +85,68 @@ body {
   }
 }
 
+
+/* Button recipe (ui-ux-guidelines §3), shared by every screen. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  padding: var(--space-3) var(--space-6);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  &--cta {
+    min-width: 200px;
+    background: var(--color-cta);
+    color: var(--color-on-cta);
+
+    &:hover:not(:disabled) {
+      background: var(--color-cta-hover);
+    }
+  }
+
+  &--primary {
+    background: var(--color-action);
+    color: var(--color-surface);
+
+    &:hover:not(:disabled) {
+      background: var(--color-action-hover);
+    }
+  }
+
+  &--secondary {
+    background: var(--color-surface);
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+
+    &:hover:not(:disabled) {
+      background: var(--color-surface-alt);
+    }
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    background: var(--color-disabled-bg);
+    border-color: transparent;
+    color: var(--color-disabled-text);
+    cursor: not-allowed;
+  }
+}
+
+/* Step 1 reveal: an item holding an open select list sits above its later
+   siblings, even while the reveal animation still runs. Global because the
+   open class lives inside the select-field component (view encapsulation). */
+.reveal:has(.select-field--open) {
+  position: relative;
+  z-index: 30;
+}

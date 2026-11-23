@@ -4,6 +4,8 @@ import type { Core } from '@strapi/strapi';
 const PUBLIC_ACTIONS = [
   // The wizard reads the list of available countries (US-00).
   'api::country.country.find',
+  // The wizard reads the form fields of the selected country (US-01).
+  'api::form-field.form-field.find',
 ];
 
 export async function grantPublicPermissions(strapi: Core.Strapi): Promise<void> {

@@ -1,0 +1,9 @@
+{
+  "collectionName": "components_form_validators",
+  "info": { "displayName": "Validator", "description": "Named validation rule" },
+  "options": {},
+  "attributes": {
+    "name": { "type": "string", "required": true },
+    "value": { "type": "integer" }
+  }
+}

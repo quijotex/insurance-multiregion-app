@@ -35,6 +35,7 @@ describe('US-00 · FR-007 header "Cambiar país"', () => {
     TestBed.inject(WizardCountry).set({
       code: 'co',
       name: 'Colombia',
+      legalAge: 18,
       iconUrl: '/uploads/co.svg',
       iconAlt: 'Bandera de Colombia',
     });
@@ -50,7 +51,7 @@ describe('US-00 · FR-007 header "Cambiar país"', () => {
   });
 
   it('keeps the country name visible when the country has no icon', () => {
-    TestBed.inject(WizardCountry).set({ code: 'co', name: 'Colombia', iconUrl: null, iconAlt: '' });
+    TestBed.inject(WizardCountry).set({ code: 'co', name: 'Colombia', legalAge: 18, iconUrl: null, iconAlt: '' });
     const el = setup({}).nativeElement as HTMLElement;
     const country = el.querySelector('.wizard-header__country');
     expect(el.querySelector('img')).toBeNull();
@@ -67,7 +68,7 @@ describe('US-00 · FR-007 header "Cambiar país"', () => {
 
   it('asks first when there is data, discards it and navigates on confirm', async () => {
     confirm.mockResolvedValue(true);
-    await clickChange(setup({ a: 1 }));
+    await clickChange(setup({ step1: { a: 'x' } }));
     expect(confirm).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Los datos que ingresaste para Colombia se van a borrar.' }),
     );
@@ -78,7 +79,7 @@ describe('US-00 · FR-007 header "Cambiar país"', () => {
 
   it('stays and keeps the data on cancel', async () => {
     confirm.mockResolvedValue(false);
-    await clickChange(setup({ a: 1 }));
+    await clickChange(setup({ step1: { a: 'x' } }));
     expect(session.hasData()).toBe(true);
     expect(navigate).not.toHaveBeenCalled();
   });

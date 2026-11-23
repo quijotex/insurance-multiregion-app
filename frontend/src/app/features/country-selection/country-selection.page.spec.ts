@@ -6,8 +6,8 @@ import { CountryService } from '../../core/country/country.service';
 import { QuoteSessionStore } from '../../core/session/quote-session.store';
 import { CountrySelectionPage } from './country-selection.page';
 
-const CL: Country = { code: 'cl', name: 'Chile', iconUrl: '/uploads/cl.svg', iconAlt: 'Bandera de Chile' };
-const CO: Country = { code: 'co', name: 'Colombia', iconUrl: null, iconAlt: '' };
+const CL: Country = { code: 'cl', name: 'Chile', legalAge: 18, iconUrl: '/uploads/cl.svg', iconAlt: 'Bandera de Chile' };
+const CO: Country = { code: 'co', name: 'Colombia', legalAge: 18, iconUrl: null, iconAlt: '' };
 
 interface Setup {
   fixture: ComponentFixture<CountrySelectionPage>;
