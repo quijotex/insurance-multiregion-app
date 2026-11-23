@@ -41,9 +41,9 @@
 
 ## Phase 2: Stories S1–S4 (Frontend)
 
-- [ ] T007 [FE] US-03 `RichTextComponent` per ADR 0007: `@switch`/`@for` templates for paragraph, heading (levels shifted to `h3`–`h4`), lists, quote, text with bold/italic/underline, and links (new tab, `rel="noopener noreferrer"`). No `innerHTML`. **UT-08** (mapper and component) (FR-005) — `frontend/src/app/shared/ui/rich-text/**` (depends on T003)
-- [ ] T008 [FE] US-03 Guards and routes per [contracts/routes.md](contracts/routes.md): `noReceiptGuard` on step 1, plans and summary; `receiptGuard` on the new `confirmation` route; `summary` → `SummaryPage`. Delete `features/plan-list/summary-placeholder.page.ts`. **UT-06** (FR-012) — `frontend/src/app/features/quote-wizard/*.guard*.ts`, `frontend/src/app/app.routes.ts` (depends on T006)
-- [ ] T009 [FE] US-03 `SummaryPage` per the plan's chosen design and the ui-ux-guidelines Summary block and Checkbox recipes:
+- [x] T007 [FE] US-03 `RichTextComponent` per ADR 0007: `@switch`/`@for` templates for paragraph, heading (levels shifted to `h3`–`h4`), lists, quote, text with bold/italic/underline, and links (new tab, `rel="noopener noreferrer"`). No `innerHTML`. **UT-08** (mapper and component) (FR-005) — `frontend/src/app/shared/ui/rich-text/**` (depends on T003)
+- [x] T008 [FE] US-03 Guards and routes per [contracts/routes.md](contracts/routes.md): `noReceiptGuard` on step 1, plans and summary; `receiptGuard` on the new `confirmation` route; `summary` → `SummaryPage`. Delete `features/plan-list/summary-placeholder.page.ts`. **UT-06** (FR-012) — `frontend/src/app/features/quote-wizard/*.guard*.ts`, `frontend/src/app/app.routes.ts` (depends on T006)
+- [x] T009 [FE] US-03 `SummaryPage` per the plan's chosen design and the ui-ux-guidelines Summary block and Checkbox recipes:
   - **Data:** loads the country, form fields and plans; builds rows (T004) and the plan offer with `simulatePrice`/`formatPrice` (US-02); a plan no longer offered → `clearPlan` and redirect to `plans`. Loading (skeletons, `aria-busy`) and error (`role="alert"`, "Reintentar") states.
   - **Layout:** "Revisa y asegúrate"; the stepper on "Resumen"; "Tus datos" and "Tu vehículo" side by side from 992 px and stacked below; the plan card full width (price with `*` and "/ mes" below the description); "Editar mis datos" and "Cambiar plan" top right of their cards; the load reveal.
   - **Acceptance:** custom checkbox, "*Acepto términos y condiciones" with the link opening a native `<dialog>` (`RichTextComponent`, "Cerrar", "Entendido", Esc, focus back to the link); no terms → error instead of the link and the CTA stays disabled; the state is saved with `acceptTerms`.
@@ -51,12 +51,12 @@
   - **Focus:** the heading on load.
   - **UT-07**.
   (FR-001–FR-010, FR-013) — `frontend/src/app/features/summary/summary.page.*` (depends on T003–T008)
-- [ ] T010 [FE] US-03 `ConfirmationPage` per the Receipt recipe (option B): stepper with all steps done, the ticket with "Pago aprobado", quote number, plan, country, date and total (formatted with the receipt's currency and locale), "Nueva cotización" → `clear()` and `/`. Heading focused on load; the load reveal (FR-009, FR-011, FR-013) — `frontend/src/app/features/summary/confirmation.page.*` (depends on T006, T008)
+- [x] T010 [FE] US-03 `ConfirmationPage` per the Receipt recipe (option B): stepper with all steps done, the ticket with "Pago aprobado", quote number, plan, country, date and total (formatted with the receipt's currency and locale), "Nueva cotización" → `clear()` and `/`. Heading focused on load; the load reveal (FR-009, FR-011, FR-013) — `frontend/src/app/features/summary/confirmation.page.*` (depends on T006, T008)
 
 ## Phase 3: E2E, review, docs
 
 - [ ] T011 [E2E] US-03 E2E-5 per plan.md (CO full flow: masked cédula, price, CTA disabled, accept, "Procesando…", confirmation with `CO-` number, reload keeps it, Back never shows the CTA) (FR-001–FR-012, SC-003) — `frontend/e2e/us-03-*.spec.ts` (depends on T002, T009, T010)
-- [ ] T012 [ORCH] US-03 Update the README (terms and the masked flag in the admin, the simulated payment rule and test values) and check the quickstart (SC-002) — `README.md`
+- [x] T012 [ORCH] US-03 Update the README (terms and the masked flag in the admin, the simulated payment rule and test values) and check the quickstart (SC-002) — `README.md`
 - [ ] T013 [ORCH] US-03 Code review rounds recorded in `review.md`, then the handoff
 
 ## Dependencies
