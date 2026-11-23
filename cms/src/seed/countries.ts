@@ -52,10 +52,15 @@ interface PricingRow {
   vehicleAgeBands?: unknown[] | null;
 }
 
-/** Pure: the values a country is missing, taken from the defaults. Present values are never in the patch. */
+/**
+ * Pure: the values a country row is missing, taken from the defaults. Only rows that predate US-02
+ * (currency or numberLocale missing) are backfilled; once a row has both, it is never touched, so bands
+ * an editor emptied on purpose stay empty. Within a pre-US-02 row, only empty bands are filled.
+ */
 export function pricingPatch(row: PricingRow): Record<string, unknown> {
-  const defaults = PRICING_DEFAULTS[row.code ?? ''];
   const patch: Record<string, unknown> = {};
+  if (row.currency && row.numberLocale) return patch;
+  const defaults = PRICING_DEFAULTS[row.code ?? ''];
   if (!row.currency && defaults) patch.currency = defaults.currency;
   if (!row.numberLocale && defaults) patch.numberLocale = defaults.numberLocale;
   if (!row.driverAgeBands?.length) patch.driverAgeBands = DRIVER_BANDS;
@@ -63,17 +68,34 @@ export function pricingPatch(row: PricingRow): Record<string, unknown> {
   return patch;
 }
 
-/** Existing databases get currency, locale and bands only where they are missing (US-02). */
+const BAND_KEYS = ['driverAgeBands', 'vehicleAgeBands'];
+
+/**
+ * Existing databases get currency, locale and bands only on rows that predate US-02.
+ * Publication state is never changed: scalars are written at the DB layer on each row (draft and published
+ * alike, like backfillLegalAge). The db layer does not manage components, so the bands are written with the
+ * Document Service on the same version only (`draft` or `published` as the row is); that updates that
+ * version in place and never publishes a draft.
+ */
 export async function backfillCountryPricing(strapi: Core.Strapi): Promise<void> {
-  for (const status of ['draft', 'published'] as const) {
-    const rows = (await strapi.documents(UID).findMany({
-      status,
-      populate: { driverAgeBands: true, vehicleAgeBands: true },
-    })) as unknown as Array<PricingRow & { documentId: string }>;
-    for (const row of rows) {
-      const patch = pricingPatch(row);
-      if (Object.keys(patch).length === 0) continue;
-      await strapi.documents(UID).update({ documentId: row.documentId, data: patch as never, status });
+  const rows = (await strapi.db.query(UID).findMany({
+    populate: { driverAgeBands: true, vehicleAgeBands: true },
+  })) as unknown as Array<PricingRow & { id: number; documentId: string; publishedAt?: string | null }>;
+  for (const row of rows) {
+    const patch = pricingPatch(row);
+    const keys = Object.keys(patch);
+    if (keys.length === 0) continue;
+    const bands = Object.fromEntries(keys.filter((k) => BAND_KEYS.includes(k)).map((k) => [k, patch[k]]));
+    const scalars = Object.fromEntries(keys.filter((k) => !BAND_KEYS.includes(k)).map((k) => [k, patch[k]]));
+    if (Object.keys(scalars).length > 0) {
+      await strapi.db.query(UID).update({ where: { id: row.id }, data: scalars });
+    }
+    if (Object.keys(bands).length > 0) {
+      await strapi.documents(UID).update({
+        documentId: row.documentId,
+        data: bands as never,
+        status: row.publishedAt ? 'published' : 'draft',
+      });
     }
   }
 }

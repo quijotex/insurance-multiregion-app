@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkFormFieldIntegrity, checkPlanIntegrity, readCountryPayload } from './country-integrity';
+import { checkFormFieldIntegrity, checkPlanIntegrity, planIntegrityMessage, readCountryPayload } from './country-integrity';
 
 describe('US-01 · Edge Cases form field integrity', () => {
   const existing = [
@@ -56,29 +56,35 @@ describe('US-01 · FR-001 admin edits keep the country (Gate 3 manual test)', ()
 });
 
 
-describe('US-02 · FR-001 plan integrity (UT-09)', () => {
-  // The effective country is the payload's when present, else the stored one (null on create).
-  const effective = (payload: unknown, stored: string | null) => {
-    const { present, ref } = readCountryPayload(payload);
-    return present ? (ref === null ? null : String(ref)) : stored;
-  };
+describe('US-02 · FR-001 plan integrity (UT-09, R-10)', () => {
+  // R-10: runs the real code path the middleware uses (planIntegrityMessage) against a fake strapi.
+  const fakeStrapi = (stored: string | null, numericIdToDocumentId: string | null = null) =>
+    ({
+      documents: () => ({ findOne: async () => (stored ? { country: { documentId: stored } } : { country: null }) }),
+      db: { query: () => ({ findOne: async () => (numericIdToDocumentId ? { documentId: numericIdToDocumentId } : null) }) },
+    }) as never;
+  const run = (data: Record<string, unknown>, stored: string | null, documentId: string | undefined, numeric: string | null = null) =>
+    planIntegrityMessage(fakeStrapi(stored, numeric), { params: { documentId, data } });
 
-  it('rejects a plan without country on create, update and publish', () => {
-    // create: nothing stored; update/publish: the payload clears the relation, or nothing is stored.
-    const cases: Array<[unknown, string | null]> = [
-      [undefined, null],
-      [null, 'co'],
-      [{ set: [] }, 'co'],
-      [{ connect: [], disconnect: [{ id: 1 }] }, 'co'],
-      [{ connect: [], disconnect: [] }, null],
-    ];
-    for (const [payload, stored] of cases) {
-      expect(checkPlanIntegrity({ countryDocumentId: effective(payload, stored) })).toBe('El plan debe tener un país.');
-    }
+  it('rejects a plan without country on create, update and publish', async () => {
+    const msg = 'El plan debe tener un país.';
+    expect(await run({}, null, undefined)).toBe(msg); // create without country
+    expect(await run({ country: null }, 'co', 'p1')).toBe(msg);
+    expect(await run({ country: { set: [] } }, 'co', 'p1')).toBe(msg);
+    expect(await run({ country: { connect: [], disconnect: [{ id: 1 }] } }, 'co', 'p1')).toBe(msg);
+    expect(await run({ country: { connect: [], disconnect: [] } }, null, 'p1')).toBe(msg); // publish, none stored
+    expect(await run({ country: 7 }, 'co', 'p1', null)).toBe(msg); // numeric id that resolves to nothing
   });
 
-  it('accepts a save that leaves the country untouched, or sets one', () => {
-    expect(checkPlanIntegrity({ countryDocumentId: effective({ connect: [], disconnect: [] }, 'co') })).toBeNull();
-    expect(checkPlanIntegrity({ countryDocumentId: effective({ connect: [{ documentId: 'cl' }] }, null) })).toBeNull();
+  it('accepts a save that leaves the country untouched, or sets one', async () => {
+    expect(await run({ country: { connect: [], disconnect: [] } }, 'co', 'p1')).toBeNull();
+    expect(await run({ name: 'x' }, 'co', 'p1')).toBeNull();
+    expect(await run({ country: { connect: [{ documentId: 'cl' }] } }, null, undefined)).toBeNull();
+    expect(await run({ country: 7 }, null, undefined, 'cl')).toBeNull();
+  });
+
+  it('keeps the pure rule', () => {
+    expect(checkPlanIntegrity({ countryDocumentId: null })).toBe('El plan debe tener un país.');
+    expect(checkPlanIntegrity({ countryDocumentId: 'co' })).toBeNull();
   });
 });

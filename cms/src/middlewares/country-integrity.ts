@@ -123,6 +123,16 @@ async function checkPlan<T>(
   context: { params?: unknown },
   next: () => T,
 ): Promise<T> {
+  const message = await planIntegrityMessage(strapi, context);
+  if (message) throw new errors.ValidationError(message);
+  return next();
+}
+
+/** The exact decision the middleware applies to a plan save: the error message, or null when allowed. */
+export async function planIntegrityMessage(
+  strapi: Core.Strapi,
+  context: { params?: unknown },
+): Promise<string | null> {
   const params = (context.params ?? {}) as { documentId?: string; data?: Record<string, unknown> };
   const { present, ref } = readCountryPayload((params.data ?? {}).country);
   let countryDocumentId: string | null = null;
@@ -143,7 +153,5 @@ async function checkPlan<T>(
     })) as { country?: { documentId: string } | null } | null;
     countryDocumentId = existing?.country?.documentId ?? null;
   }
-  const message = checkPlanIntegrity({ countryDocumentId });
-  if (message) throw new errors.ValidationError(message);
-  return next();
+  return checkPlanIntegrity({ countryDocumentId });
 }

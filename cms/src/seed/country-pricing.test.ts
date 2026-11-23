@@ -11,11 +11,27 @@ describe('US-02 · FR-004 country pricing backfill (UT-10)', () => {
     });
   });
 
-  it('never overwrites edited values and fills only what is missing', () => {
+  it('R-01 · fills only what is missing on a pre-US-02 row (currency missing)', () => {
+    const edited = [{ fromAge: 0, toAge: 99, factor: 1.5 }];
+    expect(
+      pricingPatch({ code: 'CO', currency: null, numberLocale: 'en-US', driverAgeBands: edited, vehicleAgeBands: [] }),
+    ).toEqual({ currency: 'COP', vehicleAgeBands: VEHICLE_BANDS });
+  });
+
+  it('R-01 · regression: emptied bands on a country that already has currency stay empty', () => {
+    expect(
+      pricingPatch({ code: 'CL', currency: 'CLP', numberLocale: 'es-CL', driverAgeBands: [], vehicleAgeBands: [] }),
+    ).toEqual({});
+    expect(
+      pricingPatch({ code: 'CL', currency: 'CLP', numberLocale: 'es-CL', driverAgeBands: null, vehicleAgeBands: null }),
+    ).toEqual({});
+  });
+
+  it('never overwrites edited values', () => {
     const edited = [{ fromAge: 0, toAge: 99, factor: 1.5 }];
     expect(
       pricingPatch({ code: 'CO', currency: 'USD', numberLocale: 'en-US', driverAgeBands: edited, vehicleAgeBands: [] }),
-    ).toEqual({ vehicleAgeBands: VEHICLE_BANDS });
+    ).toEqual({});
     expect(
       pricingPatch({ code: 'CO', currency: 'COP', numberLocale: 'es-CO', driverAgeBands: edited, vehicleAgeBands: edited }),
     ).toEqual({});
