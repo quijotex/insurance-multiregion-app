@@ -114,3 +114,19 @@ Scope: commit 83d059d (T018 [FE]). The human asked to remove "Editar mis datos" 
 - Observation, not a finding: the dialog hint still reads "Revisa tus datos o vuelve a intentarlo." That is still valid, because the data cards with "Editar mis datos" are visible behind the dialog once it closes.
 
 **Verdict: Approved.**
+
+## Round 6 (Gate 3 corrections, batch 3) — 2026-11-22
+Scope: commit c15654a (T018 [FE]). The human said the payment failure dialog title wrapped onto three lines at 320px because it shared a row with the close button. The reviewer ran frontend verify (228 tests) and the build, and both pass. The orchestrator reports e2e 5/5 and a measured title at 320px of scrollWidth 256 = clientWidth 256.
+
+| ID | Severity | Location | Finding | Rule/FR | Status | Resolution |
+|----|----------|----------|---------|---------|--------|------------|
+| — | — | — | No new findings. | — | — | — |
+
+### Checks
+- **Markup and accessibility (FR-010):** `aria-labelledby="payment-dialog-title"` and `aria-describedby="payment-dialog-hint"` (summary.page.html:199-200) still match the `h2` (line 216) and `p` (line 217) ids. The title now holds only text, so its accessible name is just "No pudimos procesar tu pago.". The error icon moved out of the `h2`, and it is still `aria-hidden="true"` and `focusable="false"`. Tab order is "Cerrar" then "Entendido", the same as before. The close button keeps its 48×48px target, its `aria-label` and its focus ring. Esc, "Cerrar" and "Entendido" still lead to `paymentDialogClosed()`.
+- **Styles:** `__toolbar`, `__alert` and `__alert-icon` are BEM elements of `.terms-dialog`. They use only `--space-*` and `--color-error` tokens, with no raw hex values and no Bootstrap colour or typography classes. The breakpoint `max-width: 575.98px` matches Bootstrap sm. The 18px mobile title stays above the 14px minimum, and it matches the 18px summary-section title. The 3 flex rules removed from `__title--error` were only needed when the icon sat inside the heading.
+- **Terms dialog unaffected:** it still uses `__header`, `__title` (20px, `--color-action`), `__body` and `__footer` (lines 178-189). Those rules are unchanged, and the `--error` font-size override does not apply to it.
+- **Nothing unused:** the payment dialog no longer uses `__header` or `__body`, but the terms dialog still uses both. Every new class is used. No test referred to the old structure, and the 228 tests pass unchanged.
+- **Traceability:** T018 describes the new layout and the 18px rule, and the commit footer has `Refs: US-03, T018`.
+
+**Verdict: Approved.**
