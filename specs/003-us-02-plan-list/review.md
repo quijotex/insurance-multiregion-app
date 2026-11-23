@@ -180,3 +180,15 @@ Verification (re-run by me): `npm --prefix frontend run verify` passed (lint cle
 - **Tasks:** T018 and T019 are still `[ ]` in `tasks.md`. The orchestrator should tick them when closing Gate 3.
 
 **Verdict: Approved.** No Blocker or Major findings. R-16 and R-17 are Minor, and the human can fix them or accept them as Won't fix at Gate 3.
+
+## Round 6 — 2026-11-22 (Gate 3 fix batch: R-16, R-17)
+
+Commit reviewed: `9339f79` (`plan-list.page.ts`, `plan-list.page.scss`). `npm --prefix frontend run verify` passed (188 tests, 18 files).
+
+| ID | Severity | Location | Finding | Rule/FR | Status | Resolution |
+|----|----------|----------|---------|---------|--------|------------|
+| R-16 | Minor | plan-list.page.ts:169-218 | Dots now read "Ir a la posición N de M", where M is `snapGrid.length`. The first render runs before `this.swiper` is assigned, so it falls back to the plan count. That label is then corrected right after the constructor. When the breakpoint changes, pagination re-renders through `renderBullet` with the new snap count. | ui-ux-guidelines §4, FR-013 | Resolved (9339f79) | — |
+| R-17 | Minor | plan-list.page.scss:105-112 | The arrows are now at `left/right: 0`, so they no longer reach the card radio (which sits at the top). At exactly 320px the 48px circle still overlaps the card's content box by about 3px at mid-height (before: 7px). From 360px it is clear. This is acceptable. | angular-conventions Styling (320px), FR-013 | Resolved (9339f79) | — |
+| R-18 | Minor | plan-list.page.ts:169-171, 198-202, 206, 213-214 | Dead code. In Swiper 14.4, A11y `updatePagination` sets bullet labels only when `renderBullet` is **not** set (`a11y.mjs:182`). So `paginationBulletMessage`, the `bulletMessage` helper, the `snapGridLengthChange` handler and the post-construction `paginationBulletMessage` assignment have no effect, and their comments are misleading. The visible labels come only from `renderBullet` and the `forEach` after construction. The R-16 note in Round 5, which said A11y overrides the label, was wrong for this version. | Correctness (misleading code) | Open | Remove the A11y bullet message, the helper and the handler. Keep `renderBullet` and the post-construction `forEach`. Or accept it as Won't fix. |
+
+**Verdict: Approved.** R-16 and R-17 are fixed. R-18 is Minor. There are no new Blocker or Major findings.
