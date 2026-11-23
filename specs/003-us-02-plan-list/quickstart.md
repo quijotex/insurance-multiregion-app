@@ -12,7 +12,7 @@
 | 3 | Go back to step 1, enter a birth date for age 22 and a vehicle 8 years old → Continuar | Each price is × 1.20 × 1.10, rounded |
 | 4 | Look at the recommended plan | A "Recomendado" badge with text, not colour only, on one plan only |
 | 5 | Admin: mark a second CO plan as recommended, then reload | Still one badge, on the first in order |
-| 6 | Open step 2 with no plan chosen | Continuar is disabled, and the hint "Elige un plan para continuar." is visible |
+| 6 | Open step 2 with no plan chosen | Continuar is disabled |
 | 7 | Choose a plan, then another | Only the last one has the filled radio and the ring; nothing on the page moves |
 | 8 | Continuar → summary placeholder → Volver, then reload | The same plan is still chosen |
 | 9 | Admin: unpublish the chosen plan, then reload step 2 | The plan is gone, and no plan is chosen |

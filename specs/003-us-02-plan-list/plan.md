@@ -2,7 +2,7 @@
 
 **Branch**: `003-us-02-plan-list` | **Date**: 2026-11-22 | **Spec**: [spec.md](spec.md) (Approved Gate 1)
 
-**Status**: Draft (Gate 2 pending)
+**Status**: Draft (Gate 2 pending; design approved)
 
 **Artifacts**: [research.md](research.md) · [data-model.md](data-model.md) · [contracts/](contracts/) · [quickstart.md](quickstart.md) · [ADR 0005](../../docs/adr/0005-simulated-price-rule-age-bands.md)
 
@@ -22,7 +22,7 @@
 ## Technical Context
 
 **Language/Version**: TypeScript 6, Angular 22.3 (standalone, zoneless, signals); Strapi 5.63 on Node 22
-**Primary Dependencies**: no new ones. `Intl.NumberFormat` (browser) formats the currency (R4).
+**Primary Dependencies**: **new (approved by the human at Gate 2):** `swiper` (frontend, the latest stable major) for the plan slider (R13). `Intl.NumberFormat` (browser) formats the currency (R4).
 **Storage**: SQLite (CMS); `sessionStorage['quote-session']` gains `planId`
 **Testing**: Vitest (frontend and cms) for the approved UT candidates only; Playwright for the approved E2E candidates only
 **Target Platform**: web, mobile-first (≥320 px) to desktop
@@ -36,7 +36,7 @@
 | Principle | Status |
 |-----------|--------|
 | KISS / ask before over-engineering | ✅ A pure price function, no rule engine (ADR 0005); fixed badge text (R11) |
-| No new dependency (§3.2) | ✅ None |
+| No new dependency (§3.2) | ✅ Only `swiper`, requested and approved by the human at Gate 2 |
 | Feature-first, cohesive files | ✅ New `features/plan-list/` (page, card, data, pricing) |
 | High-value tests only | ✅ Only the UT candidates the human approves below |
 | BEM, tokens only | ✅ The `.plan-card` recipe from ui-ux-guidelines |
@@ -93,8 +93,8 @@ All options use the navy header and stepper, a `.container`, the `.plan-card` re
   - The recommended plan gets a 5 px `--color-brand` top border, a 1 px brand ring, and a yellow "Recomendado" pill with a star, sitting on the top border.
 - **Aligned rows:** the cards share one CSS subgrid, so the name and description, the price (after a divider), Coberturas and Beneficios start on the same line in every card.
 - **Selection without layout shift:** a custom radio circle (it fills `--color-action` with a white check) plus a 2 px inset `--color-action` ring. There is no "Seleccionado" text, and nothing changes size.
-- **Layout:** a 3-column grid from 992 px. Below that, a scroll-snap slider (82 % cards on mobile, 46 % on tablet) that shows the next card, with previous/next buttons and dots, opening on the recommended plan. The arrows inside the radio group move the choice and scroll to it.
-- **Buttons:** "Volver" (outlined secondary) and "Continuar" (the yellow pill), which is disabled (`--color-disabled-bg` / `--color-disabled-text`) until a plan is chosen. The hint "Elige un plan para continuar." is linked by `aria-describedby`, and its line keeps its space when hidden.
+- **Layout:** a 3-column grid from 992 px. Below that, a Swiper slider (about 1.2 cards on mobile, 2.2 on tablet) with previous/next arrows and dots, opening on the recommended plan. No loop and no autoplay: the cards only fade up once on load, as in step 1 (off under `prefers-reduced-motion`). Choosing a plan with the arrow keys slides to it.
+- **Buttons:** "Volver" (outlined secondary) and "Continuar" (the yellow pill), which is disabled (`--color-disabled-bg` / `--color-disabled-text`) until a plan is chosen, with no hint text.
 
 **Summary placeholder:** the US-01 placeholder card with the stepper on "Resumen", the text "El resumen llega con US-03." and "Volver". There are no options: it is temporary.
 
@@ -111,7 +111,7 @@ Each candidate needs the human's Approved or Rejected at Gate 2. Names follow `d
 | UT-05 | Country mapper (bands) | Maps `currency`, locale and bands; drops an invalid band (from > to, factor ≤ 0); missing bands → [] | Bad CMS data must not crash pricing or produce absurd prices | Pending |
 | UT-06 | `quote-session.store` | Saves and reads `planId`; `saveStep1` keeps it; `discardData` and a country change drop it | FR-009 / SC-004 persistence, plus the "step 1 edited" edge case | Pending |
 | UT-07 | Guards | `step1CompleteGuard`: valid values pass; values invalid against the current fields → step 1 with `step1Completed` cleared; fields fail to load → step 1. `planChosenGuard`: no plan → plans | FR-011 / R-19: invalid data must never reach plans or the summary | Pending |
-| UT-08 | Plan list page | Restores the choice, or drops it when the plan is not offered; Continuar disabled with its hint until a choice, then → summary; empty and error states with retry | The page's critical interactions (FR-007–FR-010) | Pending |
+| UT-08 | Plan list page | Restores the choice, or drops it when the plan is not offered; Continuar disabled until a choice, then → summary; empty and error states with retry | The page's critical interactions (FR-007–FR-010) | Pending |
 | UT-09 | CMS middleware (Plan) | Rejects a plan with no country on create, update and publish; accepts a save that leaves the country untouched | ADR 0001 mitigation; a plan without a country silently disappears | Pending |
 | UT-10 | CMS country backfill | Fills currency, locale and bands only when they are missing; never overwrites an edited value | Existing databases must get the new fields without losing editors' changes | Pending |
 
@@ -144,3 +144,7 @@ Not proposed: the empty and error states, admin edits, and reloads (unit tests a
   - The spec is updated (Clarifications, FR-004, FR-005, FR-008, User Story 3).
   - ADR 0005 and R12 record where the rule is documented.
   - The chosen design is recorded, and UT-08 and E2E-3 are adjusted.
+
+### 2026-11-22 — Gate 2, round 4 (design approved)
+- **Asked:** remove the "Elige un plan para continuar." hint; use Swiper for the slider, with arrows and dots, no loop and no movement except the step 1 load animation; then move on.
+- **Changed:** FR-008 and User Story 3 drop the hint. `swiper` is added as an approved dependency (R13). The design section, the recipe and the quickstart are updated.

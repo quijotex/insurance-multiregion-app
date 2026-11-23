@@ -78,7 +78,7 @@
   - A `<fieldset>` with a `<legend>`, and one `<input type="radio">` inside each card's `<label>`.
   - The arrow keys move between plans.
   - The chosen card shows "Seleccionado" with a check icon.
-  - "Continuar" is disabled until a plan is chosen. A hint, "Elige un plan para continuar.", is linked to it with `aria-describedby` (FR-008, Gate 2).
+  - "Continuar" is disabled until a plan is chosen, with no hint text (FR-008, Gate 2).
   - Selection needs no text: the custom radio and the ring change, and nothing moves (no layout shift).
 - **Alternatives:** buttons with `aria-pressed`. They have no arrow-key behaviour and need more ARIA to get right.
 
@@ -93,3 +93,13 @@
   - [ADR 0005](../../docs/adr/0005-simulated-price-rule-age-bands.md).
   - A doc comment on `simulatePrice`, linking ADR 0005.
   - The Strapi `description` of the Country band fields and of the `pricing.age-band` component, so editors see what a factor does.
+
+## R13 — Plan slider (below 992 px)
+- **Decision:** `swiper` (core API, with the Navigation, Pagination, A11y and Keyboard modules), as the human asked at Gate 2.
+  - Created in `afterNextRender` only when the viewport is below 992 px, and destroyed above that. From 992 px the same cards sit in a 3-column grid.
+  - `loop: false`, no autoplay, `slidesPerView` about 1.2 (mobile) and 2.2 (tablet), centred on the recommended plan.
+  - Arrows and dots are real buttons with Spanish labels.
+  - Choosing a plan with the arrow keys calls `slideTo`.
+  - The only motion is the step 1 load animation, which is off under `prefers-reduced-motion`.
+- **Trade-off:** slides are separate boxes, so rows align exactly only in the desktop grid (CSS subgrid). In the slider the cards keep equal heights.
+- **Alternatives:** the CSS scroll-snap slider from the mockup, which needs no dependency. The human preferred Swiper.

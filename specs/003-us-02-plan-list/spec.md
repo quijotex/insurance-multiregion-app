@@ -17,7 +17,7 @@
 - Q: Where is the currency configured? → A: On the Country only, with its number format, as ADR 0001 says; every plan uses its country's currency (FR-004).
 - Q: What period does a price cover and what does a plan show? → A: Prices are monthly. Each plan shows only its final monthly price ("/ mes") (FR-004).
 - Q (Gate 2, human design review): Should the page explain how the price is calculated? → A: No. The rule still applies, but the person doesn't need to know how the company estimates prices: no help text about it. The rule is documented as an explicit decision in the docs (ADR 0005), in the code and in the content manager (FR-004, FR-005).
-- Q (Gate 2, human design review): What does "Continuar" do before a plan is chosen? → A: It is disabled until a plan is chosen, with a visible hint "Elige un plan para continuar." next to it (FR-008).
+- Q (Gate 2, human design review): What does "Continuar" do before a plan is chosen? → A: It is disabled until a plan is chosen, with no extra hint text (FR-008).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -64,7 +64,7 @@ The person selects exactly one plan and moves on to the summary.
 
 1. **Given** I am on the plan list, **When** I select a plan, **Then** it is marked as chosen and any previously chosen plan is not.
 2. **Given** a plan is chosen, **When** I press "Continuar", **Then** I move on to the summary step.
-3. **Given** no plan is chosen, **When** I view the list, **Then** "Continuar" is disabled and a hint tells me to choose a plan.
+3. **Given** no plan is chosen, **When** I view the list, **Then** "Continuar" is disabled.
 4. **Given** I chose a plan, **When** I come back to step 2 from the summary or reload the tab, **Then** the same plan is still chosen, if it is still offered.
 5. **Given** I use only the keyboard or a screen reader, **When** I choose a plan, **Then** I can reach, choose and confirm it, and I hear which plan is chosen.
 
@@ -107,7 +107,7 @@ When the business has no active plans for a country, the person is told so inste
 - **FR-005**: The final price MUST be the base price × the driver-age factor × the vehicle-age factor, rounded to a whole peso. Each factor comes from the age bands configured on the active country (an age range and its factor); the policyholder's age and the vehicle's age come from step 1. The rule is simulated, and it is documented as an explicit decision in the docs, in the code and in the content manager's field descriptions, but not shown to the person. The same inputs MUST always give the same price.
 - **FR-006**: A plan marked as recommended MUST be visually distinguished and announced as recommended to assistive technology. At most one plan is highlighted (see Edge Cases).
 - **FR-007**: The person MUST be able to choose exactly one plan; choosing another replaces the choice. The choice MUST be visible and announced.
-- **FR-008**: "Continuar" MUST be disabled until a plan is chosen, with a visible hint asking the person to choose one; once a plan is chosen, it moves to the summary step.
+- **FR-008**: "Continuar" MUST be disabled until a plan is chosen; once a plan is chosen, it moves to the summary step.
 - **FR-009**: The chosen plan MUST be saved in the tab's session and restored when the person returns to step 2 or reloads, while the plan is still offered.
 - **FR-010**: Step 2 MUST show loading, empty ("no plans available") and error (with retry) states. The empty state offers a way back to step 1.
 - **FR-011**: Step 2 MUST be reachable only with a complete and still valid step 1 (US-01 guard, plus the re-check in Edge Cases).

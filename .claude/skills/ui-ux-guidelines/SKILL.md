@@ -110,7 +110,7 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 - Price: large, `--color-brand`, formatted in the country's currency with no decimals, followed by "/ mes". No text explaining how the price is calculated.
 - Sections: Coberturas and Beneficios with check icons; an empty list is hidden.
 - Selectable as a radio group, one choice only; the arrow keys move the choice.
-- The "Continuar" pill is disabled (`--color-disabled-bg` / `--color-disabled-text`) until a plan is chosen. Its hint "Elige un plan para continuar." is linked with `aria-describedby` and keeps its space when hidden.
+- The "Continuar" pill is disabled (`--color-disabled-bg` / `--color-disabled-text`) until a plan is chosen, with no hint text.
 
 **Stepper** — `.stepper`, `__step`, `--current`, `--done`: numbered steps with text labels in an `<ol>`, above the form card; current step has `aria-current="step"`. Current and done circles (32px): `--color-surface-highlight` fill, 2px `--color-action` ring, `--color-brand` number (check icon when done); upcoming: white, 1.5px `--color-border` ring, `--color-text-muted`. Current label bold `--color-brand`; connector lines 2px, `--color-action` up to a done step, else `--color-border`. On mobile show only the current circle + "Paso 2 de 3" + current label.
 
@@ -142,7 +142,7 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
   - Alignment and spacing: `.d-flex`, `.flex-column`, `.justify-content-*`, `.align-items-*`, `.gap-*`, `m-*` / `p-*`, `.text-center` / `.text-md-start`, `.d-none .d-md-block`.
   - Never use Bootstrap colour, typography, border, shadow or component classes (`.btn`, `.card`, `.bg-*`, `.text-primary`, `.fs-*`…). Those come from our tokens and BEM recipes.
   - Component SCSS holds component styling only (look, states, internal spacing with `--space-*`), not page layout.
-- Plan cards: a scroll-snap slider below 992px (82% wide cards on mobile, 46% on tablet, the next card peeking in, with previous/next buttons and dots, opening on the recommended plan); a 3-column grid from 992px.
+- Plan cards: a Swiper slider below 992px (about 1.2 cards on mobile, 2.2 on tablet, with previous/next arrows and dots, opening on the recommended plan, no loop and no autoplay; only the load animation); a 3-column grid from 992px.
 - Header: navy bar with text wordmark; no navigation beyond the wizard.
 
 ## 6. Imagery
