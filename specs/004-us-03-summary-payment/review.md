@@ -68,3 +68,17 @@ Fix commits reviewed: `61f4e24` (CMS) and `50ce930` (frontend, plan.md). Verific
 - R-13 Fixed: the two cases beyond the approved examples are removed (UT-04 injected-random case, UT-02 seventh example).
 - R-14 Fixed: tasks.md T014/T015 name the R-01 and R-02 regression tests.
 - R-10, R-11: Won't fix proposed by the reviewer; waiting for the human.
+
+## Round 3 — 2026-11-22
+Scope: commit e3b0a64 and the uncommitted T016 FR fix in tasks.md (now FR-002, FR-005).
+
+| ID | Severity | Location | Finding | Rule/FR | Status | Resolution |
+|----|----------|----------|---------|---------|--------|------------|
+| R-10 | Nit | rich-text.mapper.ts:18-36; rich-text.spec.ts:46 | Round 1 finding: nested links rendered `<a>` inside `<a>`. | ADR 0007 | Resolved (e3b0a64) | The human asked for a fix. `mapInlines(raw, allowLinks = true)` maps a link's children with `allowLinks = false`, so a nested link becomes its text. Safe top-level links are kept, and unsafe URLs still fall through to their text, because `isSafeUrl` is still checked. Regression test "R-10 · a link nested in a link becomes its text" is named in T016. |
+| R-11 | Nit | format-price.ts:4-34; summary.page.ts:22, 125 | Round 1 finding: the amount was derived by stripping `/ mes`. | FR-002 | Resolved (e3b0a64) | `formatAmount` is exported. `formatPrice` returns `` `${formatAmount(...)} / mes` ``, so step 2 output is unchanged (same fallback chain, and the only caller is plan-list.page.ts:70). The summary calls `formatAmount` directly. `PER_MONTH_SUFFIX` and the `.replace` are gone. |
+
+### Regression check
+- No `any`, no new dependency, no template change. tasks.md T016 has `US-03`, FR IDs, the files, and the named regression test.
+- Observation, not a finding: `confirmation.page.ts:13` still has its own private `formatAmount(receipt)` with a slightly shorter fallback chain. It predates this commit and is out of scope. It could reuse the shared helper the next time it is touched.
+
+**Verdict: Approved.** R-10 and R-11 are resolved, and no new Blocker or Major was found.
