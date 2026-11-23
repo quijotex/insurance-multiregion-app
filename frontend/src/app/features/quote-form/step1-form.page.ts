@@ -18,8 +18,11 @@ import { WizardCountry } from '../quote-wizard/wizard-country.service';
 import { FormFieldComponent, fieldInputId } from './components/form-field/form-field.component';
 import { FormFieldDescriptor, FormSections } from './data/form-field.model';
 import { FormFieldService } from './data/form-field.service';
+import { restoredValue } from './validation/restored-value';
 import { buildValidators } from './validation/build-validators';
 import { FieldValue } from './validation/validation.model';
+
+export { restoredValue };
 
 type Step1Group = FormGroup<Record<string, FormControl<FieldValue>>>;
 
@@ -34,17 +37,6 @@ const SECTION_TITLES: Record<SectionView['id'], string> = {
   policyholder: 'Tus datos',
   vehicle: 'Tu vehículo',
 };
-
-/**
- * Value restored from the session for a field: the wrong type falls back to empty, and a select
- * value that is no longer one of its options (renamed or removed in the CMS) is dropped (R-13).
- */
-export function restoredValue(field: FormFieldDescriptor, saved: FieldValue | undefined): FieldValue {
-  if (field.type === 'checkbox') return typeof saved === 'boolean' ? saved : false;
-  if (typeof saved !== 'string') return '';
-  if (field.type === 'select' && !field.options.some((o) => o.value === saved)) return '';
-  return saved;
-}
 
 @Component({
   selector: 'app-step1-form-page',

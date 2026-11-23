@@ -67,6 +67,15 @@ export class QuoteSessionStore {
     });
   }
 
+  /** Step 1 no longer counts as complete (its saved values failed the re-check). */
+  clearStep1Completed(): void {
+    const current = this.read();
+    if (!current) return;
+    const rest = { ...current.data };
+    delete rest['step1Completed'];
+    this.write({ countryCode: current.countryCode, data: rest });
+  }
+
   isStep1Completed(): boolean {
     return this.read()?.data['step1Completed'] === true;
   }
