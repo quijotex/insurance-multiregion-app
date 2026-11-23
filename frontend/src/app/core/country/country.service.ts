@@ -21,6 +21,10 @@ export class CountryService {
         .set('fields[0]', 'name')
         .set('fields[1]', 'code')
         .set('fields[2]', 'legalAge')
+        .set('fields[3]', 'currency')
+        .set('fields[4]', 'numberLocale')
+        .set('populate[driverAgeBands]', 'true')
+        .set('populate[vehicleAgeBands]', 'true')
         .set('populate[icon][fields][0]', 'url')
         .set('populate[icon][fields][1]', 'alternativeText')
         .set('sort', 'order:asc');

@@ -501,6 +501,8 @@ export interface ApiCountryCountry extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    currency: Schema.Attribute.String & Schema.Attribute.Required;
+    driverAgeBands: Schema.Attribute.Component<'pricing.age-band', true>;
     icon: Schema.Attribute.Media<'images'>;
     legalAge: Schema.Attribute.Integer &
       Schema.Attribute.Required &
@@ -518,6 +520,7 @@ export interface ApiCountryCountry extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     name: Schema.Attribute.String & Schema.Attribute.Required;
+    numberLocale: Schema.Attribute.String & Schema.Attribute.Required;
     order: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
@@ -530,6 +533,7 @@ export interface ApiCountryCountry extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    vehicleAgeBands: Schema.Attribute.Component<'pricing.age-band', true>;
   };
 }
 
@@ -581,6 +585,60 @@ export interface ApiFormFieldFormField extends Struct.CollectionTypeSchema {
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     validations: Schema.Attribute.Component<'form.validations', false>;
+  };
+}
+
+export interface ApiPlanPlan extends Struct.CollectionTypeSchema {
+  collectionName: 'plans';
+  info: {
+    description: 'Insurance plan offered in a country';
+    displayName: 'Plan';
+    pluralName: 'plans';
+    singularName: 'plan';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    active: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    basePrice: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    benefits: Schema.Attribute.Component<'plan.item', true>;
+    country: Schema.Attribute.Relation<'manyToOne', 'api::country.country'>;
+    coverages: Schema.Attribute.Component<'plan.item', true>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::plan.plan'> &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    order: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+    publishedAt: Schema.Attribute.DateTime;
+    recommended: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    shortDescription: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -1121,6 +1179,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::country.country': ApiCountryCountry;
       'api::form-field.form-field': ApiFormFieldFormField;
+      'api::plan.plan': ApiPlanPlan;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

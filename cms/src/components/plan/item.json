@@ -1,0 +1,8 @@
+{
+  "collectionName": "components_plan_items",
+  "info": { "displayName": "Item", "description": "Coverage or benefit line of a plan" },
+  "options": {},
+  "attributes": {
+    "text": { "type": "string", "required": true, "maxLength": 120 }
+  }
+}

@@ -36,6 +36,10 @@ describe('US-00 · FR-007 header "Cambiar país"', () => {
       code: 'co',
       name: 'Colombia',
       legalAge: 18,
+      currency: 'COP',
+      numberLocale: 'es-CO',
+      driverAgeBands: [],
+      vehicleAgeBands: [],
       iconUrl: '/uploads/co.svg',
       iconAlt: 'Bandera de Colombia',
     });
@@ -51,7 +55,7 @@ describe('US-00 · FR-007 header "Cambiar país"', () => {
   });
 
   it('keeps the country name visible when the country has no icon', () => {
-    TestBed.inject(WizardCountry).set({ code: 'co', name: 'Colombia', legalAge: 18, iconUrl: null, iconAlt: '' });
+    TestBed.inject(WizardCountry).set({ code: 'co', name: 'Colombia', legalAge: 18, currency: 'COP', numberLocale: 'es-CO', driverAgeBands: [], vehicleAgeBands: [], iconUrl: null, iconAlt: '' });
     const el = setup({}).nativeElement as HTMLElement;
     const country = el.querySelector('.wizard-header__country');
     expect(el.querySelector('img')).toBeNull();

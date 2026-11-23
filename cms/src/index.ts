@@ -1,13 +1,14 @@
 import type { Core } from '@strapi/strapi';
-import { registerFormFieldIntegrity } from './middlewares/form-field-integrity';
+import { registerCountryIntegrity } from './middlewares/country-integrity';
 import { seedAdmin } from './seed/admin';
-import { seedCountries } from './seed/countries';
+import { backfillCountryPricing, seedCountries } from './seed/countries';
 import { backfillLegalAge, seedFormFields } from './seed/form-fields';
 import { grantPublicPermissions } from './seed/permissions';
+import { seedPlans } from './seed/plans';
 
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {
-    registerFormFieldIntegrity(strapi);
+    registerCountryIntegrity(strapi);
   },
 
   // Idempotent: safe to run on every start.
@@ -16,6 +17,8 @@ export default {
     await seedCountries(strapi);
     await backfillLegalAge(strapi);
     await seedFormFields(strapi);
+    await backfillCountryPricing(strapi);
+    await seedPlans(strapi);
     await seedAdmin(strapi);
   },
 };

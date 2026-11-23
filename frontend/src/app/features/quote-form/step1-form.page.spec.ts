@@ -9,7 +9,7 @@ import { FormFieldDescriptor, FormSections } from './data/form-field.model';
 import { FormFieldService } from './data/form-field.service';
 import { restoredValue, Step1FormPage } from './step1-form.page';
 
-const COUNTRY: Country = { code: 'co', name: 'Colombia', legalAge: 18, iconUrl: null, iconAlt: '' };
+const COUNTRY: Country = { code: 'co', name: 'Colombia', legalAge: 18, currency: 'COP', numberLocale: 'es-CO', driverAgeBands: [], vehicleAgeBands: [], iconUrl: null, iconAlt: '' };
 
 function field(partial: Partial<FormFieldDescriptor> & { key: string }): FormFieldDescriptor {
   const type = partial.type ?? 'text';

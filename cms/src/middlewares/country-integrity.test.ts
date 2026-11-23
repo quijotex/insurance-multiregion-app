@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkFormFieldIntegrity, readCountryPayload } from './form-field-integrity';
+import { checkFormFieldIntegrity, checkPlanIntegrity, readCountryPayload } from './country-integrity';
 
 describe('US-01 · Edge Cases form field integrity', () => {
   const existing = [
@@ -55,3 +55,30 @@ describe('US-01 · FR-001 admin edits keep the country (Gate 3 manual test)', ()
   });
 });
 
+
+describe('US-02 · FR-001 plan integrity (UT-09)', () => {
+  // The effective country is the payload's when present, else the stored one (null on create).
+  const effective = (payload: unknown, stored: string | null) => {
+    const { present, ref } = readCountryPayload(payload);
+    return present ? (ref === null ? null : String(ref)) : stored;
+  };
+
+  it('rejects a plan without country on create, update and publish', () => {
+    // create: nothing stored; update/publish: the payload clears the relation, or nothing is stored.
+    const cases: Array<[unknown, string | null]> = [
+      [undefined, null],
+      [null, 'co'],
+      [{ set: [] }, 'co'],
+      [{ connect: [], disconnect: [{ id: 1 }] }, 'co'],
+      [{ connect: [], disconnect: [] }, null],
+    ];
+    for (const [payload, stored] of cases) {
+      expect(checkPlanIntegrity({ countryDocumentId: effective(payload, stored) })).toBe('El plan debe tener un país.');
+    }
+  });
+
+  it('accepts a save that leaves the country untouched, or sets one', () => {
+    expect(checkPlanIntegrity({ countryDocumentId: effective({ connect: [], disconnect: [] }, 'co') })).toBeNull();
+    expect(checkPlanIntegrity({ countryDocumentId: effective({ connect: [{ documentId: 'cl' }] }, null) })).toBeNull();
+  });
+});

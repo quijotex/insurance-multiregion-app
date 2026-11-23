@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "plans",
+  "info": {
+    "singularName": "plan",
+    "pluralName": "plans",
+    "displayName": "Plan",
+    "description": "Insurance plan offered in a country"
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": {},
+  "attributes": {
+    "name": { "type": "string", "required": true },
+    "shortDescription": { "type": "string", "required": true, "maxLength": 160 },
+    "basePrice": { "type": "integer", "required": true, "min": 0 },
+    "coverages": { "type": "component", "repeatable": true, "component": "plan.item" },
+    "benefits": { "type": "component", "repeatable": true, "component": "plan.item" },
+    "order": { "type": "integer", "required": true, "min": 1 },
+    "recommended": { "type": "boolean", "default": false },
+    "active": { "type": "boolean", "required": true, "default": true },
+    "country": { "type": "relation", "relation": "manyToOne", "target": "api::country.country" }
+  }
+}

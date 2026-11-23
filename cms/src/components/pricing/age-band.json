@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_pricing_age_bands",
+  "info": {
+    "displayName": "Age band",
+    "description": "Monthly price = base price × driver-age factor × vehicle-age factor. The first band that covers the age applies; no band → factor 1. Not shown to customers (ADR 0005)."
+  },
+  "options": {},
+  "attributes": {
+    "fromAge": { "type": "integer", "required": true, "min": 0 },
+    "toAge": { "type": "integer", "required": true, "min": 0 },
+    "factor": { "type": "decimal", "required": true, "min": 0.01 }
+  }
+}

@@ -2,6 +2,7 @@ import type { Core } from '@strapi/strapi';
 import { errors } from '@strapi/utils';
 
 const UID = 'api::form-field.form-field';
+const PLAN_UID = 'api::plan.plan';
 const ACTIONS = ['create', 'update', 'publish'];
 
 export interface FormFieldIntegrityInput {
@@ -25,6 +26,12 @@ export function checkFormFieldIntegrity(
     (f) => f.key === input.key && f.documentId !== input.selfDocumentId,
   );
   if (duplicate) return `Ya existe un campo con la clave «${input.key}» para este país.`;
+  return null;
+}
+
+/** Pure rule: a plan needs a country, otherwise it silently disappears from every country's list. */
+export function checkPlanIntegrity(input: { countryDocumentId?: string | null }): string | null {
+  if (!input.countryDocumentId) return 'El plan debe tener un país.';
   return null;
 }
 
@@ -57,9 +64,11 @@ export function readCountryPayload(value: unknown): { present: boolean; ref: Ref
   return { present: false, ref: null };
 }
 
-export function registerFormFieldIntegrity(strapi: Core.Strapi): void {
+export function registerCountryIntegrity(strapi: Core.Strapi): void {
   strapi.documents.use(async (context, next) => {
-    if (context.uid !== UID || !ACTIONS.includes(context.action)) return next();
+    if (!ACTIONS.includes(context.action)) return next();
+    if (context.uid === PLAN_UID) return checkPlan(strapi, context, next);
+    if (context.uid !== UID) return next();
 
     const params = (context.params ?? {}) as { documentId?: string; data?: Record<string, unknown> };
     const data = params.data ?? {};
@@ -106,4 +115,35 @@ export function registerFormFieldIntegrity(strapi: Core.Strapi): void {
     if (message) throw new errors.ValidationError(message);
     return next();
   });
+}
+
+/** Resolves the effective country (payload, else stored) of a plan and applies the Plan rule. */
+async function checkPlan<T>(
+  strapi: Core.Strapi,
+  context: { params?: unknown },
+  next: () => T,
+): Promise<T> {
+  const params = (context.params ?? {}) as { documentId?: string; data?: Record<string, unknown> };
+  const { present, ref } = readCountryPayload((params.data ?? {}).country);
+  let countryDocumentId: string | null = null;
+  if (present) {
+    if (typeof ref === 'number') {
+      const found = (await strapi.db.query('api::country.country').findOne({ where: { id: ref } })) as {
+        documentId: string;
+      } | null;
+      countryDocumentId = found?.documentId ?? null;
+    } else {
+      countryDocumentId = ref;
+    }
+  } else if (params.documentId) {
+    const existing = (await strapi.documents(PLAN_UID).findOne({
+      documentId: params.documentId,
+      populate: { country: { fields: ['documentId'] } },
+      status: 'draft',
+    })) as { country?: { documentId: string } | null } | null;
+    countryDocumentId = existing?.country?.documentId ?? null;
+  }
+  const message = checkPlanIntegrity({ countryDocumentId });
+  if (message) throw new errors.ValidationError(message);
+  return next();
 }
