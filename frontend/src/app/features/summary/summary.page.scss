@@ -224,7 +224,7 @@
   }
 
   &::backdrop {
-    background: rgba(28, 28, 36, 0.6);
+    background: var(--color-overlay);
   }
 
   &__content {
@@ -279,6 +279,11 @@
     min-height: 0;
     padding: var(--space-4) var(--space-6);
     overflow-y: auto;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset var(--focus-ring);
+    }
   }
 
   &__footer {

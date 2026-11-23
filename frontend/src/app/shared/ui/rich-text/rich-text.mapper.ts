@@ -72,6 +72,21 @@ function mapBlock(node: Record<string, unknown>): RichTextBlock | null {
   }
 }
 
+function inlinesHaveText(inlines: RichTextInline[]): boolean {
+  return inlines.some((inline) =>
+    inline.type === 'text' ? inline.text.trim() !== '' : inlinesHaveText(inline.children),
+  );
+}
+
+/** True when some text (also inside links and list items) is non-blank after trimming. */
+export function hasVisibleText(blocks: RichTextBlock[]): boolean {
+  return blocks.some((block) =>
+    block.type === 'list'
+      ? block.children.some((item) => inlinesHaveText(item.children))
+      : inlinesHaveText(block.children),
+  );
+}
+
 /** Keeps the supported blocks, drops images, code and unknown types; missing input gives []. */
 export function mapRichText(raw: unknown): RichTextBlock[] {
   if (!Array.isArray(raw)) return [];

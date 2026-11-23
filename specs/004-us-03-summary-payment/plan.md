@@ -58,7 +58,7 @@ frontend/src/app/
 │   ├── summary-rows.ts · mask.ts    # R8, R4
 │   ├── payment/                     # simulate-payment.ts, quote-number.ts, payment.service.ts (R1–R3)
 │   ├── summary.page.*               # data, plan, terms, accept, pay, states
-│   └── confirmation.page.*          # receipt, copy number, Nueva cotización
+│   └── confirmation.page.*          # receipt, Nueva cotización
 └── features/quote-wizard/           # + noReceiptGuard, receiptGuard; routes (contracts/routes.md)
 ```
 

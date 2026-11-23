@@ -17,6 +17,7 @@ describe('US-03 · FR-008 simulated payment outcome (ADR 0006)', () => {
       ['documentNumber'],
       'approved',
     ],
+    ['no masked field configured', { documentNumber: '1020300000' }, [], 'approved'],
   ];
 
   it.each(cases)('%s', (_name, values, maskedKeys, expected) => {

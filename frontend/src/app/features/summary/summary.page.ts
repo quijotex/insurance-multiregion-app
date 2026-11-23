@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  Injector,
   ElementRef,
   afterNextRender,
   computed,
@@ -12,6 +13,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, forkJoin } from 'rxjs';
 import { QuoteSessionStore, Step1Values } from '../../core/session/quote-session.store';
+import { hasVisibleText } from '../../shared/ui/rich-text/rich-text.mapper';
 import { RichTextComponent } from '../../shared/ui/rich-text/rich-text.component';
 import { StepperComponent } from '../../shared/ui/stepper/stepper.component';
 import { Plan } from '../plan-list/data/plan.model';
@@ -54,6 +56,7 @@ export class SummaryPage {
   private readonly route = inject(ActivatedRoute);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
 
   private readonly dialog = viewChild<ElementRef<HTMLDialogElement>>('termsDialog');
   private readonly termsLink = viewChild<ElementRef<HTMLButtonElement>>('termsLink');
@@ -74,7 +77,7 @@ export class SummaryPage {
     buildSummaryRows(this.fields(), this.values(), this.wizardCountry.country()?.numberLocale ?? 'es'),
   );
   protected readonly terms = computed(() => this.wizardCountry.country()?.termsAndConditions ?? []);
-  protected readonly hasTerms = computed(() => this.terms().length > 0);
+  protected readonly hasTerms = computed(() => hasVisibleText(this.terms()));
   protected readonly processing = computed(() => this.paymentState() === 'processing');
   protected readonly canPay = computed(
     () =>
@@ -149,8 +152,10 @@ export class SummaryPage {
     const dialog = this.dialog()?.nativeElement;
     if (!dialog) return;
     if (typeof dialog.close === 'function') dialog.close();
-    else dialog.removeAttribute('open');
-    this.termsClosed();
+    else {
+      dialog.removeAttribute('open');
+      this.termsClosed();
+    }
   }
 
   /** Esc, "Cerrar" and "Entendido" all end here: focus goes back to the link. */
@@ -182,10 +187,19 @@ export class SummaryPage {
     this.paySub = this.payment.pay(this.values(), maskedKeys).subscribe({
       next: (result) => {
         if (result === 'approved') this.approve(country.code, chosen, country);
-        else this.paymentState.set('rejected');
+        else this.reject();
       },
-      error: () => this.paymentState.set('rejected'),
+      error: () => this.reject(),
     });
+  }
+
+  /** R-03: after a rejection, focus moves to the alert so the person hears it and can Tab to retry. */
+  private reject(): void {
+    this.paymentState.set('rejected');
+    afterNextRender(
+      () => this.host.nativeElement.querySelector<HTMLElement>('.summary__error--payment')?.focus(),
+      { injector: this.injector },
+    );
   }
 
   private approve(

@@ -114,7 +114,7 @@ describe('US-03 · FR-001–FR-010 summary page', () => {
     expect(el.textContent).toContain('Plan Total');
   });
 
-  it('FR-004 keeps "Quiero mi seguro" disabled until the terms are accepted, and remembers the acceptance', async () => {
+  it('FR-006 keeps "Quiero mi seguro" disabled until the terms are accepted, and remembers the acceptance', async () => {
     await setup();
     expect(payButton().disabled).toBe(true);
     await accept();
@@ -130,13 +130,13 @@ describe('US-03 · FR-001–FR-010 summary page', () => {
     await fixture.whenStable();
     expect(pay).toHaveBeenCalledTimes(1);
     expect(pay).toHaveBeenCalledWith(expect.objectContaining({ documentNumber: '1020304050' }), ['documentNumber']);
-    expect(payButton().disabled).toBe(true);
+    expect(payButton().getAttribute('aria-disabled')).toBe('true');
     expect(payButton().getAttribute('aria-busy')).toBe('true');
     expect(payButton().textContent).toContain('Procesando…');
     expect(checkbox().disabled).toBe(true);
   });
 
-  it('FR-008 a rejected payment shows an alert, keeps data and acceptance, and allows a retry', async () => {
+  it('FR-010 a rejected payment shows an alert, keeps data and acceptance, and allows a retry', async () => {
     await setup();
     await accept();
     payButton().click();
@@ -177,16 +177,26 @@ describe('US-03 · FR-001–FR-010 summary page', () => {
     expect(navigate).toHaveBeenCalledWith(['..', 'confirmation'], expect.objectContaining({ replaceUrl: true }));
   });
 
-  it('FR-010 a plan that is no longer offered clears the choice and goes to the plan list', async () => {
+  it('FR-012 a plan that is no longer offered clears the choice and goes to the plan list', async () => {
     plans = [{ ...PLAN, id: 'other' }];
     await setup();
     expect(session.readPlanId()).toBeNull();
     expect(navigate).toHaveBeenCalledWith(['..', 'plans'], expect.anything());
   });
 
-  it('FR-005 a country without terms shows an error and keeps the CTA disabled', async () => {
+  it('FR-006 a country without terms shows an error and keeps the CTA disabled', async () => {
     await setup({ ...COUNTRY, termsAndConditions: [] });
     expect(el.querySelector('[role="alert"]')?.textContent).toContain('términos y condiciones');
+    expect(el.querySelector('input[type="checkbox"]')).toBeNull();
+    expect(payButton().disabled).toBe(true);
+  });
+
+  it('R-02 · terms with no visible text block the payment', async () => {
+    const blank = [
+      { type: 'paragraph' as const, children: [{ type: 'text' as const, text: '   ' }] },
+      { type: 'paragraph' as const, children: [] },
+    ];
+    await setup({ ...COUNTRY, termsAndConditions: blank });
     expect(el.querySelector('input[type="checkbox"]')).toBeNull();
     expect(payButton().disabled).toBe(true);
   });
