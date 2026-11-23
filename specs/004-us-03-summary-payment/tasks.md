@@ -13,11 +13,11 @@
 
 ## Phase 1: Foundational — CMS (blocks the stories)
 
-- [ ] T001 [CMS] US-03 Schemas per [data-model.md](data-model.md) and [contracts/cms-api.md](contracts/cms-api.md):
+- [x] T001 [CMS] US-03 Schemas per [data-model.md](data-model.md) and [contracts/cms-api.md](contracts/cms-api.md):
   - Country gains `termsAndConditions` (`blocks`), with the editor description from data-model.
   - FormField gains `maskedInSummary` (boolean, default `false`), with its description.
   (FR-003, FR-005) — `cms/src/api/country/content-types/country/schema.json`, `cms/src/api/form-field/content-types/form-field/schema.json`
-- [ ] T002 [CMS] US-03 Seed and backfill:
+- [x] T002 [CMS] US-03 Seed and backfill:
   - Different fictitious Spanish terms for CO and CL (heading, 3–4 paragraphs, one list, one `https://example.com/...` link, no placeholder lines such as "Texto ficticio de ejemplo"); none for PE.
   - `maskedInSummary: true` on CO `documentNumber` and CL `rut` in the seed.
   - Backfill R4: the flag only on `documentNumber`/`rut` rows where it is `null` (DB layer, draft and published rows).
@@ -27,17 +27,17 @@
 
 ## Phase 1: Foundational — Frontend (parallel with the CMS phase; the contract is fixed)
 
-- [ ] T003 [P] [FE] US-03 Contract models: `Country` gains `termsAndConditions: RichTextBlock[]` (the mapper drops unknown nodes, images, code, and links with a scheme other than http(s)/mailto, which become text; missing → `[]`); the form field DTO and descriptor gain `maskedInSummary` (missing → `false`). The rich text model lives in `shared/ui/rich-text/rich-text.model.ts` (FR-003, FR-005) — `frontend/src/app/core/country/**`, `frontend/src/app/features/quote-form/data/form-field.*`, `frontend/src/app/shared/ui/rich-text/rich-text.model.ts`
-- [ ] T004 [P] [FE] US-03 Summary pure functions:
+- [x] T003 [P] [FE] US-03 Contract models: `Country` gains `termsAndConditions: RichTextBlock[]` (the mapper drops unknown nodes, images, code, and links with a scheme other than http(s)/mailto, which become text; missing → `[]`); the form field DTO and descriptor gain `maskedInSummary` (missing → `false`). The rich text model lives in `shared/ui/rich-text/rich-text.model.ts` (FR-003, FR-005) — `frontend/src/app/core/country/**`, `frontend/src/app/features/quote-form/data/form-field.*`, `frontend/src/app/shared/ui/rich-text/rich-text.model.ts`
+- [x] T004 [P] [FE] US-03 Summary pure functions:
   - `maskValue(value)`: last 4 characters kept, the rest `•`; 4 or fewer → fully masked. **UT-01** (4 examples).
   - `buildSummaryRows(fields, values, locale)` per R8. **UT-02** (6 examples).
   (FR-001, FR-003) — `frontend/src/app/features/summary/mask.ts`, `summary-rows.ts`, specs
-- [ ] T005 [P] [FE] US-03 Payment (ADR 0006):
+- [x] T005 [P] [FE] US-03 Payment (ADR 0006):
   - `simulatePayment(values, maskedKeys)` with a doc comment stating the rule and linking ADR 0006. **UT-03** (4 examples).
   - `createQuoteNumber(countryCode, now, random)` per R3, default random from `crypto.getRandomValues`. **UT-04**.
   - `PaymentService.pay(...)` returning the outcome after ~1.5 s.
   (FR-008, FR-009) — `frontend/src/app/features/summary/payment/**`
-- [ ] T006 [P] [FE] US-03 Session: `termsAccepted` (`acceptTerms(boolean)`, kept by `saveStep1` and `savePlan`), `completePayment(receipt)` (one write: receipt in, data, `step1Completed`, `planId` and `termsAccepted` out), `readReceipt()`, `clearReceipt()`; `start(country)` and `discardData` drop the receipt. **UT-05** (FR-011, R6) — `frontend/src/app/core/session/quote-session.store*.ts`
+- [x] T006 [P] [FE] US-03 Session: `termsAccepted` (`acceptTerms(boolean)`, kept by `saveStep1` and `savePlan`), `completePayment(receipt)` (one write: receipt in, data, `step1Completed`, `planId` and `termsAccepted` out), `readReceipt()`, `clearReceipt()`; `start(country)` and `discardData` drop the receipt. **UT-05** (FR-011, R6) — `frontend/src/app/core/session/quote-session.store*.ts`
 
 ## Phase 2: Stories S1–S4 (Frontend)
 
