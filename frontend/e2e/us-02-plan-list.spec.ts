@@ -14,7 +14,7 @@ async function pickOption(page: Page, label: string | RegExp, index = 0): Promis
 /** Accessible description of a plan radio is its price ("$ 89.000 / mes"); only NBSP is normalised. */
 async function priceOf(page: Page, name: string | RegExp): Promise<string> {
   const radio = page.getByRole('radio', { name });
-  const id = await radio.getAttribute('aria-describedby');
+  const id = ((await radio.getAttribute('aria-describedby')) ?? '').split(' ')[0];
   const text = (await page.locator(`[id="${id}"]`).textContent()) ?? '';
   return text.replace(/[  ]/g, ' ').trim();
 }
@@ -44,9 +44,9 @@ test.describe('US-02 · plan list', () => {
     // Only the active plans, in configured order; the inactive "Clásico" is absent.
     const radios = page.getByRole('radio');
     await expect(radios).toHaveCount(3);
-    await expect(radios.nth(0)).toHaveAccessibleName(/^Básico/);
-    await expect(radios.nth(1)).toHaveAccessibleName(/^Plus/);
-    await expect(radios.nth(2)).toHaveAccessibleName(/^Total/);
+    await expect(radios.nth(0)).toHaveAccessibleName('Básico');
+    await expect(radios.nth(1)).toHaveAccessibleName('Plus, plan recomendado');
+    await expect(radios.nth(2)).toHaveAccessibleName('Total');
     await expect(page.getByText('Clásico')).toHaveCount(0);
 
     // Prices in COP format (driver 30 and vehicle 3 years: no adjustment).

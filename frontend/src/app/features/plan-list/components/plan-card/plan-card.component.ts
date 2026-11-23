@@ -34,8 +34,8 @@ import { PlanOffer } from '../../data/plan.model';
         [value]="offer().plan.id"
         [checked]="selected()"
         [id]="inputId()"
-        [attr.aria-label]="offer().plan.highlighted ? offer().plan.name + ', plan recomendado' : null"
-        [attr.aria-describedby]="priceId()"
+        [attr.aria-label]="accessibleName()"
+        [attr.aria-describedby]="priceId() + ' ' + descriptionId()"
         (change)="chosen.emit(offer().plan.id)"
       />
       <span class="plan-card__head">
@@ -53,7 +53,7 @@ import { PlanOffer } from '../../data/plan.model';
         </span>
         <label class="plan-card__title" [for]="inputId()">
           <span class="plan-card__name">{{ offer().plan.name }}</span>
-          <span class="plan-card__description">{{ offer().plan.shortDescription }}</span>
+          <span class="plan-card__description" [id]="descriptionId()">{{ offer().plan.shortDescription }}</span>
         </label>
       </span>
       <span class="plan-card__price-row" [id]="priceId()">
@@ -101,6 +101,12 @@ export class PlanCardComponent {
   readonly chosen = output<string>();
 
   protected readonly inputId = computed(() => `plan-input-${this.offer().plan.id}`);
+  /** Same source for every plan: the name, plus the recommended note when highlighted. */
+  protected readonly accessibleName = computed(() => {
+    const { name, highlighted } = this.offer().plan;
+    return highlighted ? `${name}, plan recomendado` : name;
+  });
+  protected readonly descriptionId = computed(() => `plan-desc-${this.offer().plan.id}`);
   protected readonly priceId = computed(() => `plan-price-${this.offer().plan.id}`);
   /** "$ 145.000 / mes" shown as a large amount and a smaller period. */
   protected readonly price = computed(() => {
