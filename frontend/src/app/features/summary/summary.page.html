@@ -201,23 +201,23 @@
       (close)="paymentDialogClosed()"
     >
       <div class="terms-dialog__content">
-        <div class="terms-dialog__header">
-          <h2 id="payment-dialog-title" class="terms-dialog__title terms-dialog__title--error">
-            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
-              <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
-              <path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            No pudimos procesar tu pago.
-          </h2>
+        <div class="terms-dialog__toolbar">
           <button type="button" class="terms-dialog__close" aria-label="Cerrar" (click)="closePaymentDialog()">
             <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
               <path d="M3 3l10 10M13 3 3 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
           </button>
         </div>
-        <p id="payment-dialog-hint" class="terms-dialog__body terms-dialog__text">
-          Revisa tus datos o vuelve a intentarlo. No perdiste nada de lo que ingresaste.
-        </p>
+        <div class="terms-dialog__alert">
+          <svg class="terms-dialog__alert-icon" viewBox="0 0 24 24" width="32" height="32" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+            <path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          <h2 id="payment-dialog-title" class="terms-dialog__title terms-dialog__title--error">No pudimos procesar tu pago.</h2>
+          <p id="payment-dialog-hint" class="terms-dialog__text">
+            Revisa tus datos o vuelve a intentarlo. No perdiste nada de lo que ingresaste.
+          </p>
+        </div>
         <div class="terms-dialog__footer">
           <button type="button" class="button button--cta" (click)="closePaymentDialog()">Entendido</button>
         </div>
