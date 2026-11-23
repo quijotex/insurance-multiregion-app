@@ -120,7 +120,7 @@ export class PlanListPage {
     this.selectedId.set(planId);
     this.session.savePlan(planId);
     const index = this.offers().findIndex((offer) => offer.plan.id === planId);
-    if (index >= 0) this.swiper?.slideTo(index);
+    if (index >= 0) this.swiper?.slideTo(index, this.reducedMotion() ? 0 : undefined);
   }
 
   protected backToStep1(): void {
@@ -141,6 +141,10 @@ export class PlanListPage {
     this.destroyRef.onDestroy(() => query.removeEventListener('change', onChange));
   }
 
+  private reducedMotion(): boolean {
+    return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
   private mountSwiper(): void {
     if (this.swiper) return;
     const root = this.host.nativeElement;
@@ -157,17 +161,26 @@ export class PlanListPage {
       centeredSlides: true,
       spaceBetween: 16,
       loop: false,
+      // R-08: no slide transition under prefers-reduced-motion.
+      speed: this.reducedMotion() ? 0 : 300,
       breakpoints: { 768: { slidesPerView: 2.2 } },
       keyboard: { enabled: true, onlyInViewport: true },
       navigation: {
         prevEl: root.querySelector<HTMLElement>('.plan-list__nav--prev'),
         nextEl: root.querySelector<HTMLElement>('.plan-list__nav--next'),
       },
-      pagination: { el: root.querySelector<HTMLElement>('.plan-list__dots'), clickable: true },
+      pagination: {
+        el: root.querySelector<HTMLElement>('.plan-list__dots'),
+        clickable: true,
+        // R-07: real buttons with a Spanish name.
+        bulletElement: 'button',
+        renderBullet: (index, className) =>
+          `<button type="button" class="${className}" aria-label="Ir al plan ${index + 1} de ${offers.length}"></button>`,
+      },
       a11y: {
         prevSlideMessage: 'Plan anterior',
         nextSlideMessage: 'Plan siguiente',
-        paginationBulletMessage: 'Ir al plan {{index}}',
+        paginationBulletMessage: `Ir al plan {{index}} de ${offers.length}`,
         firstSlideMessage: 'Este es el primer plan',
         lastSlideMessage: 'Este es el último plan',
         slideLabelMessage: 'Plan {{index}} de {{slidesLength}}',

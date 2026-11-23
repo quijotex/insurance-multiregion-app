@@ -77,6 +77,7 @@
     line-height: 1.2;
     white-space: nowrap;
     transform: translate(-50%, -50%);
+    pointer-events: none;
   }
 
   &__head {
@@ -114,10 +115,19 @@
   }
 
   &__title {
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
     min-width: 0;
+  }
+
+  /* Stretched label: the whole card selects the radio (lists stay outside the label, R-09). */
+  &__title::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
   }
 
   &__name {

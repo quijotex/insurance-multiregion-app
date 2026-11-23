@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { PlanOffer } from '../../data/plan.model';
 
 /**
- * One selectable plan: a native radio inside a label, styled as a card (ui-ux-guidelines plan-card
+ * One selectable plan: a native radio with a label over name and description; the label is stretched
+ * (::after) so the whole card is the click target. Styled as a card (ui-ux-guidelines plan-card
  * recipe). The four rows (name, price, coverages, benefits) sit in the parent's subgrid.
  */
 @Component({
@@ -10,7 +11,7 @@ import { PlanOffer } from '../../data/plan.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './plan-card.component.scss',
   template: `
-    <label
+    <div
       class="plan-card"
       [class.plan-card--recommended]="offer().plan.highlighted"
       [class.plan-card--selected]="selected()"
@@ -32,7 +33,8 @@ import { PlanOffer } from '../../data/plan.model';
         [name]="groupName()"
         [value]="offer().plan.id"
         [checked]="selected()"
-        [attr.aria-labelledby]="nameId()"
+        [id]="inputId()"
+        [attr.aria-label]="offer().plan.highlighted ? offer().plan.name + ', plan recomendado' : null"
         [attr.aria-describedby]="priceId()"
         (change)="chosen.emit(offer().plan.id)"
       />
@@ -49,13 +51,10 @@ import { PlanOffer } from '../../data/plan.model';
             />
           </svg>
         </span>
-        <span class="plan-card__title">
-          <span class="plan-card__name" [id]="nameId()"
-            >{{ offer().plan.name
-            }}@if (offer().plan.highlighted) {<span class="visually-hidden">, plan recomendado</span>}</span
-          >
+        <label class="plan-card__title" [for]="inputId()">
+          <span class="plan-card__name">{{ offer().plan.name }}</span>
           <span class="plan-card__description">{{ offer().plan.shortDescription }}</span>
-        </span>
+        </label>
       </span>
       <span class="plan-card__price-row" [id]="priceId()">
         <span class="plan-card__price">{{ price().amount }}</span>
@@ -91,7 +90,7 @@ import { PlanOffer } from '../../data/plan.model';
           </ul>
         }
       </span>
-    </label>
+    </div>
   `,
 })
 export class PlanCardComponent {
@@ -101,7 +100,7 @@ export class PlanCardComponent {
   readonly groupName = input.required<string>();
   readonly chosen = output<string>();
 
-  protected readonly nameId = computed(() => `plan-name-${this.offer().plan.id}`);
+  protected readonly inputId = computed(() => `plan-input-${this.offer().plan.id}`);
   protected readonly priceId = computed(() => `plan-price-${this.offer().plan.id}`);
   /** "$ 145.000 / mes" shown as a large amount and a smaller period. */
   protected readonly price = computed(() => {
@@ -109,6 +108,6 @@ export class PlanCardComponent {
     const cut = text.lastIndexOf(' / ');
     return cut < 0
       ? { amount: text, period: '' }
-      : { amount: text.slice(0, cut), period: text.slice(cut + 1) };
+      : { amount: text.slice(0, cut), period: text.slice(cut) };
   });
 }

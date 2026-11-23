@@ -41,9 +41,12 @@ describe('US-02 · FR-005 simulatePrice', () => {
     { name: 'driver 25 is in the standard band', base: 100000, driver: 25, vehicle: 0, bands, expected: 100000 },
     { name: 'driver 65 is in the standard band', base: 100000, driver: 65, vehicle: 0, bands, expected: 100000 },
     { name: 'driver 66 is in the senior band', base: 100000, driver: 66, vehicle: 0, bands, expected: 115000 },
-    { name: 'vehicle 5 and 6 change band (6)', base: 100000, driver: 30, vehicle: 6, bands, expected: 110000 },
-    { name: 'vehicle 10 and 11 change band (11)', base: 100000, driver: 30, vehicle: 11, bands, expected: 120000 },
-    { name: 'no band or unknown age gives factor 1; overlapping bands: first wins', base: 100000, driver: 30, vehicle: null, bands: overlapping, expected: 150000 },
+    { name: 'vehicle 5 is the last of the first band', base: 100000, driver: 30, vehicle: 5, bands, expected: 100000 },
+    { name: 'vehicle 6 starts the second band', base: 100000, driver: 30, vehicle: 6, bands, expected: 110000 },
+    { name: 'vehicle 10 is the last of the second band', base: 100000, driver: 30, vehicle: 10, bands, expected: 110000 },
+    { name: 'vehicle 11 starts the third band', base: 100000, driver: 30, vehicle: 11, bands, expected: 120000 },
+    { name: 'no band covers the age (driver 130, vehicle 30) gives factor 1', base: 100000, driver: 130, vehicle: 30, bands, expected: 100000 },
+    { name: 'unknown age gives factor 1; overlapping bands: first wins', base: 100000, driver: 30, vehicle: null, bands: overlapping, expected: 150000 },
     { name: 'rounds to a whole peso', base: 89990, driver: 22, vehicle: 8, bands, expected: 118787 },
   ];
 
@@ -91,5 +94,10 @@ describe('US-02 · FR-004 formatPrice', () => {
 
   it('formats CLP with no decimals and " / mes"', () => {
     expect(plain(formatPrice(39990, { currency: 'CLP', numberLocale: 'es-CL' }))).toBe('$39.990 / mes');
+  });
+
+  it('R-12 a country without currency or locale falls back to a plain number and does not throw', () => {
+    expect(plain(formatPrice(145000, { currency: '', numberLocale: '' }))).toMatch(/^145\D?000 \/ mes$/);
+    expect(plain(formatPrice(145000, { currency: 'XX', numberLocale: 'es-CO' }))).toBe('145.000 / mes');
   });
 });

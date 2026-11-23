@@ -41,7 +41,11 @@
     height: auto;
   }
 
-  /* From 992px: three columns; each item spans 4 rows that the cards share (subgrid). */
+  /*
+   * Layout exception (ADR 0003): Bootstrap columns cannot share rows between cards, so from 992px
+   * the track is a CSS grid whose items subgrid 4 rows; that keeps name, price, coverages and
+   * benefits aligned across cards (agreed at Gate 2). Everything else uses Bootstrap row/col.
+   * From 992px: three columns; each item spans 4 rows that the cards share (subgrid). */
   @media (min-width: 992px) {
     &__track {
       display: grid;
@@ -100,22 +104,30 @@
   &__dots {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
   }
 
+  /* R-07: each dot is a real button with a 48x48 hit area; the small dot is drawn by ::before. */
   &__dots .swiper-pagination-bullet {
     position: relative;
-    width: 12px;
-    height: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin: 0;
+    padding: 0;
+    border: 0;
     border-radius: 50%;
-    background: var(--color-border);
+    background: transparent;
+    opacity: 1;
     cursor: pointer;
 
-    /* Bigger touch target around the small dot. */
-    &::after {
+    &::before {
       content: '';
-      position: absolute;
-      inset: -18px -6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-border);
     }
 
     &:focus-visible {
@@ -124,10 +136,9 @@
     }
   }
 
-  &__dots .swiper-pagination-bullet-active {
+  &__dots .swiper-pagination-bullet-active::before {
     background: var(--color-action);
   }
-
   &__actions {
     margin-top: var(--space-8);
 
@@ -141,20 +152,9 @@
   }
 
   /* States */
+  /* The skeleton lays out with Bootstrap row/col in the template; only its top spacing lives here. */
   &__skeleton {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
     padding-top: var(--space-6);
-
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (min-width: 992px) {
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-6);
-    }
   }
 
   &__skeleton-card {

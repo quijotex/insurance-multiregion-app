@@ -10,16 +10,18 @@
   </header>
 
   @if (loading()) {
-    <div class="plan-list__skeleton" aria-busy="true">
+    <div class="plan-list__skeleton row g-3 g-lg-4" aria-busy="true">
       <span class="visually-hidden">Cargando planes…</span>
       @for (n of [1, 2, 3]; track n) {
-        <div class="plan-list__skeleton-card" aria-hidden="true">
-          <span class="plan-list__skeleton-line plan-list__skeleton-line--title"></span>
-          <span class="plan-list__skeleton-line"></span>
-          <span class="plan-list__skeleton-line plan-list__skeleton-line--price"></span>
-          <span class="plan-list__skeleton-line"></span>
-          <span class="plan-list__skeleton-line"></span>
-          <span class="plan-list__skeleton-line"></span>
+        <div class="col-12 col-md-6 col-lg-4" aria-hidden="true">
+          <div class="plan-list__skeleton-card">
+            <span class="plan-list__skeleton-line plan-list__skeleton-line--title"></span>
+            <span class="plan-list__skeleton-line"></span>
+            <span class="plan-list__skeleton-line plan-list__skeleton-line--price"></span>
+            <span class="plan-list__skeleton-line"></span>
+            <span class="plan-list__skeleton-line"></span>
+            <span class="plan-list__skeleton-line"></span>
+          </div>
         </div>
       }
     </div>

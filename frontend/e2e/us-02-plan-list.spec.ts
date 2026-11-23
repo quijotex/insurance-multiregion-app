@@ -11,13 +11,12 @@ async function pickOption(page: Page, label: string | RegExp, index = 0): Promis
   await page.getByRole('option').nth(index).click();
 }
 
-/** Accessible description of a plan radio is its price ("$ 89.000 / mes"), with NBSP normalised. */
+/** Accessible description of a plan radio is its price ("$ 89.000 / mes"); only NBSP is normalised. */
 async function priceOf(page: Page, name: string | RegExp): Promise<string> {
   const radio = page.getByRole('radio', { name });
   const id = await radio.getAttribute('aria-describedby');
   const text = (await page.locator(`[id="${id}"]`).textContent()) ?? '';
-  // Amount and period are separate spans (spacing is CSS), so normalise the gap before "/ mes".
-  return text.replace(/[\s  ]+/g, ' ').replace(/\s*\/\s*mes/, ' / mes').trim();
+  return text.replace(/[  ]/g, ' ').trim();
 }
 
 async function fillColombiaStep1(page: Page): Promise<void> {
@@ -57,7 +56,7 @@ test.describe('US-02 · plan list', () => {
 
     // "Recomendado" badge on Plus only, also announced to assistive technology.
     await expect(page.getByText('Recomendado', { exact: true })).toHaveCount(1);
-    await expect(page.getByRole('radio', { name: /^Plus\s*, plan recomendado/ })).toHaveCount(1);
+    await expect(page.getByRole('radio', { name: /^Plus, plan recomendado/ })).toHaveCount(1);
     await expect(page.getByRole('radio', { name: /recomendado/ })).toHaveCount(1);
 
     // Nothing chosen: Continuar disabled.
