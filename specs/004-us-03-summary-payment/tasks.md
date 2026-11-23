@@ -65,6 +65,11 @@
 - [x] T015 [FE] US-03 R-02–R-09, R-12, R-13: terms need visible text, with regression test "R-02 · terms with no visible text block the payment"; pay button keeps focus and a rejection focuses the alert; test FR names; the missing UT-03 example; keyboard-scrollable terms dialog; overlay token; `aria-required` on the acceptance; single focus on dialog close; two tests beyond the approved examples removed (FR-006, FR-008, FR-010, FR-013) — `frontend/src/app/features/summary/**`, `frontend/src/app/shared/ui/rich-text/rich-text.mapper.ts`, `frontend/src/styles.scss`
 - [x] T016 [FE] US-03 R-10, R-11 (human asked to fix both): a link nested in a link becomes its text, with regression test "R-10 · a link nested in a link becomes its text"; `formatAmount` exported from the US-02 pricing code and used by the summary instead of stripping " / mes" (FR-002, FR-005) — `frontend/src/app/shared/ui/rich-text/rich-text.mapper.ts`, `rich-text.spec.ts`, `frontend/src/app/features/plan-list/pricing/format-price.ts`, `frontend/src/app/features/summary/summary.page.ts`
 
+## Phase 5: Gate 3 corrections (human, 2026-11-22)
+
+- [x] T017 [CMS] US-03 Gate 3: the seeded terms drop their own heading (the dialog already has the title "Términos y condiciones") and the "datos ficticios" line, for CO and CL. A one-shot upgrade (second core-store marker, set on a fresh seed) replaces terms only when they still equal the first seed exactly; edited terms are kept. Regression test "Gate 3 · replaces only the untouched first seed (heading and mock-data line) with the current terms" (FR-005, FR-014) — `cms/src/seed/countries.ts`, `cms/src/seed/summary-backfill.test.ts`
+- [x] T018 [FE] US-03 Gate 3: the confirmation heading says "¡Listo, ya estás asegurado!"; a rejected payment opens a modal alert dialog ("No pudimos procesar tu pago.", "Editar mis datos", "Entendido", Esc; focus back to "Quiero mi seguro") instead of the inline alert. UT-07's FR-010 test and E2E-5 follow the new UI (FR-009, FR-010) — `frontend/src/app/features/summary/summary.page.*`, `confirmation.page.html`, `frontend/e2e/us-03-summary-payment.spec.ts`, `.claude/skills/ui-ux-guidelines/SKILL.md`
+
 ## Dependencies
 
 - T001 → T002 (CMS chain, one agent), in parallel with the frontend foundation.

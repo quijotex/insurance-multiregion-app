@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { isDeepStrictEqual } from 'node:util';
 import path from 'node:path';
 import type { Core } from '@strapi/strapi';
 
@@ -163,8 +164,6 @@ const item = (text: string) => ({ type: 'list-item' as const, children: [t(text)
 // Fictitious terms, different per country. PE (inactive) has none.
 export const TERMS_BY_COUNTRY: Record<string, TermsBlock[]> = {
   CO: [
-    { type: 'heading', level: 2, children: [t('Términos y condiciones del seguro de auto en Colombia')] },
-    para(t('Esta cotización es una simulación con datos ficticios y no constituye una póliza vigente.')),
     para(t('El valor mensual mostrado depende de la información que indicaste y puede cambiar si esta no es correcta.')),
     para(t('Al pagar, aceptas que usemos tus datos únicamente para generar tu cotización y contactarte sobre ella.')),
     {
@@ -179,8 +178,6 @@ export const TERMS_BY_COUNTRY: Record<string, TermsBlock[]> = {
     para(t('Consulta el detalle completo en '), { type: 'link', url: 'https://example.com/co/terminos', children: [t('nuestra página de términos')] }, t('.')),
   ],
   CL: [
-    { type: 'heading', level: 2, children: [t('Condiciones generales del seguro automotriz en Chile')] },
-    para(t('Esta cotización es una demostración con datos ficticios y no corresponde a un contrato de seguro real.')),
     para(t('La prima mensual informada se calcula con los antecedentes declarados y puede ajustarse al emitir la póliza.')),
     para(t('Al continuar con el pago, declaras que la información entregada es veraz y autorizas su uso para esta cotización.')),
     {
@@ -197,6 +194,33 @@ export const TERMS_BY_COUNTRY: Record<string, TermsBlock[]> = {
 };
 
 /**
+ * Gate 3: the first seed opened with a heading (the dialog already has the title) and a "mock data" line.
+ * These are the blocks it had before the current TERMS_BY_COUNTRY, used only to recognise untouched terms.
+ */
+const LEGACY_TERMS_LEAD: Record<string, TermsBlock[]> = {
+  CO: [
+    { type: 'heading', level: 2, children: [t('Términos y condiciones del seguro de auto en Colombia')] },
+    para(t('Esta cotización es una simulación con datos ficticios y no constituye una póliza vigente.')),
+  ],
+  CL: [
+    { type: 'heading', level: 2, children: [t('Condiciones generales del seguro automotriz en Chile')] },
+    para(t('Esta cotización es una demostración con datos ficticios y no corresponde a un contrato de seguro real.')),
+  ],
+};
+
+/**
+ * Pure (Gate 3): the new seeded terms, only when the row still has exactly the first seeded terms. Terms an
+ * editor changed in any way (or removed) are left alone.
+ */
+export function termsUpgradePatch(row: { code?: string; termsAndConditions?: unknown[] | null }): Record<string, unknown> {
+  const code = row.code ?? '';
+  const lead = LEGACY_TERMS_LEAD[code];
+  const current = TERMS_BY_COUNTRY[code];
+  if (!lead || !current || !row.termsAndConditions?.length) return {};
+  return isDeepStrictEqual(row.termsAndConditions, [...lead, ...current]) ? { termsAndConditions: current } : {};
+}
+
+/**
  * Pure (R5): the terms to add to a country row. Only when the row has none (null, missing or []); existing
  * terms, even edited ones, are never overwritten. Countries without seeded terms (PE) get nothing.
  */
@@ -207,6 +231,7 @@ export function termsPatch(row: { code?: string; termsAndConditions?: unknown[] 
 }
 
 const TERMS_MARKER = { type: 'core', name: 'seed', key: 'us03-terms-backfill' } as const;
+const TERMS_UPGRADE_MARKER = { type: 'core', name: 'seed', key: 'us03-terms-upgrade-gate3' } as const;
 
 /**
  * Pure (R-01): the terms backfill runs once per database. When the marker is set it never runs again, so terms
@@ -224,7 +249,18 @@ export function shouldRunTermsBackfill(markerSet: boolean): boolean {
  * country, whose published version lacks the terms until an editor publishes.
  */
 export async function backfillTerms(strapi: Core.Strapi): Promise<void> {
-  const store = strapi.store(TERMS_MARKER);
+  await patchTermsOnce(strapi, TERMS_MARKER, termsPatch, 'added to');
+  await patchTermsOnce(strapi, TERMS_UPGRADE_MARKER, termsUpgradePatch, 'updated in');
+}
+
+/** One pass per marker (R-01): writes `patch(row)` to the draft and publishes only a clean one. */
+async function patchTermsOnce(
+  strapi: Core.Strapi,
+  marker: { type: 'core'; name: 'seed'; key: string },
+  patchFor: (row: { code?: string; termsAndConditions?: unknown[] | null }) => Record<string, unknown>,
+  verb: string,
+): Promise<void> {
+  const store = strapi.store(marker);
   if (!shouldRunTermsBackfill(Boolean(await store.get({})))) return;
   const rows = (await strapi.db.query(UID).findMany({})) as unknown as Array<
     DbRow & { termsAndConditions?: unknown[] | null }
@@ -237,7 +273,7 @@ export async function backfillTerms(strapi: Core.Strapi): Promise<void> {
     const published = versions.find((v) => v.publishedAt);
     const base = draft ?? published;
     if (!base) continue;
-    const patch = termsPatch(base);
+    const patch = patchFor(base);
     if (Object.keys(patch).length === 0) continue;
 
     await strapi.documents(UID).update({ documentId, data: patch as never, status: 'draft' });
@@ -246,7 +282,7 @@ export async function backfillTerms(strapi: Core.Strapi): Promise<void> {
       await strapi.documents(UID).publish({ documentId });
     } else {
       strapi.log.warn(
-        `Country ${base.code}: terms and conditions were added to the draft only because it has unpublished changes; the published version lacks them until an editor publishes.`,
+        `Country ${base.code}: terms and conditions were ${verb} the draft only because it has unpublished changes; the published version lacks them until an editor publishes.`,
       );
     }
   }
@@ -268,8 +304,9 @@ export async function seedCountries(strapi: Core.Strapi): Promise<void> {
   const total = await strapi.documents(UID).count({});
   if (total > 0) return;
 
-  // A fresh database already has the terms: the one-shot backfill must never run on it.
+  // A fresh database already has the current terms: the one-shot passes must never run on it.
   await strapi.store(TERMS_MARKER).set({ value: true });
+  await strapi.store(TERMS_UPGRADE_MARKER).set({ value: true });
   for (const country of COUNTRIES) {
     const icon = country.icon ? await uploadIcon(strapi, country.icon.file, country.icon.alt) : undefined;
     await strapi.documents(UID).create({

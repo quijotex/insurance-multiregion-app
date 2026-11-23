@@ -58,6 +58,8 @@ export class SummaryPage {
 
   private readonly dialog = viewChild<ElementRef<HTMLDialogElement>>('termsDialog');
   private readonly termsLink = viewChild<ElementRef<HTMLButtonElement>>('termsLink');
+  private readonly paymentDialog = viewChild<ElementRef<HTMLDialogElement>>('paymentDialog');
+  private readonly payButton = viewChild<ElementRef<HTMLButtonElement>>('payButton');
 
   protected readonly steps = ['Tus datos', 'Elige tu plan', 'Resumen'];
   protected readonly loading = signal(true);
@@ -140,20 +142,11 @@ export class SummaryPage {
   }
 
   protected openTerms(): void {
-    const dialog = this.dialog()?.nativeElement;
-    if (!dialog) return;
-    if (typeof dialog.showModal === 'function') dialog.showModal();
-    else dialog.setAttribute('open', '');
+    showDialog(this.dialog()?.nativeElement);
   }
 
   protected closeTerms(): void {
-    const dialog = this.dialog()?.nativeElement;
-    if (!dialog) return;
-    if (typeof dialog.close === 'function') dialog.close();
-    else {
-      dialog.removeAttribute('open');
-      this.termsClosed();
-    }
+    closeDialog(this.dialog()?.nativeElement, () => this.termsClosed());
   }
 
   /** Esc, "Cerrar" and "Entendido" all end here: focus goes back to the link. */
@@ -191,13 +184,24 @@ export class SummaryPage {
     });
   }
 
-  /** R-03: after a rejection, focus moves to the alert so the person hears it and can Tab to retry. */
+  /** Gate 3: a rejection opens a modal alert dialog; data and acceptance stay, and the person can retry. */
   private reject(): void {
     this.paymentState.set('rejected');
-    afterNextRender(
-      () => this.host.nativeElement.querySelector<HTMLElement>('.summary__error--payment')?.focus(),
-      { injector: this.injector },
-    );
+    afterNextRender(() => showDialog(this.paymentDialog()?.nativeElement), { injector: this.injector });
+  }
+
+  protected closePaymentDialog(): void {
+    closeDialog(this.paymentDialog()?.nativeElement, () => this.paymentDialogClosed());
+  }
+
+  /** Esc, "Cerrar" and "Entendido" all end here: focus goes back to the pay button for a retry. */
+  protected paymentDialogClosed(): void {
+    this.payButton()?.nativeElement.focus();
+  }
+
+  protected editFromPaymentDialog(): void {
+    this.closePaymentDialog();
+    this.edit();
   }
 
   private approve(
@@ -220,5 +224,21 @@ export class SummaryPage {
       relativeTo: this.route,
       replaceUrl: true,
     });
+  }
+}
+
+function showDialog(dialog: HTMLDialogElement | undefined): void {
+  if (!dialog || dialog.open) return;
+  if (typeof dialog.showModal === 'function') dialog.showModal();
+  else dialog.setAttribute('open', '');
+}
+
+/** `onClosed` runs here only without native `close()`; otherwise the dialog's (close) event calls it. */
+function closeDialog(dialog: HTMLDialogElement | undefined, onClosed: () => void): void {
+  if (!dialog) return;
+  if (typeof dialog.close === 'function') dialog.close();
+  else {
+    dialog.removeAttribute('open');
+    onClosed();
   }
 }

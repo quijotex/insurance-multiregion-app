@@ -83,7 +83,7 @@ test.describe('US-03 · FR-001–FR-012 summary and simulated payment', () => {
     await expect(page.getByRole('button', { name: 'Procesando…' })).toBeDisabled();
 
     // Confirmation.
-    const confirmationHeading = page.getByRole('heading', { level: 1, name: 'Pago aprobado' });
+    const confirmationHeading = page.getByRole('heading', { level: 1, name: '¡Listo, ya estás asegurado!' });
     await expect(confirmationHeading).toBeVisible();
     const numberValue = page.locator('dt', { hasText: 'Número de cotización' }).locator('xpath=following-sibling::dd[1]');
     await expect(numberValue).toHaveText(/^CO-\d{8}-[A-HJ-KM-NP-Z2-9]{6}$/);
@@ -97,6 +97,6 @@ test.describe('US-03 · FR-001–FR-012 summary and simulated payment', () => {
     // Back never shows the payment button.
     await page.goBack();
     await expect(page.getByRole('button', { name: /Quiero mi seguro|Procesando/ })).toHaveCount(0);
-    await expect(page.getByRole('heading', { level: 1, name: 'Pago aprobado' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: '¡Listo, ya estás asegurado!' })).toBeVisible();
   });
 });

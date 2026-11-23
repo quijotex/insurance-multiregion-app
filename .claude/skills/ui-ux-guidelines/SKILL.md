@@ -124,7 +124,7 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 
 **Checkbox** — `.checkbox`: a custom 24px box before its label (7px radius, 2px `--color-text-muted` ring; checked: `--color-action` fill with a white check; focus `--focus-ring`), built on a native `<input type="checkbox">`. Terms acceptance: "*Acepto términos y condiciones", where "términos y condiciones" is an underlined `--color-action` link opening the terms in a modal `<dialog>` (title, "Cerrar", "Entendido", Esc closes, focus returns to the link). The pay CTA reads "Quiero mi seguro", never the price.
 
-**Receipt** — `.receipt` (confirmation, US-03 Gate 2): a ticket with a 1.5px dashed `--color-border` border, 14px radius, max-width 360px, centred; a `--color-success` check icon with "Pago aprobado", rows for quote number (bold), plan, country, date and total paid, then "Nueva cotización" (CTA pill).
+**Receipt** — `.receipt` (confirmation, US-03 Gate 2): a ticket with a 1.5px dashed `--color-border` border, 14px radius, max-width 360px, centred; a `--color-success` check icon with "¡Listo, ya estás asegurado!" (US-03 Gate 3), rows for quote number (bold), plan, country, date and total paid, then "Nueva cotización" (CTA pill).
 
 **States**
 - **Loading:** skeletons shaped like the final content (cards, fields); `aria-busy` on the region.

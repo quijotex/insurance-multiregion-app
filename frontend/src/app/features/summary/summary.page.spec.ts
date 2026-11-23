@@ -136,14 +136,16 @@ describe('US-03 · FR-001–FR-010 summary page', () => {
     expect(checkbox().disabled).toBe(true);
   });
 
-  it('FR-010 a rejected payment shows an alert, keeps data and acceptance, and allows a retry', async () => {
+  it('FR-010 a rejected payment opens an alert dialog, keeps data and acceptance, and allows a retry', async () => {
     await setup();
     await accept();
     payButton().click();
     paySubject.next('rejected');
     await fixture.whenStable();
 
-    expect(el.querySelector('[role="alert"]')?.textContent).toContain('No pudimos procesar tu pago.');
+    const alert = el.querySelector<HTMLDialogElement>('dialog[role="alertdialog"]');
+    expect(alert?.hasAttribute('open')).toBe(true);
+    expect(alert?.textContent).toContain('No pudimos procesar tu pago.');
     expect(session.readStep1()['documentNumber']).toBe('1020304050');
     expect(session.readTermsAccepted()).toBe(true);
     expect(checkbox().checked).toBe(true);

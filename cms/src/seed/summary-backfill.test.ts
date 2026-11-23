@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TERMS_BY_COUNTRY, shouldPublishAfterBackfill, shouldRunTermsBackfill, termsPatch } from './countries';
+import { TERMS_BY_COUNTRY, shouldPublishAfterBackfill, shouldRunTermsBackfill, termsPatch, termsUpgradePatch } from './countries';
 import { rowsNeedingMaskedFlag } from './form-fields';
 
 describe('US-03 · FR-003 masked flag backfill (UT-09)', () => {
@@ -49,5 +49,19 @@ describe('US-03 · FR-014 terms backfill (UT-09)', () => {
     expect(shouldRunTermsBackfill(false)).toBe(true);
     // With the marker absent the per-row rule still fills empty terms.
     expect(termsPatch({ code: 'CO', termsAndConditions: [] })).toEqual({ termsAndConditions: TERMS_BY_COUNTRY.CO });
+  });
+});
+
+describe('US-03 · FR-005 terms upgrade (Gate 3)', () => {
+  it('Gate 3 · replaces only the untouched first seed (heading and mock-data line) with the current terms', () => {
+    const lead = [
+      { type: 'heading', level: 2, children: [{ type: 'text', text: 'Términos y condiciones del seguro de auto en Colombia' }] },
+      { type: 'paragraph', children: [{ type: 'text', text: 'Esta cotización es una simulación con datos ficticios y no constituye una póliza vigente.' }] },
+    ];
+    const firstSeed = [...lead, ...TERMS_BY_COUNTRY.CO];
+    expect(termsUpgradePatch({ code: 'CO', termsAndConditions: firstSeed })).toEqual({ termsAndConditions: TERMS_BY_COUNTRY.CO });
+    expect(termsUpgradePatch({ code: 'CO', termsAndConditions: [...firstSeed, lead[1]] })).toEqual({});
+    expect(termsUpgradePatch({ code: 'CO', termsAndConditions: TERMS_BY_COUNTRY.CO })).toEqual({});
+    expect(termsUpgradePatch({ code: 'CO', termsAndConditions: [] })).toEqual({});
   });
 });
