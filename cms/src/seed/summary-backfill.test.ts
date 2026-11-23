@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { TERMS_BY_COUNTRY, shouldPublishAfterBackfill, termsPatch } from './countries';
+import { TERMS_BY_COUNTRY, shouldPublishAfterBackfill, shouldRunTermsBackfill, termsPatch } from './countries';
 import { rowsNeedingMaskedFlag } from './form-fields';
 
-describe('US-03 · FR-014 masked flag backfill (UT-09)', () => {
+describe('US-03 · FR-003 masked flag backfill (UT-09)', () => {
   it('flags only documentNumber/rut rows where it is null or missing', () => {
     const rows = [
       { key: 'documentNumber', maskedInSummary: null },
@@ -42,5 +42,12 @@ describe('US-03 · FR-014 terms backfill (UT-09)', () => {
   it('publishes only when the draft is clean', () => {
     expect(shouldPublishAfterBackfill({ draftUpdatedAt: '2026-01-01T10:00:00Z', publishedAt: '2026-01-01T10:00:00Z' })).toBe(true);
     expect(shouldPublishAfterBackfill({ draftUpdatedAt: '2026-02-01T10:00:00Z', publishedAt: '2026-01-01T10:00:00Z' })).toBe(false);
+  });
+
+  it('R-01 · marker present: no backfill even when terms are empty; marker absent: backfill runs', () => {
+    expect(shouldRunTermsBackfill(true)).toBe(false);
+    expect(shouldRunTermsBackfill(false)).toBe(true);
+    // With the marker absent the per-row rule still fills empty terms.
+    expect(termsPatch({ code: 'CO', termsAndConditions: [] })).toEqual({ termsAndConditions: TERMS_BY_COUNTRY.CO });
   });
 });

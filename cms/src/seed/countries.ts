@@ -206,12 +206,26 @@ export function termsPatch(row: { code?: string; termsAndConditions?: unknown[] 
   return terms ? { termsAndConditions: terms } : {};
 }
 
+const TERMS_MARKER = { type: 'core', name: 'seed', key: 'us03-terms-backfill' } as const;
+
 /**
- * Terms for existing databases (R5): written to the draft only through the Document Service, then published
- * only if the draft had no pending changes (same rule and R-01/R-15 lessons as backfillCountryPricing);
- * otherwise a warning names the country, whose published version lacks the terms until an editor publishes.
+ * Pure (R-01): the terms backfill runs once per database. When the marker is set it never runs again, so terms
+ * an editor removed on purpose are not re-seeded on the next boot.
+ */
+export function shouldRunTermsBackfill(markerSet: boolean): boolean {
+  return !markerSet;
+}
+
+/**
+ * Terms for existing databases (R5), one-shot (R-01): runs only while the marker in Strapi's core store is
+ * absent, then sets it. seedCountries also sets it on a fresh database, so a fresh DB never runs the backfill.
+ * Rows are written to the draft only through the Document Service, then published only if the draft had no
+ * pending changes (same rule and R-01/R-15 lessons as backfillCountryPricing); otherwise a warning names the
+ * country, whose published version lacks the terms until an editor publishes.
  */
 export async function backfillTerms(strapi: Core.Strapi): Promise<void> {
+  const store = strapi.store(TERMS_MARKER);
+  if (!shouldRunTermsBackfill(Boolean(await store.get({})))) return;
   const rows = (await strapi.db.query(UID).findMany({})) as unknown as Array<
     DbRow & { termsAndConditions?: unknown[] | null }
   >;
@@ -236,6 +250,7 @@ export async function backfillTerms(strapi: Core.Strapi): Promise<void> {
       );
     }
   }
+  await store.set({ value: true });
 }
 
 async function uploadIcon(strapi: Core.Strapi, file: string, alt: string): Promise<number> {
@@ -253,6 +268,8 @@ export async function seedCountries(strapi: Core.Strapi): Promise<void> {
   const total = await strapi.documents(UID).count({});
   if (total > 0) return;
 
+  // A fresh database already has the terms: the one-shot backfill must never run on it.
+  await strapi.store(TERMS_MARKER).set({ value: true });
   for (const country of COUNTRIES) {
     const icon = country.icon ? await uploadIcon(strapi, country.icon.file, country.icon.alt) : undefined;
     await strapi.documents(UID).create({
