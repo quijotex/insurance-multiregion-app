@@ -99,3 +99,18 @@ Scope: commit af84917 (T017 [CMS], T018 [FE]). The orchestrator already ran thes
 - **Tests:** the CMS regression test "Gate 3 · replaces only the untouched first seed (heading and mock-data line) with the current terms" is named in T017. It checks the behaviour with 1 positive case and 3 negative ones. The UT-07 FR-010 test only changed its selector to the alertdialog (`open` and text). E2E-5 only changed its heading text. No unapproved cases were added. T017 and T018 include `US-03`, the FR IDs and the files.
 
 **Verdict: Approved.**
+
+## Round 5 (Gate 3 corrections, batch 2) — 2026-11-22
+Scope: commit 83d059d (T018 [FE]). The human asked to remove "Editar mis datos" from the payment failure dialog. The orchestrator ran frontend verify (228 tests) and the build, and both pass.
+
+| ID | Severity | Location | Finding | Rule/FR | Status | Resolution |
+|----|----------|----------|---------|---------|--------|------------|
+| — | — | — | No new findings. | — | — | — |
+
+### Checks
+- **Removal:** the dialog footer button and `editFromPaymentDialog()` are gone. Nothing in `frontend/src` or `frontend/e2e` still refers to either of them. `edit()` (summary.page.ts:157) is still used by the two data-card pills (summary.page.html:51, 70), so it is not left unused. No test asserted the removed button.
+- **Dialog behaviour (FR-010):** the dialog still has the "Cerrar" icon button (`aria-label="Cerrar"`) and "Entendido". Both call `closePaymentDialog()`. Esc goes through `(close)`. All three paths end in `paymentDialogClosed()`, which moves focus back to `#payButton` ("Quiero mi seguro"). `role="alertdialog"`, `aria-labelledby` and `aria-describedby` are unchanged. The footer `gap`/`flex-wrap` styles are harmless with one button.
+- **Traceability:** T018 now lists "Entendido", "Cerrar" and Esc, says "no 'Editar mis datos' button, per the human", and keeps `US-03` and FR-009/FR-010. The commit footer has `Refs: US-03, T018`. The remaining "Editar mis datos" mentions in spec.md (FR-004), plan.md, contracts/routes.md, quickstart.md and the ui-ux skill all refer to the summary cards, not the dialog, so they are still correct.
+- Observation, not a finding: the dialog hint still reads "Revisa tus datos o vuelve a intentarlo." That is still valid, because the data cards with "Editar mis datos" are visible behind the dialog once it closes.
+
+**Verdict: Approved.**
