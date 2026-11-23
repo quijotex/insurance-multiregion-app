@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DRIVER_BANDS, VEHICLE_BANDS, pricingPatch } from './countries';
+import { DRIVER_BANDS, VEHICLE_BANDS, pricingPatch, shouldPublishAfterBackfill } from './countries';
 
 describe('US-02 · FR-004 country pricing backfill (UT-10)', () => {
   it('fills currency, locale and bands when all are missing', () => {
@@ -35,5 +35,31 @@ describe('US-02 · FR-004 country pricing backfill (UT-10)', () => {
     expect(
       pricingPatch({ code: 'CO', currency: 'COP', numberLocale: 'es-CO', driverAgeBands: edited, vehicleAgeBands: edited }),
     ).toEqual({});
+  });
+});
+
+describe('US-02 · FR-004 backfill publish decision', () => {
+  it('R-01 · draft not ahead of the published version: publish after writing', () => {
+    expect(
+      shouldPublishAfterBackfill({
+        draftUpdatedAt: '2026-01-01T10:00:00.000Z',
+        publishedAt: '2026-01-01T10:00:00.000Z',
+        publishedUpdatedAt: '2026-01-01T10:00:00.000Z',
+      }),
+    ).toBe(true);
+  });
+
+  it('R-01 · draft ahead (pending editor changes): do not publish (warning)', () => {
+    expect(
+      shouldPublishAfterBackfill({
+        draftUpdatedAt: '2026-02-01T10:00:00.000Z',
+        publishedAt: '2026-01-01T10:00:00.000Z',
+        publishedUpdatedAt: '2026-01-01T10:00:00.000Z',
+      }),
+    ).toBe(false);
+  });
+
+  it('R-01 · never publishes when there is no published version', () => {
+    expect(shouldPublishAfterBackfill({ draftUpdatedAt: '2026-01-01T10:00:00.000Z', publishedAt: null })).toBe(false);
   });
 });

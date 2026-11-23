@@ -70,32 +70,83 @@ export function pricingPatch(row: PricingRow): Record<string, unknown> {
 
 const BAND_KEYS = ['driverAgeBands', 'vehicleAgeBands'];
 
+type DateLike = string | Date | null | undefined;
+
+const toTime = (d: DateLike): number => (d ? new Date(d).getTime() : Number.NaN);
+
 /**
- * Existing databases get currency, locale and bands only on rows that predate US-02.
- * Publication state is never changed: scalars are written at the DB layer on each row (draft and published
- * alike, like backfillLegalAge). The db layer does not manage components, so the bands are written with the
- * Document Service on the same version only (`draft` or `published` as the row is); that updates that
- * version in place and never publishes a draft.
+ * Pure: whether the draft may be published after the backfill wrote to it. Publishing copies the whole draft
+ * to the published version, so it is only safe when the draft carries no pending editor changes, i.e. it was
+ * not modified after the published version was last published/updated. No published version, or unreadable
+ * dates, means do not publish (never publish a draft that was not live, never guess).
+ */
+export function shouldPublishAfterBackfill(input: {
+  draftUpdatedAt: DateLike;
+  publishedAt: DateLike;
+  publishedUpdatedAt?: DateLike;
+}): boolean {
+  const published = Math.max(toTime(input.publishedAt), toTime(input.publishedUpdatedAt));
+  const draft = toTime(input.draftUpdatedAt);
+  if (Number.isNaN(published) || Number.isNaN(draft)) return false;
+  return draft <= published;
+}
+
+type DbRow = PricingRow & {
+  id: number;
+  documentId: string;
+  publishedAt?: DateLike;
+  updatedAt?: DateLike;
+};
+
+/**
+ * Existing databases get currency, locale and bands only on rows that predate US-02, never overwriting.
+ * Scalars are written at the DB layer on each row (draft and published alike, like backfillLegalAge). The db
+ * layer does not manage components, so the bands go through the Document Service. In Strapi 5,
+ * `documents().update({ status: 'published' })` writes the draft and then publishes the WHOLE draft, which
+ * would take unpublished editor changes live. So the bands are written to the draft only, and the draft is
+ * published afterwards only if it had no pending changes (see shouldPublishAfterBackfill); otherwise a
+ * warning names the country, whose published version lacks the bands until an editor publishes.
  */
 export async function backfillCountryPricing(strapi: Core.Strapi): Promise<void> {
   const rows = (await strapi.db.query(UID).findMany({
     populate: { driverAgeBands: true, vehicleAgeBands: true },
-  })) as unknown as Array<PricingRow & { id: number; documentId: string; publishedAt?: string | null }>;
-  for (const row of rows) {
-    const patch = pricingPatch(row);
-    const keys = Object.keys(patch);
-    if (keys.length === 0) continue;
-    const bands = Object.fromEntries(keys.filter((k) => BAND_KEYS.includes(k)).map((k) => [k, patch[k]]));
-    const scalars = Object.fromEntries(keys.filter((k) => !BAND_KEYS.includes(k)).map((k) => [k, patch[k]]));
-    if (Object.keys(scalars).length > 0) {
-      await strapi.db.query(UID).update({ where: { id: row.id }, data: scalars });
+  })) as unknown as DbRow[];
+  const byDocument = new Map<string, DbRow[]>();
+  for (const row of rows) byDocument.set(row.documentId, [...(byDocument.get(row.documentId) ?? []), row]);
+
+  for (const [documentId, versions] of byDocument) {
+    const draft = versions.find((v) => !v.publishedAt);
+    const published = versions.find((v) => v.publishedAt);
+    const draftUpdatedAtBefore = draft?.updatedAt;
+
+    let bandsPatch: Record<string, unknown> = {};
+    for (const row of versions) {
+      const patch = pricingPatch(row);
+      const scalars = Object.fromEntries(Object.entries(patch).filter(([k]) => !BAND_KEYS.includes(k)));
+      if (Object.keys(scalars).length > 0) {
+        await strapi.db.query(UID).update({ where: { id: row.id }, data: scalars });
+      }
+      if (row === (draft ?? published)) {
+        bandsPatch = Object.fromEntries(Object.entries(patch).filter(([k]) => BAND_KEYS.includes(k)));
+      }
     }
-    if (Object.keys(bands).length > 0) {
-      await strapi.documents(UID).update({
-        documentId: row.documentId,
-        data: bands as never,
-        status: row.publishedAt ? 'published' : 'draft',
-      });
+    if (Object.keys(bandsPatch).length === 0) continue;
+
+    await strapi.documents(UID).update({ documentId, data: bandsPatch as never, status: 'draft' });
+    if (!published) continue;
+    const code = (draft ?? published).code;
+    if (
+      shouldPublishAfterBackfill({
+        draftUpdatedAt: draftUpdatedAtBefore,
+        publishedAt: published.publishedAt,
+        publishedUpdatedAt: published.updatedAt,
+      })
+    ) {
+      await strapi.documents(UID).publish({ documentId });
+    } else {
+      strapi.log.warn(
+        `Country ${code}: age bands were added to the draft only because it has unpublished changes; the published version lacks the pricing until an editor publishes it.`,
+      );
     }
   }
 }
