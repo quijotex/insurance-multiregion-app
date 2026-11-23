@@ -104,7 +104,7 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 
 **Plan card** — `.plan-card`, `__badge`, `__radio`, `__name`, `__price`, `__section`, `__item`, `--recommended`, `--selected` (agreed at US-02 Gate 2)
 - White `--color-surface`, 14px radius, padding `--space-4`/`--space-6`, 1px inset ring `--color-border`. No top stripe and no grey background.
-- `--recommended`: a 5px `--color-brand` top border, a 1px brand ring, and a `__badge` pill ("Recomendado" with a star icon; `--color-cta` bg, `--color-on-cta` text) centred **on the top border**. Only the first recommended plan in order.
+- `--recommended`: a 5px `--color-brand` top border, a 1px brand ring, and a large `__badge` pill ("Recomendado" with a star icon; 16px bold text, an 18px icon, 6px × 18px padding; `--color-cta` bg, `--color-on-cta` text) centred **on the top border**. Only the first recommended plan in order.
 - `--selected`: a `__radio` circle filled with `--color-action` and a white check, plus a 2px **inset** `--color-action` ring. No "Seleccionado" text: nothing may change size or position (no layout shift). The radio state is the non-colour cue.
 - The cards share one CSS subgrid, so the name and description, the price (after a divider), Coberturas and Beneficios start on the same line in every card.
 - Price: large, `--color-brand`, formatted in the country's currency with no decimals, followed by "/ mes". No text explaining how the price is calculated.

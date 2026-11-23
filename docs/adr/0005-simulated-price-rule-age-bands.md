@@ -1,6 +1,6 @@
 # 0005 — Simulated price rule with age bands on Country
 
-- **Status:** Proposed
+- **Status:** Accepted (Gate 2, US-02 — 2026-11-22)
 - **Date:** 2026-11-22
 - **Related:** US-02, ADR 0001 ("Limits of configurability"), ADR 0004 (field keys), `specs/003-us-02-plan-list/research.md` (R1–R4)
 

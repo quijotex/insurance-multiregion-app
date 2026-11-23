@@ -3,7 +3,7 @@
 - **Status:** Accepted (Gate 2, US-00 — 2026-11-22)
 - **Date:** 2026-11-21
 - **Related:** US-00, US-01, US-02, US-03
-- **Amended:** Gate 2, US-01 — 2026-11-22 (FormField `section`, save validation, `legalAge`, published-only FormField `find`); Gate 2, US-02 — proposed 2026-11-22 (Plan save check and published-only `find`, `plan.item` component, Country `currency`, `numberLocale` and age bands, ADR 0005)
+- **Amended:** Gate 2, US-01 — 2026-11-22 (FormField `section`, save validation, `legalAge`, published-only FormField `find`); Gate 2, US-02 — 2026-11-22 (Plan save check and published-only `find`, `plan.item` component, Country `currency`, `numberLocale` and age bands, ADR 0005)
 
 ## Context and problem
 
