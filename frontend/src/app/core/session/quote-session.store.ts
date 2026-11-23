@@ -4,9 +4,44 @@ export const QUOTE_SESSION_KEY = 'quote-session';
 
 export type Step1Values = Record<string, string | boolean>;
 
+/** What the confirmation needs after paying (ADR 0006). */
+export interface QuoteReceipt {
+  quoteNumber: string;
+  countryCode: string;
+  planName: string;
+  /** Whole units of `currency`. */
+  amount: number;
+  currency: string;
+  numberLocale: string;
+  /** ISO date-time. */
+  paidAt: string;
+}
+
 export interface QuoteSession {
   countryCode: string;
   data: Record<string, unknown>;
+  termsAccepted?: boolean;
+  receipt?: QuoteReceipt | null;
+}
+
+function without(session: QuoteSession, key: 'termsAccepted' | 'receipt'): QuoteSession {
+  const copy = { ...session };
+  delete copy[key];
+  return copy;
+}
+
+function isReceipt(value: unknown): value is QuoteReceipt {
+  if (typeof value !== 'object' || value === null) return false;
+  const r = value as Record<string, unknown>;
+  return (
+    typeof r['quoteNumber'] === 'string' &&
+    typeof r['countryCode'] === 'string' &&
+    typeof r['planName'] === 'string' &&
+    typeof r['amount'] === 'number' &&
+    typeof r['currency'] === 'string' &&
+    typeof r['numberLocale'] === 'string' &&
+    typeof r['paidAt'] === 'string'
+  );
 }
 
 /** Single persistence helper for the quote wizard (sessionStorage). Never stores tokens. */
@@ -18,11 +53,14 @@ export class QuoteSessionStore {
       if (!raw) return null;
       const parsed: unknown = JSON.parse(raw);
       if (typeof parsed !== 'object' || parsed === null) return null;
-      const { countryCode, data } = parsed as Partial<QuoteSession>;
+      const { countryCode, data, termsAccepted, receipt } = parsed as Partial<QuoteSession>;
       if (typeof countryCode !== 'string' || !countryCode) return null;
       const safeData =
         typeof data === 'object' && data !== null && !Array.isArray(data) ? data : {};
-      return { countryCode, data: safeData };
+      const session: QuoteSession = { countryCode, data: safeData };
+      if (termsAccepted === true) session.termsAccepted = true;
+      if (isReceipt(receipt)) session.receipt = receipt;
+      return session;
     } catch {
       return null;
     }
@@ -55,16 +93,13 @@ export class QuoteSessionStore {
     if (!current) return;
     const rest = { ...current.data };
     delete rest['step1Completed'];
-    this.write({ countryCode: current.countryCode, data: { ...rest, step1: { ...values } } });
+    this.write({ ...current, data: { ...rest, step1: { ...values } } });
   }
 
   markStep1Completed(): void {
     const current = this.read();
     if (!current) return;
-    this.write({
-      countryCode: current.countryCode,
-      data: { ...current.data, step1Completed: true },
-    });
+    this.write({ ...current, data: { ...current.data, step1Completed: true } });
   }
 
   /** Step 1 no longer counts as complete (its saved values failed the re-check). */
@@ -73,17 +108,14 @@ export class QuoteSessionStore {
     if (!current) return;
     const rest = { ...current.data };
     delete rest['step1Completed'];
-    this.write({ countryCode: current.countryCode, data: rest });
+    this.write({ ...current, data: rest });
   }
 
   /** R-02: the guard asks step 1 to show its errors once (consumed by `consumeStep1Review`). */
   flagStep1Review(): void {
     const current = this.read();
     if (!current) return;
-    this.write({
-      countryCode: current.countryCode,
-      data: { ...current.data, step1Review: true },
-    });
+    this.write({ ...current, data: { ...current.data, step1Review: true } });
   }
 
   /** Returns true once after `flagStep1Review`, then clears the flag. */
@@ -92,7 +124,7 @@ export class QuoteSessionStore {
     if (current?.data['step1Review'] !== true) return false;
     const rest = { ...current.data };
     delete rest['step1Review'];
-    this.write({ countryCode: current.countryCode, data: rest });
+    this.write({ ...current, data: rest });
     return true;
   }
 
@@ -104,7 +136,7 @@ export class QuoteSessionStore {
   savePlan(planId: string): void {
     const current = this.read();
     if (!current) return;
-    this.write({ countryCode: current.countryCode, data: { ...current.data, planId } });
+    this.write({ ...current, data: { ...current.data, planId } });
   }
 
   readPlanId(): string | null {
@@ -117,20 +149,52 @@ export class QuoteSessionStore {
     if (!current) return;
     const rest = { ...current.data };
     delete rest['planId'];
-    this.write({ countryCode: current.countryCode, data: rest });
+    this.write({ ...current, data: rest });
   }
 
   /** Same country keeps data; a different country resets it. */
   start(countryCode: string): void {
     const current = this.read();
-    const data = current?.countryCode === countryCode ? current.data : {};
-    this.write({ countryCode, data });
+    if (current?.countryCode === countryCode) {
+      this.write(without(current, 'receipt'));
+    } else {
+      this.write({ countryCode, data: {} });
+    }
   }
 
   /** Keeps the country, empties the form data. */
   discardData(): void {
     const current = this.read();
     if (current) this.write({ countryCode: current.countryCode, data: {} });
+  }
+
+  /** Records that the person accepted (or un-ticked) the country's terms. */
+  acceptTerms(accepted: boolean): void {
+    const current = this.read();
+    if (!current) return;
+    const rest = without(current, 'termsAccepted');
+    this.write(accepted ? { ...rest, termsAccepted: true } : rest);
+  }
+
+  readTermsAccepted(): boolean {
+    return this.read()?.termsAccepted === true;
+  }
+
+  /** One write after an approved payment: keeps only the receipt (FR-011). */
+  completePayment(receipt: QuoteReceipt): void {
+    const current = this.read();
+    if (!current) return;
+    this.write({ countryCode: current.countryCode, data: {}, receipt });
+  }
+
+  readReceipt(): QuoteReceipt | null {
+    return this.read()?.receipt ?? null;
+  }
+
+  clearReceipt(): void {
+    const current = this.read();
+    if (!current) return;
+    this.write(without(current, 'receipt'));
   }
 
   clear(): void {

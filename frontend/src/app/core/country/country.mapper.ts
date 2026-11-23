@@ -1,3 +1,4 @@
+import { mapRichText } from '../../shared/ui/rich-text/rich-text.mapper';
 import { AgeBand, AgeBandDto, Country, CountryDto } from './country.model';
 
 const DEFAULT_LEGAL_AGE = 18;
@@ -31,6 +32,7 @@ export function mapCountry(dto: CountryDto): Country {
     vehicleAgeBands: mapAgeBands(dto.vehicleAgeBands),
     iconUrl: dto.icon?.url ?? null,
     iconAlt: dto.icon?.alternativeText || dto.name,
+    termsAndConditions: mapRichText(dto.termsAndConditions),
   };
 }
 

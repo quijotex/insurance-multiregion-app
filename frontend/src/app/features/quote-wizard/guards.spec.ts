@@ -10,8 +10,8 @@ import { countryGuard } from './country.guard';
 import { switchConfirmGuard } from './switch-confirm.guard';
 import { wizardEntryGuard } from './wizard-entry.guard';
 
-const CO: Country = { code: 'co', name: 'Colombia', legalAge: 18, currency: 'COP', numberLocale: 'es-CO', driverAgeBands: [], vehicleAgeBands: [], iconUrl: '/uploads/co.svg', iconAlt: 'Bandera de Colombia' };
-const CL: Country = { code: 'cl', name: 'Chile', legalAge: 18, currency: 'CLP', numberLocale: 'es-CL', driverAgeBands: [], vehicleAgeBands: [], iconUrl: '/uploads/cl.svg', iconAlt: 'Bandera de Chile' };
+const CO: Country = { code: 'co', name: 'Colombia', legalAge: 18, currency: 'COP', numberLocale: 'es-CO', driverAgeBands: [], vehicleAgeBands: [], termsAndConditions: [], iconUrl: '/uploads/co.svg', iconAlt: 'Bandera de Colombia' };
+const CL: Country = { code: 'cl', name: 'Chile', legalAge: 18, currency: 'CLP', numberLocale: 'es-CL', driverAgeBands: [], vehicleAgeBands: [], termsAndConditions: [], iconUrl: '/uploads/cl.svg', iconAlt: 'Bandera de Chile' };
 
 describe('US-00 · quote wizard entry guards', () => {
   let load: () => Observable<Country[]>;

@@ -67,6 +67,11 @@
       "repeatable": true,
       "component": "pricing.age-band",
       "description": "Monthly price = base price × driver-age factor × vehicle-age factor. The first band that covers the age applies; no band → factor 1. Not shown to customers (ADR 0005)."
+    },
+    "termsAndConditions": {
+      "type": "blocks",
+      "required": false,
+      "description": "Términos y condiciones que la persona acepta antes de pagar. Usa títulos, párrafos, negritas, listas y enlaces; las imágenes y el código no se muestran."
     }
   }
 }

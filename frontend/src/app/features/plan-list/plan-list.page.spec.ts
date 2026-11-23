@@ -16,6 +16,7 @@ const COUNTRY: Country = {
   currency: 'COP',
   numberLocale: 'es-CO',
   driverAgeBands: [],
+  termsAndConditions: [],
   vehicleAgeBands: [],
   iconUrl: null,
   iconAlt: '',

@@ -24,6 +24,7 @@ function field(partial: Partial<FormFieldDescriptor> & { key: string }): FormFie
     options: [],
     rules: { type, required: true, min: null, max: null, pattern: null, validators: [] },
     inputLimits: { allowedCharacters: null, maxLength: null },
+    maskedInSummary: false,
     ...partial,
   };
 }

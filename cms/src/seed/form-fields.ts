@@ -35,6 +35,7 @@ interface SeedField {
     allowedCharacters?: 'digits' | 'alphanumeric' | 'rut';
     maxLength?: number;
   };
+  maskedInSummary?: boolean;
 }
 
 const opts = (labels: string[]): SeedOption[] => labels.map((l) => ({ label: l, value: l }));
@@ -144,6 +145,7 @@ const CO_FIELDS: SeedField[] = withOrder([
     placeholder: 'Ej: 1020304050',
     errorMessage: 'Escribe de 6 a 10 dígitos, sin puntos ni espacios.',
     validations: { pattern: CO_DOCUMENT_NUMBER_PATTERN, allowedCharacters: 'digits', maxLength: 10 },
+    maskedInSummary: true,
   },
   fullName,
   birthDate,
@@ -191,6 +193,7 @@ const CL_FIELDS: SeedField[] = withOrder([
     placeholder: 'Ej: 12.345.678-5',
     errorMessage: 'Escribe un RUT válido, por ejemplo 12.345.678-5.',
     validations: { pattern: CL_RUT_PATTERN, validators: [{ name: 'rut' }], allowedCharacters: 'rut', maxLength: 12 },
+    maskedInSummary: true,
   },
   fullName,
   birthDate,
@@ -246,6 +249,27 @@ export async function backfillLegalAge(strapi: Core.Strapi): Promise<void> {
   }
 }
 
+const MASKED_KEYS = ['documentNumber', 'rut'];
+
+/** Pure (R4): identity-document rows that get the flag, i.e. where it was never set (null/undefined). */
+export function rowsNeedingMaskedFlag<T extends { key?: string; maskedInSummary?: boolean | null }>(rows: T[]): T[] {
+  return rows.filter(
+    (r) => MASKED_KEYS.includes(r.key ?? '') && (r.maskedInSummary === null || r.maskedInSummary === undefined),
+  );
+}
+
+/** Draft and published rows alike, at the DB layer; a boolean scalar needs no publish step. */
+export async function backfillMaskedInSummary(strapi: Core.Strapi): Promise<void> {
+  const rows = (await strapi.db.query(FIELD_UID).findMany({})) as Array<{
+    id: number;
+    key?: string;
+    maskedInSummary?: boolean | null;
+  }>;
+  for (const row of rowsNeedingMaskedFlag(rows)) {
+    await strapi.db.query(FIELD_UID).update({ where: { id: row.id }, data: { maskedInSummary: true } });
+  }
+}
+
 export async function seedFormFields(strapi: Core.Strapi): Promise<void> {
   const total = await strapi.documents(FIELD_UID).count({});
   if (total > 0) return;
@@ -255,7 +279,7 @@ export async function seedFormFields(strapi: Core.Strapi): Promise<void> {
     if (!country) continue;
     for (const field of fields) {
       await strapi.documents(FIELD_UID).create({
-        data: { ...field, required: true, country: country.documentId },
+        data: { maskedInSummary: false, ...field, required: true, country: country.documentId },
         status: 'published',
       });
     }

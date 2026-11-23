@@ -19,6 +19,7 @@ const FIELD: FormFieldDescriptor = {
   options: [],
   rules: { type: 'text', required: true, min: null, max: null, pattern: null, validators: [] },
   inputLimits: { allowedCharacters: null, maxLength: null },
+  maskedInSummary: false,
 };
 
 @Component({

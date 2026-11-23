@@ -153,3 +153,69 @@ describe('US-01 · FR-009 step 1 persistence', () => {
     expect(() => store.saveStep1({ a: 'x' })).not.toThrow();
   });
 });
+
+describe('US-03 · FR-011 terms acceptance and receipt-only session', () => {
+  let store: QuoteSessionStore;
+  const receipt = {
+    quoteNumber: 'CO-20261122-7KQ4MZ',
+    countryCode: 'co',
+    planName: 'Plan Básico',
+    amount: 145000,
+    currency: 'COP',
+    numberLocale: 'es-CO',
+    paidAt: '2026-11-22T10:00:00.000Z',
+  };
+
+  beforeEach(() => {
+    sessionStorage.clear();
+    store = new QuoteSessionStore();
+    store.start('co');
+  });
+
+  it('keeps the acceptance when step 1 or the plan change', () => {
+    store.acceptTerms(true);
+    store.saveStep1({ name: 'Ana' });
+    store.savePlan('abc');
+    expect(store.readTermsAccepted()).toBe(true);
+    store.acceptTerms(false);
+    expect(store.readTermsAccepted()).toBe(false);
+  });
+
+  it('completePayment keeps only the receipt', () => {
+    store.saveStep1({ name: 'Ana' });
+    store.markStep1Completed();
+    store.savePlan('abc');
+    store.acceptTerms(true);
+    store.completePayment(receipt);
+    expect(new QuoteSessionStore().read()).toEqual({ countryCode: 'co', data: {}, receipt });
+    expect(store.readReceipt()).toEqual(receipt);
+    expect(store.readPlanId()).toBeNull();
+    expect(store.isStep1Completed()).toBe(false);
+    expect(store.readTermsAccepted()).toBe(false);
+  });
+
+  it('start (same or other country), discardData and clearReceipt drop the receipt', () => {
+    store.completePayment(receipt);
+    store.start('co');
+    expect(store.readReceipt()).toBeNull();
+    store.completePayment(receipt);
+    store.start('cl');
+    expect(store.readReceipt()).toBeNull();
+    store.completePayment({ ...receipt, countryCode: 'cl' });
+    store.discardData();
+    expect(store.readReceipt()).toBeNull();
+    store.completePayment(receipt);
+    store.clearReceipt();
+    expect(store.readReceipt()).toBeNull();
+    expect(store.lastCountryCode()).toBe('cl');
+  });
+
+  it('discardData and a country change drop the acceptance', () => {
+    store.acceptTerms(true);
+    store.discardData();
+    expect(store.readTermsAccepted()).toBe(false);
+    store.acceptTerms(true);
+    store.start('cl');
+    expect(store.readTermsAccepted()).toBe(false);
+  });
+});
