@@ -79,9 +79,4 @@ describe('US-03 · FR-001 summary rows from the configured fields', () => {
       'Sí',
     );
   });
-
-  it('ignores values of fields that are no longer configured', () => {
-    const rows = buildSummaryRows({ policyholder: [], vehicle: [] }, values, 'es-CO');
-    expect(rows).toEqual({ policyholder: [], vehicle: [] });
-  });
 });

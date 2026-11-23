@@ -59,6 +59,11 @@
 - [x] T012 [ORCH] US-03 Update the README (terms and the masked flag in the admin, the simulated payment rule and test values) and check the quickstart (SC-002) — `README.md`
 - [ ] T013 [ORCH] US-03 Code review rounds recorded in `review.md`, then the handoff
 
+## Phase 4: Review fixes (code review rounds 1–2)
+
+- [x] T014 [CMS] US-03 R-01: the terms backfill runs once per database (core-store marker; a fresh seed sets it). Regression test "R-01 · marker present: no backfill even when terms are empty; marker absent: backfill runs" (FR-005, FR-014) — `cms/src/seed/countries.ts`, `cms/src/seed/summary-backfill.test.ts`
+- [x] T015 [FE] US-03 R-02–R-09, R-12, R-13: terms need visible text, with regression test "R-02 · terms with no visible text block the payment"; pay button keeps focus and a rejection focuses the alert; test FR names; the missing UT-03 example; keyboard-scrollable terms dialog; overlay token; `aria-required` on the acceptance; single focus on dialog close; two tests beyond the approved examples removed (FR-006, FR-008, FR-010, FR-013) — `frontend/src/app/features/summary/**`, `frontend/src/app/shared/ui/rich-text/rich-text.mapper.ts`, `frontend/src/styles.scss`
+
 ## Dependencies
 
 - T001 → T002 (CMS chain, one agent), in parallel with the frontend foundation.

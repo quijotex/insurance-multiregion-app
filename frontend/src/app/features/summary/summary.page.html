@@ -127,6 +127,7 @@
               class="checkbox__input"
               type="checkbox"
               aria-labelledby="terms-accepted-label terms-link"
+              aria-required="true"
               [checked]="accepted()"
               [disabled]="processing()"
               (change)="toggleTerms($event)"

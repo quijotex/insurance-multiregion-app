@@ -7,10 +7,6 @@ describe('US-03 · FR-009 quote number', () => {
     expect(createQuoteNumber('co', now)).toMatch(/^CO-20261122-[2-9A-HJKMNP-Z]{6}$/);
   });
 
-  it('is built from the injected random source', () => {
-    expect(createQuoteNumber('CL', now, () => 0)).toBe('CL-20261122-222222');
-  });
-
   it('gives 1000 unique numbers', () => {
     const numbers = new Set(Array.from({ length: 1000 }, () => createQuoteNumber('CO', now)));
     expect(numbers.size).toBe(1000);
