@@ -117,4 +117,26 @@ describe('US-02 · FR-002–FR-010 plan list page', () => {
     expect(el.querySelector('[role="alert"]')).toBeNull();
     expect(radios()).toHaveLength(3);
   });
+
+  it('G3 · more than 3 plans use the slider on desktop', async () => {
+    vi.stubGlobal('matchMedia', () => ({
+      matches: false,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    }));
+    try {
+      load.mockReturnValue(of([...PLANS, plan('d', 250000)]));
+      await setup();
+      expect(el.querySelectorAll('.plan-list__nav')).toHaveLength(2);
+      expect(el.querySelector('.plan-list__dots')).not.toBeNull();
+      fixture.destroy();
+
+      load.mockReturnValue(of(PLANS));
+      await setup();
+      expect(el.querySelector('.plan-list__nav')).toBeNull();
+      expect(el.querySelector('.plan-list__dots')).toBeNull();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });

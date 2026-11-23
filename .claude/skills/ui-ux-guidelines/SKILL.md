@@ -142,7 +142,7 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
   - Alignment and spacing: `.d-flex`, `.flex-column`, `.justify-content-*`, `.align-items-*`, `.gap-*`, `m-*` / `p-*`, `.text-center` / `.text-md-start`, `.d-none .d-md-block`.
   - Never use Bootstrap colour, typography, border, shadow or component classes (`.btn`, `.card`, `.bg-*`, `.text-primary`, `.fs-*`…). Those come from our tokens and BEM recipes.
   - Component SCSS holds component styling only (look, states, internal spacing with `--space-*`), not page layout.
-- Plan cards: a Swiper slider below 992px (about 1.2 cards on mobile, 2.2 on tablet, with previous/next arrows and dots, opening on the recommended plan, no loop and no autoplay; only the load animation); a 3-column grid from 992px.
+- Plan cards: a Swiper slider below 992px (about 1.2 cards on mobile, 2.2 on tablet) and also from 992px when there are more than 3 plans (3 visible); a 3-column grid from 992px with 3 plans or fewer. The slider opens on the chosen or recommended plan, has no loop and no autoplay (only the load animation), keeps the card rows aligned across slides, and has previous/next arrows vertically centred at its left and right edges, with dots centred below.
 - Header: navy bar with text wordmark; no navigation beyond the wizard.
 
 ## 6. Imagery

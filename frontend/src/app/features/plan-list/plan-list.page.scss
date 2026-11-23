@@ -33,56 +33,95 @@
     padding: var(--space-6) var(--space-1) var(--space-1);
   }
 
-  /* Below 992px: the Swiper slider (classes toggled by the page). */
+  &__stage {
+    position: relative;
+
+    @media (min-width: 768px) {
+      &--slider {
+        padding-inline: calc(48px + var(--space-2));
+      }
+    }
+  }
+
   &__item.swiper-slide {
     display: flex;
     height: auto;
   }
 
   /*
-   * Layout exception (ADR 0003): Bootstrap columns cannot share rows between cards, so from 992px
-   * the track is a CSS grid whose items subgrid 4 rows; that keeps name, price, coverages and
-   * benefits aligned across cards (agreed at Gate 2). Everything else uses Bootstrap row/col.
-   * From 992px: three columns; each item spans 4 rows that the cards share (subgrid). */
+   * Layout exception (ADR 0003): from 992px the grid (3 plans or fewer) is a CSS grid whose items
+   * subgrid 4 rows, so name, price, coverages and benefits align across cards (Gate 2).
+   */
   @media (min-width: 992px) {
-    &__track {
+    &__track:not(.swiper-wrapper) {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       column-gap: var(--space-6);
-      row-gap: 0;
     }
 
-    &__item {
+    &__item:not(.swiper-slide) {
       display: grid;
       grid-row: span 4;
       grid-template-rows: subgrid;
     }
   }
 
+  /* Slider: each row takes the tallest height across slides (--plan-row-N, set by the page). */
+  &__viewport.swiper .plan-card {
+    grid-row: auto;
+    grid-template-rows:
+      minmax(var(--plan-row-1, 0px), auto) minmax(var(--plan-row-2, 0px), auto)
+      minmax(var(--plan-row-3, 0px), auto) minmax(var(--plan-row-4, 0px), auto);
+
+    > * {
+      align-self: start;
+    }
+  }
+
   &__controls {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: var(--space-4);
     margin-top: var(--space-4);
   }
 
+  /* Arrows: centred on the cards (the viewport has more room above than below). */
   &__nav {
+    position: absolute;
+    top: calc(50% + (var(--space-6) - var(--space-1)) / 2);
+    z-index: 2;
     display: inline-flex;
-    flex: none;
     align-items: center;
     justify-content: center;
     width: 48px;
     height: 48px;
     padding: 0;
-    border: 1px solid var(--color-brand);
+    border: 2px solid var(--color-action);
     border-radius: 50%;
     background: var(--color-surface);
     color: var(--color-brand);
     cursor: pointer;
+    transform: translateY(-50%);
+
+    &--prev {
+      left: var(--space-1);
+    }
+
+    &--next {
+      right: var(--space-1);
+    }
+
+    @media (min-width: 768px) {
+      &--prev {
+        left: 0;
+      }
+
+      &--next {
+        right: 0;
+      }
+    }
 
     &:hover:not(:disabled) {
-      background: var(--color-surface-alt);
+      background: var(--color-surface-highlight);
     }
 
     &:focus-visible {
@@ -92,7 +131,7 @@
 
     &:disabled,
     &.swiper-button-disabled {
-      border-color: transparent;
+      border-color: var(--color-border);
       background: var(--color-disabled-bg);
       color: var(--color-disabled-text);
       cursor: not-allowed;

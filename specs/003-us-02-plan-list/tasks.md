@@ -106,6 +106,17 @@
 - [x] T016 [ORCH] US-02 Update the README (plans in the admin, the price bands) and check the quickstart (SC-001) — `README.md`
 - [x] T017 [ORCH] US-02 Code review rounds recorded in `review.md`, then the handoff
 
+## Phase 5: Gate 3 corrections (human manual test, 2026-11-22)
+
+- [ ] T018 [FE] US-02 Slider arrows sit at the slider's left and right edges, vertically centred on the cards. They sit in the side gutters from 768px and overlay the track edges (white fill, action ring, 48px) below that. The dots stay centred below the slider (FR-013) — `frontend/src/app/features/plan-list/plan-list.page.*`
+- [ ] T019 [FE] US-02 More than 3 plans → a slider on desktop as well:
+  - **Up to 3 plans from 992px:** the 3-column grid stays as it is.
+  - **More than 3 plans from 992px:** Swiper with 3 visible slides, arrows and dots, no loop, no autoplay.
+  - **Below 992px:** always the slider.
+  - **Row alignment in the slider:** the name, price, Coberturas and Beneficios rows line up across slides. A ResizeObserver syncs each row's height to the tallest card, replacing the "equal heights only" trade-off from R13.
+  - **Regression test "G3 · more than 3 plans use the slider on desktop":** 4 plans on a desktop viewport → slider mode, with arrows and dots; 3 plans → grid.
+  (FR-002, FR-013) — `frontend/src/app/features/plan-list/**` (depends on T018)
+
 ## Dependencies
 
 - T002 → T003, T004 → T005 → T006 (CMS chain, one agent).

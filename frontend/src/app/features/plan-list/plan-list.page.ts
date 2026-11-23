@@ -25,8 +25,12 @@ import { Ages, agesFromStep1 } from './pricing/ages-from-step1';
 import { formatPrice } from './pricing/format-price';
 import { simulatePrice } from './pricing/simulate-price';
 
-/** Below Bootstrap's lg breakpoint the cards become a Swiper slider (R13). */
-const SLIDER_QUERY = '(max-width: 991.98px)';
+/** Below Bootstrap's lg breakpoint the cards always become a Swiper slider (R13). */
+const NARROW_QUERY = '(max-width: 991.98px)';
+/** From lg up, more than this many plans use the slider (3 visible) instead of the grid (G3). */
+const MAX_GRID_PLANS = 3;
+const ROW_SELECTOR =
+  ':scope > .plan-card__head, :scope > .plan-card__price-row, :scope > .plan-card__section';
 
 @Component({
   selector: 'app-plan-list-page',
@@ -49,12 +53,13 @@ export class PlanListPage {
   protected readonly steps = ['Tus datos', 'Elige tu plan', 'Resumen'];
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
-  protected readonly slider = signal(false);
+  private readonly narrow = signal(false);
   protected readonly selectedId = signal<string | null>(null);
   private readonly plans = signal<Plan[]>([]);
   private readonly ages = signal<Ages>({ driverAge: null, vehicleAge: null });
   private loadSub: Subscription | null = null;
   private swiper: Swiper | null = null;
+  private rowObserver: ResizeObserver | null = null;
 
   protected readonly offers = computed<PlanOffer[]>(() => {
     const country = this.wizardCountry.country();
@@ -65,7 +70,11 @@ export class PlanListPage {
       return { plan, finalPrice, formattedPrice: formatPrice(finalPrice, country) };
     });
   });
-  protected readonly isEmpty = computed(
+  /** Slider below 992px, or from 992px when there are more than 3 plans. */
+  protected readonly slider = computed(
+    () => this.narrow() || this.offers().length > MAX_GRID_PLANS,
+  );
+  protected readonly isEmpty =computed(
     () => !this.loading() && !this.failed() && this.offers().length === 0,
   );
   protected readonly actionsDelay = computed(() => this.offers().length + 1);
@@ -134,9 +143,9 @@ export class PlanListPage {
 
   private watchViewport(): void {
     if (typeof matchMedia !== 'function') return;
-    const query = matchMedia(SLIDER_QUERY);
-    this.slider.set(query.matches);
-    const onChange = (event: MediaQueryListEvent) => this.slider.set(event.matches);
+    const query = matchMedia(NARROW_QUERY);
+    this.narrow.set(query.matches);
+    const onChange = (event: MediaQueryListEvent) => this.narrow.set(event.matches);
     query.addEventListener('change', onChange);
     this.destroyRef.onDestroy(() => query.removeEventListener('change', onChange));
   }
@@ -154,16 +163,22 @@ export class PlanListPage {
     const selectedId = untracked(this.selectedId);
     const chosen = offers.findIndex((offer) => offer.plan.id === selectedId);
     const highlighted = offers.findIndex((offer) => offer.plan.highlighted);
+    // From 992px 3 slides are visible and not centred: clamp so the last 3 fill the track.
+    const start = Math.max(0, chosen >= 0 ? chosen : highlighted);
+    const initialSlide = this.narrow() ? start : Math.min(start, Math.max(0, offers.length - 3));
     this.swiper = new Swiper(container, {
       modules: [Navigation, Pagination, A11y, Keyboard],
-      initialSlide: Math.max(0, chosen >= 0 ? chosen : highlighted),
+      initialSlide,
       slidesPerView: 1.2,
       centeredSlides: true,
       spaceBetween: 16,
       loop: false,
       // R-08: no slide transition under prefers-reduced-motion.
       speed: this.reducedMotion() ? 0 : 300,
-      breakpoints: { 768: { slidesPerView: 2.2 } },
+      breakpoints: {
+        768: { slidesPerView: 2.2 },
+        992: { slidesPerView: 3, centeredSlides: false, spaceBetween: 24 },
+      },
       keyboard: { enabled: true, onlyInViewport: true },
       navigation: {
         prevEl: root.querySelector<HTMLElement>('.plan-list__nav--prev'),
@@ -186,9 +201,28 @@ export class PlanListPage {
         slideLabelMessage: 'Plan {{index}} de {{slidesLength}}',
       },
     });
+    this.syncRows(container);
+  }
+
+  /** Slider only: every row (name, price, coverages, benefits) takes the tallest height across slides. */
+  private syncRows(container: HTMLElement): void {
+    if (typeof ResizeObserver !== 'function') return;
+    const cards = Array.from(container.querySelectorAll<HTMLElement>('.plan-card'));
+    const rows = cards.map((card) => Array.from(card.querySelectorAll<HTMLElement>(ROW_SELECTOR)));
+    const apply = () => {
+      for (let i = 0; i < 4; i++) {
+        const tallest = Math.max(0, ...rows.map((r) => r[i]?.getBoundingClientRect().height ?? 0));
+        container.style.setProperty(`--plan-row-${i + 1}`, `${Math.ceil(tallest)}px`);
+      }
+    };
+    this.rowObserver = new ResizeObserver(apply);
+    rows.flat().forEach((row) => this.rowObserver?.observe(row));
+    apply();
   }
 
   private unmountSwiper(): void {
+    this.rowObserver?.disconnect();
+    this.rowObserver = null;
     this.swiper?.destroy(true, true);
     this.swiper = null;
   }

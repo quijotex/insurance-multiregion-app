@@ -52,37 +52,41 @@
   } @else {
     <fieldset class="plan-list__group">
       <legend class="visually-hidden">Elige tu plan</legend>
-      <div class="plan-list__viewport" [class.swiper]="slider()">
-        <div class="plan-list__track" [class.swiper-wrapper]="slider()">
-          @for (offer of offers(); track offer.plan.id; let i = $index) {
-            <div
-              class="plan-list__item plan-list__reveal"
-              [class.swiper-slide]="slider()"
-              [style.--reveal-index]="i + 1"
-            >
-              <app-plan-card
-                [offer]="offer"
-                [selected]="selectedId() === offer.plan.id"
-                groupName="plan"
-                (chosen)="choose($event)"
-              />
-            </div>
-          }
+      <div class="plan-list__stage" [class.plan-list__stage--slider]="slider()">
+        <div class="plan-list__viewport" [class.swiper]="slider()">
+          <div class="plan-list__track" [class.swiper-wrapper]="slider()">
+            @for (offer of offers(); track offer.plan.id; let i = $index) {
+              <div
+                class="plan-list__item plan-list__reveal"
+                [class.swiper-slide]="slider()"
+                [style.--reveal-index]="i + 1"
+              >
+                <app-plan-card
+                  [offer]="offer"
+                  [selected]="selectedId() === offer.plan.id"
+                  groupName="plan"
+                  (chosen)="choose($event)"
+                />
+              </div>
+            }
+          </div>
         </div>
-      </div>
-      @if (slider()) {
-        <div class="plan-list__controls">
+        @if (slider()) {
           <button type="button" class="plan-list__nav plan-list__nav--prev" aria-label="Plan anterior">
             <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
               <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
-          <div class="plan-list__dots"></div>
           <button type="button" class="plan-list__nav plan-list__nav--next" aria-label="Plan siguiente">
             <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
               <path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
+        }
+      </div>
+      @if (slider()) {
+        <div class="plan-list__controls">
+          <div class="plan-list__dots"></div>
         </div>
       }
     </fieldset>
