@@ -55,7 +55,7 @@
 
 ## Phase 3: E2E, review, docs
 
-- [ ] T011 [E2E] US-03 E2E-5 per plan.md (CO full flow: masked cédula, price, CTA disabled, accept, "Procesando…", confirmation with `CO-` number, reload keeps it, Back never shows the CTA) (FR-001–FR-012, SC-003) — `frontend/e2e/us-03-*.spec.ts` (depends on T002, T009, T010)
+- [x] T011 [E2E] US-03 E2E-5 per plan.md (CO full flow: masked cédula, price, CTA disabled, accept, "Procesando…", confirmation with `CO-` number, reload keeps it, Back never shows the CTA) (FR-001–FR-012, SC-003) — `frontend/e2e/us-03-*.spec.ts` (depends on T002, T009, T010)
 - [x] T012 [ORCH] US-03 Update the README (terms and the masked flag in the admin, the simulated payment rule and test values) and check the quickstart (SC-002) — `README.md`
 - [ ] T013 [ORCH] US-03 Code review rounds recorded in `review.md`, then the handoff
 
