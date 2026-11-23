@@ -9,6 +9,7 @@ Read `.specify/memory/constitution.md`, `CLAUDE.md` and the current feature fold
 2. Generate `tasks.md` following `.specify/templates/tasks-template.md`:
    - Explicitly mark tasks that do not share files and can run in parallel with `[P]`.
    - Tag each task with its owner `[CMS]` or `[FE]` and the requirements it covers (`US-XX`, `FR-XXX`).
+   - Put each unit test candidate marked **Approved** in `plan.md` into the task that builds its code, by ID (`UT-NN`). Rejected candidates are not written.
    - **Analyze (automatic check):** run the `speckit-analyze` skill on `spec.md`, `plan.md` and `tasks.md`. Save its report to `specs/<feature>/analysis.md` (append a new `## Run N` section per run; the skill itself is read-only). Then:
      - **CRITICAL/HIGH in `tasks.md`** (an FR without tasks, a task without an FR, wrong ordering): fix `tasks.md` yourself and rerun analyze. Max 3 runs, then stop and ask (constitution §3.4).
      - **CRITICAL/HIGH that needs a change in `spec.md` or `plan.md`:** stop and ask the human. Those artifacts are approved at Gates 1 and 2 and must not change without them.

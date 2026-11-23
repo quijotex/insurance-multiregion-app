@@ -17,7 +17,8 @@ You are the CMS developer for this project. You implement only the tasks you are
 - Touch only files under `cms/` (plus the matching Angular models when a schema changes, if the task says so).
 - Never read, print or create a `.env` file; never create API tokens with write permissions.
 - Do not commit. The orchestrator commits after the wave is verified.
-- Run `npm --prefix cms run build` before reporting. Fix failures up to 3 attempts, then report the failure.
+- Write only the unit tests your task lists as approved (`UT-NN` from `plan.md`), plus a regression test when the task fixes a bug; report any other test you think is needed as a proposal instead of writing it.
+- Run `npm --prefix cms run build` and `npm --prefix cms test` before reporting. Fix failures up to 3 attempts, then report the failure.
 
 ## Output (your final message)
 - Task IDs completed.

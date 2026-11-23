@@ -31,6 +31,7 @@ The full agentic flow (steps, gates, agents) is described in `FLOW.md`.
 
 ## Plan Phase Additions (Gate 2)
 `plan.md` must also contain, when applicable:
+- **Unit test candidates:** list the unit tests worth writing (business logic, validations, calculations, data mapping, critical interactions; never trivial rendering or getters), each with **what** it checks and **why** it matters, as a table (ID `UT-NN`, area, what, why). Table-driven tests state their example count. The human marks each one **Approved** or **Rejected** at Gate 2. Developer agents write only approved unit tests; a regression test for a bug found after Gate 2 (review finding or Gate 3 correction) is allowed and must be named in its task.
 - **E2E candidates:** list only critical flows that deserve an e2e test, each with a one-line justification. The human marks each one **Approved** or **Rejected** at Gate 2. The `e2e-tester` agent runs only for approved candidates.
 - **Design options:** for every client-facing view, 2–3 design options based on the `ui-ux-guidelines` skill, with a recommendation. The human picks one at Gate 2.
 - **ADRs:** every architectural decision gets an ADR in `docs/adr/` (context, alternatives, consequences), linked from `plan.md`.
