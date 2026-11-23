@@ -43,6 +43,31 @@ describe('US-03 · FR-005 rich text mapper', () => {
     ]);
   });
 
+  it('R-10 · a link nested in a link becomes its text', () => {
+    const [block] = mapRichText([
+      {
+        type: 'paragraph',
+        children: [
+          {
+            type: 'link',
+            url: 'https://example.com/a',
+            children: [text('ver '), { type: 'link', url: 'https://example.com/b', children: [text('más')] }],
+          },
+        ],
+      },
+    ]);
+    expect(block.type === 'paragraph' && block.children).toEqual([
+      {
+        type: 'link',
+        url: 'https://example.com/a',
+        children: [
+          { type: 'text', text: 'ver ' },
+          { type: 'text', text: 'más' },
+        ],
+      },
+    ]);
+  });
+
   it('returns [] for missing or malformed input', () => {
     expect(mapRichText(undefined)).toEqual([]);
     expect(mapRichText({})).toEqual([]);

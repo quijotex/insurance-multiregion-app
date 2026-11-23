@@ -15,7 +15,8 @@ function isSafeUrl(url: unknown): url is string {
   }
 }
 
-function mapInlines(raw: unknown): RichTextInline[] {
+/** Inside a link, `allowLinks` is false: a nested link becomes its text (R-10, no link inside a link). */
+function mapInlines(raw: unknown, allowLinks = true): RichTextInline[] {
   if (!Array.isArray(raw)) return [];
   const result: RichTextInline[] = [];
   for (const node of raw) {
@@ -27,8 +28,8 @@ function mapInlines(raw: unknown): RichTextInline[] {
       if (node['underline'] === true) text.underline = true;
       result.push(text);
     } else if (node['type'] === 'link') {
-      const children = mapInlines(node['children']);
-      if (isSafeUrl(node['url'])) {
+      const children = mapInlines(node['children'], false);
+      if (allowLinks && isSafeUrl(node['url'])) {
         result.push({ type: 'link', url: node['url'].trim(), children });
       } else {
         result.push(...children);

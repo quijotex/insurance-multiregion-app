@@ -19,7 +19,7 @@ import { StepperComponent } from '../../shared/ui/stepper/stepper.component';
 import { Plan } from '../plan-list/data/plan.model';
 import { PlanService } from '../plan-list/data/plan.service';
 import { agesFromStep1 } from '../plan-list/pricing/ages-from-step1';
-import { formatPrice } from '../plan-list/pricing/format-price';
+import { formatAmount } from '../plan-list/pricing/format-price';
 import { simulatePrice } from '../plan-list/pricing/simulate-price';
 import { FormFieldService } from '../quote-form/data/form-field.service';
 import { FormSections } from '../quote-form/data/form-field.model';
@@ -36,8 +36,6 @@ interface ChosenPlan {
   /** Amount only, e.g. "$ 189.000" (the "/ mes" is rendered separately). */
   amount: string;
 }
-
-const PER_MONTH_SUFFIX = / \/ mes$/;
 
 @Component({
   selector: 'app-summary-page',
@@ -124,7 +122,7 @@ export class SummaryPage {
         this.chosen.set({
           plan,
           finalPrice,
-          amount: formatPrice(finalPrice, country).replace(PER_MONTH_SUFFIX, ''),
+          amount: formatAmount(finalPrice, country),
         });
         this.loading.set(false);
       },
