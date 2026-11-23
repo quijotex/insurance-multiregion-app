@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Approved (Gate 1) — 2026-11-22
 
 **Input**: User story [US-02](../../docs/user-stories/US-02.md) (verbatim business story, the source of truth). Builds on [US-01](../002-us-01-policyholder-vehicle-form/spec.md), which provides the step 1 form, the tab's quote session (step 1 values and completion) and a step 2 placeholder at `/:country/quote/plans`. Architecture: [ADR 0001](../../docs/adr/0001-multi-country-content-strategy.md) (Plan collection, currency on Country, limits of configurability), [ADR 0003](../../docs/adr/0003-bootstrap-grid-for-layouts.md) (layout), [ADR 0004](../../docs/adr/0004-dynamic-form-from-cms.md) (step 1 values by field key).
 
