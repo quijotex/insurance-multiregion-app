@@ -3,7 +3,7 @@
 - **Status:** Accepted (Gate 2, US-00 — 2026-11-22)
 - **Date:** 2026-11-21
 - **Related:** US-00, US-01, US-02, US-03
-- **Amended:** Gate 2, US-01 — 2026-11-22 (FormField `section`, save validation, `legalAge`, published-only FormField `find`); Gate 2, US-02 — 2026-11-22 (Plan save check and published-only `find`, `plan.item` component, Country `currency`, `numberLocale` and age bands, ADR 0005)
+- **Amended:** Gate 2, US-01 — 2026-11-22 (FormField `section`, save validation, `legalAge`, published-only FormField `find`); Gate 2, US-02 — 2026-11-22 (Plan save check and published-only `find`, `plan.item` component, Country `currency`, `numberLocale` and age bands, ADR 0005); Gate 2, US-03 — 2026-11-22 (FormField `maskedInSummary`, Country `termsAndConditions` as `blocks`, ADRs 0006 and 0007)
 
 ## Context and problem
 
@@ -28,11 +28,11 @@ So we need to decide two things:
 
 Let's take a **Country as collection** approach, and **FormField** and **Plan** as collections too, with a many-to-one relation towards Country. All three use native draft/published.
 
-- **Country** saves `code`, `name`, `icon` (media), `order`, `active`, `currency`, `numberLocale` (e.g. `es-CO`), `legalAge` and `termsAndConditions`. Each story adds the fields it uses (US-00: `code`, `name`, `icon`, `order`, `active`).
+- **Country** saves `code`, `name`, `icon` (media), `order`, `active`, `currency`, `numberLocale` (e.g. `es-CO`), `legalAge` and `termsAndConditions` (Strapi `blocks` rich text, rendered without HTML: [ADR 0007](0007-rich-text-terms-without-html.md), US-03). Each story adds the fields it uses (US-00: `code`, `name`, `icon`, `order`, `active`).
 - **FormField** saves `key`, `label`, `type`, `required`, `helpText`, `placeholder`, `errorMessage`, `order` and `section` (`policyholder` | `vehicle`; no `step`, because only step 1 is a configurable form), plus two components:
   - `validations`: `min`, `max`, `pattern`, and `validators` with name and value.
   - `options`: for selects.
-  - `key` is the stable technical name of the field (e.g. `documentNumber`, `vehicleYear`, `birthDate`). Angular uses it as the form control name, and the summary (masking) and the price rule use it to find values. Labels can't play this role because the business edits them. Unique per country.
+  - `key` is the stable technical name of the field (e.g. `documentNumber`, `vehicleYear`, `birthDate`). Angular uses it as the form control name, and the price rule uses it to find values. Masking on the summary does **not** use keys (Chile's document key is `rut`, Colombia's `documentNumber`): FormField has a `maskedInSummary` boolean that editors set (US-03), which also marks the identity document for the simulated payment rule ([ADR 0006](0006-simulated-payment-and-receipt.md)). Labels can't play this role because the business edits them. Unique per country.
   - `type` is an enumeration: `text`, `number`, `select`, `date`, `checkbox`.
 - **Plan** saves `name`, `shortDescription`, `basePrice`, `order`, `recommended`, `active`, and `coverages` and `benefits` as repeatable components.
   - `coverages` and `benefits` use one component, `plan.item` (`text`). The recommended badge text is fixed in Angular (US-02).

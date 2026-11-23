@@ -16,6 +16,8 @@
 - Q: Which rule decides a simulated payment's outcome? → A: Rejected when the identity document ends in "0000"; approved otherwise. Documented in the README and an ADR (FR-008).
 - Q: What happens to the tab's quote data after a successful payment? → A: Form data, plan and acceptance are cleared at once; only the receipt (quote number, plan, amount, date, country) stays, so a reload still shows it. "Nueva cotización" clears it and goes to country selection (FR-011).
 - Q: How do editors write the terms and conditions? → A: Rich text with basic formatting (headings, paragraphs, bold, lists, links), rendered safely with no raw HTML (FR-005).
+- Q (Gate 2, human design review): What does the pay button say? → A: "Quiero mi seguro" (yellow CTA), with no price in it (FR-006, FR-007).
+- Q (Gate 2, human design review): Where are the terms shown? → A: Not as a block on the page. The acceptance reads "*Acepto términos y condiciones", checkbox first, and "términos y condiciones" is a link that opens the country's terms in a dialog. The plan price ends with a matching "*" (FR-006).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -58,13 +60,13 @@ The person reads the terms and conditions configured by the business for their c
 
 **Why this priority**: Paying without accepting the terms is not allowed.
 
-**Independent Test**: Change Chile's terms in the content manager and publish: the Chilean summary shows the new text, Colombia's does not change. "Pagar" stays disabled until the acceptance box is ticked.
+**Independent Test**: Change Chile's terms in the content manager and publish: the Chilean summary shows the new text, Colombia's does not change. "Quiero mi seguro" stays disabled until the acceptance box is ticked.
 
 **Acceptance Scenarios**:
 
 1. **Given** I am on the summary, **When** I view the terms and conditions, **Then** the text is the one published for my country.
-2. **Given** I have not accepted the terms, **When** I view the summary, **Then** "Pagar" is disabled.
-3. **Given** I accept the terms, **When** I view the summary, **Then** "Pagar" is enabled; if I untick them, it is disabled again.
+2. **Given** I have not accepted the terms, **When** I view the summary, **Then** "Quiero mi seguro" is disabled.
+3. **Given** I accept the terms, **When** I view the summary, **Then** "Quiero mi seguro" is enabled; if I untick them, it is disabled again.
 
 ---
 
@@ -74,25 +76,25 @@ The person pays (simulated) and gets a confirmation with a quote number; a faile
 
 **Why this priority**: It closes the quote; without it the person never becomes insured.
 
-**Independent Test**: Accept the terms and press "Pagar": the button is locked and shows progress, then a confirmation shows a quote number. Repeat with an identity document ending in "0000": a clear error appears, the data and the acceptance are kept, and "Pagar" works again.
+**Independent Test**: Accept the terms and press "Quiero mi seguro": the button is locked and shows progress, then a confirmation shows a quote number. Repeat with an identity document ending in "0000": a clear error appears, the data and the acceptance are kept, and "Quiero mi seguro" works again.
 
 **Acceptance Scenarios**:
 
-1. **Given** I accepted the terms, **When** I press "Pagar", **Then** the button is locked and announced as processing until the payment ends, and further presses do nothing.
+1. **Given** I accepted the terms, **When** I press "Quiero mi seguro", **Then** the button is locked and announced as processing until the payment ends, and further presses do nothing.
 2. **Given** the payment succeeds, **When** it ends, **Then** I see a confirmation with a simulated quote number, the plan and the amount paid.
-3. **Given** the payment fails, **When** it ends, **Then** I see a clear error message, my data, plan and acceptance are kept, and I can press "Pagar" again.
+3. **Given** the payment fails, **When** it ends, **Then** I see a clear error message, my data, plan and acceptance are kept, and I can press "Quiero mi seguro" again.
 4. **Given** I see the confirmation, **When** I reload, go back or open the summary again, **Then** the same quote is never paid twice.
 
 ---
 
 ### Edge Cases
 
-- **Terms not configured or not published for a country**: the summary shows an error instead of the terms and "Pagar" stays disabled; a person can never pay without terms to accept.
+- **Terms not configured or not published for a country**: the summary shows an error instead of the terms link and "Quiero mi seguro" stays disabled; a person can never pay without terms to accept.
 - **Content service fails** (country, form fields or plans): the summary shows an error with a retry action, like steps 1 and 2.
 - **Chosen plan no longer offered** when reaching the summary: the person is sent back to step 2 to choose again (US-02 behaviour).
 - **Step 1 data no longer valid**: the person is sent back to step 1 (US-02 re-check).
 - **Reaching the summary without a plan or the confirmation without a payment** (typed URL): the person is redirected to the step they still need.
-- **Very long terms text**: shown in a scrollable area of limited height that is keyboard-reachable; the acceptance box stays visible.
+- **Very long terms text**: the dialog body scrolls (keyboard-reachable); the dialog's title and close actions stay visible.
 - **Identity document of 4 characters or fewer**: shown fully masked.
 - **Price changed by the business between step 2 and payment**: the summary always shows the price calculated with the current plan and country data, and that is the amount paid.
 
@@ -105,8 +107,8 @@ The person pays (simulated) and gets a confirmation with a quote number; a faile
 - **FR-003**: The identity document number MUST be shown partially masked: only the last 4 characters visible, the rest replaced by "•". Which fields are masked is a per-field setting in the content manager (seeded on for `documentNumber` and `rut`); no field key is hard-coded for masking.
 - **FR-004**: The summary MUST offer "Editar mis datos" (to step 1, answers kept) and "Cambiar plan" (to step 2, plan kept). Coming back shows the updated data and price.
 - **FR-005**: The business team MUST be able to configure the terms and conditions text per country as rich text with basic formatting (headings, paragraphs, bold, lists, links), and publish it through draft and publish, without code changes. It is rendered safely, never as raw HTML.
-- **FR-006**: The summary MUST show the active country's published terms and an unticked acceptance checkbox with a visible label. "Pagar" MUST be disabled until it is ticked.
-- **FR-007**: Pressing "Pagar" MUST lock the button and show a processing state until the payment ends. While processing, and after success, the payment cannot be submitted again.
+- **FR-006**: The summary MUST offer the active country's published terms in a dialog, opened from the "términos y condiciones" link of an unticked acceptance checkbox labelled "*Acepto términos y condiciones"; the price carries a matching "*". "Quiero mi seguro" MUST be disabled until it is ticked.
+- **FR-007**: Pressing "Quiero mi seguro" MUST lock the button and show a processing state until the payment ends. While processing, and after success, the payment cannot be submitted again.
 - **FR-008**: The payment is simulated: no card or bank data is asked or stored, nothing is charged, and the outcome is decided by a documented rule: rejected when the identity document ends in "0000", approved otherwise.
 - **FR-009**: On success, a confirmation view MUST show a simulated quote number, the plan, the amount paid and the country. The quote number is unique enough not to repeat in practice, and its format is documented.
 - **FR-010**: On rejection, the summary MUST show a clear error message announced to assistive technology, keep the data, plan and acceptance, and let the person retry.
