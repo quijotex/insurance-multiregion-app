@@ -104,7 +104,7 @@
 
 - [x] T015 [E2E] US-02 E2E-3 (CO choose-plan flow) and E2E-4 (CL price adjustment) per plan.md (FR-002–FR-009, SC-002) — `frontend/e2e/us-02-*.spec.ts` (depends on T006, T013, T014)
 - [x] T016 [ORCH] US-02 Update the README (plans in the admin, the price bands) and check the quickstart (SC-001) — `README.md`
-- [ ] T017 [ORCH] US-02 Code review rounds recorded in `review.md`, then the handoff
+- [x] T017 [ORCH] US-02 Code review rounds recorded in `review.md`, then the handoff
 
 ## Dependencies
 

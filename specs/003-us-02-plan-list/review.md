@@ -115,3 +115,42 @@ Verification (re-run by me): `npm --prefix frontend run verify` passed (lint, ty
 - **Tests vs approval:** the only new unit tests are the three `R-01 · …` cases in `cms/src/seed/country-pricing.test.ts:41-65`, under `US-02 · FR-004 backfill publish decision`. The frontend unit test count is unchanged (187). The only E2E change tightens E2E-3 for R-06 and changes how `priceOf` reads the price for the new `aria-describedby`. No unapproved tests were found.
 
 **Verdict: Changes requested.** R-01, R-04 and R-06 are resolved, and R-03 is Won't fix (accepted). R-15 (Major) is new. The publish check trusts the published row's `updatedAt`, which DB-layer backfills bump, so it can still publish pending draft edits. The fix is one line plus a regression test.
+
+## Round 4 — 2026-11-22 (Gate 3 fix R-15)
+
+Range reviewed: `HEAD~1..HEAD` (fix commit `93d9b90`, which touches `cms/src/seed/countries.ts` and `cms/src/seed/country-pricing.test.ts`, and records round 3 in this file). No frontend files changed.
+
+Verification (re-run by me): `npm --prefix cms run build` passed. `npm --prefix cms test` passed (44 tests in 3 files, 43 + 1 new R-15 test). `npm --prefix frontend run build` passed with no budget warning or error. The `anyComponentStyle` budget is 6 kB / 8 kB (`frontend/angular.json:51-53`). The frontend source is unchanged since round 3, so I did not re-run `verify` or E2E.
+
+| ID | Severity | Location | Finding | Rule/FR | Status | Resolution |
+|----|----------|----------|---------|---------|--------|------------|
+| R-15 | Major | cms/src/seed/countries.ts:77-90, 136-141 | `shouldPublishAfterBackfill` now takes `{ draftUpdatedAt, publishedAt }` only and returns `draft <= published` with `published = toTime(publishedAt)`. The published row's `updatedAt` is no longer read. Because `backfillLegalAge` bumps that value with DB-layer writes in the same boot, this is the gap R-15 described, and it is closed. A DB-layer write to the draft can now only make it look changed (a warning and no publish), which is the safe side. The optional-parameter `NaN` issue is gone with the parameter. `draftUpdatedAtBefore` is still read before the backfill's own writes. The only caller (`backfillCountryPricing`, line 137) no longer passes `publishedUpdatedAt`, and a search of `cms/` and `frontend/src/` finds no other reference. The doc comment matches the code: only `publishedAt` is compared, it explains why, and it says no published version or unreadable dates means no publish. | Round 3 R-15, Round 1 R-01 (2), research R5 | Resolved (93d9b90) | — |
+
+### Specific checks requested
+- **Fix matches round 3:** yes. It is the one-line comparison change, and `publishedUpdatedAt` is dropped.
+- **Other callers:** none. `shouldPublishAfterBackfill` is called only at `countries.ts:137` and in its tests.
+- **Doc comment:** accurate.
+- **Tests vs approval:** the only new test is `R-15 · a later published updatedAt (DB-layer backfill) does not hide a pending draft edit` (`country-pricing.test.ts:61-69`). The other change removes the `publishedUpdatedAt` argument from the two existing R-01 cases. Nothing else was added. Observation, not a finding: once the parameter is removed, the R-15 case has the same inputs as the R-01 "draft ahead" case, so it repeats that assertion. The guarantee is now structural, because the input type has no published `updatedAt` field and TypeScript rejects passing one in an object literal. The test is allowed as a named regression test.
+- **Frontend budget:** the production build is within the 6 kB / 8 kB component budget.
+
+### Final status, all findings
+
+| ID | Severity | Final status |
+|----|----------|--------------|
+| R-01 | Major | Resolved (bbb742a, remaining gap closed via R-15 in 93d9b90) |
+| R-02 | Major | Resolved (2c01fdb) |
+| R-03 | Minor | Won't fix (accepted by the human at Gate 3, same as US-01 R-17) |
+| R-04 | Minor | Resolved (b086a30) |
+| R-05 | Minor | Resolved (92570d1) |
+| R-06 | Minor | Resolved (b086a30) |
+| R-07 | Minor | Resolved (92570d1) |
+| R-08 | Minor | Resolved (92570d1) |
+| R-09 | Minor | Resolved (92570d1) |
+| R-10 | Minor | Resolved (92570d1) |
+| R-11 | Minor | Resolved (92570d1) |
+| R-12 | Minor | Resolved (92570d1) |
+| R-13 | Minor | Resolved (92570d1) |
+| R-14 | Nit | Resolved (2c01fdb) |
+| R-15 | Major | Resolved (93d9b90) |
+
+**Verdict: Approved.** No findings are open. R-03 is Won't fix, accepted by the human. There are no new Blocker or Major findings.
