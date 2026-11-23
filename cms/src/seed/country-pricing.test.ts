@@ -44,7 +44,6 @@ describe('US-02 · FR-004 backfill publish decision', () => {
       shouldPublishAfterBackfill({
         draftUpdatedAt: '2026-01-01T10:00:00.000Z',
         publishedAt: '2026-01-01T10:00:00.000Z',
-        publishedUpdatedAt: '2026-01-01T10:00:00.000Z',
       }),
     ).toBe(true);
   });
@@ -54,7 +53,16 @@ describe('US-02 · FR-004 backfill publish decision', () => {
       shouldPublishAfterBackfill({
         draftUpdatedAt: '2026-02-01T10:00:00.000Z',
         publishedAt: '2026-01-01T10:00:00.000Z',
-        publishedUpdatedAt: '2026-01-01T10:00:00.000Z',
+      }),
+    ).toBe(false);
+  });
+
+  it('R-15 · a later published updatedAt (DB-layer backfill) does not hide a pending draft edit', () => {
+    // backfillLegalAge bumps updatedAt on the published row; only publishedAt counts.
+    expect(
+      shouldPublishAfterBackfill({
+        draftUpdatedAt: '2026-02-01T10:00:00.000Z',
+        publishedAt: '2026-01-01T10:00:00.000Z',
       }),
     ).toBe(false);
   });

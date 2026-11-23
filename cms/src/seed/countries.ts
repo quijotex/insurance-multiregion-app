@@ -77,15 +77,13 @@ const toTime = (d: DateLike): number => (d ? new Date(d).getTime() : Number.NaN)
 /**
  * Pure: whether the draft may be published after the backfill wrote to it. Publishing copies the whole draft
  * to the published version, so it is only safe when the draft carries no pending editor changes, i.e. it was
- * not modified after the published version was last published/updated. No published version, or unreadable
- * dates, means do not publish (never publish a draft that was not live, never guess).
+ * not modified after it was last published. Only `publishedAt` is compared: the published row's `updatedAt`
+ * is bumped by DB-layer writes such as backfillLegalAge, which would hide a pending draft edit (R-15). A
+ * DB-layer write can only make the draft look changed, which errs on the safe side (warning, no publish).
+ * No published version, or unreadable dates, means do not publish (never publish a draft that was not live).
  */
-export function shouldPublishAfterBackfill(input: {
-  draftUpdatedAt: DateLike;
-  publishedAt: DateLike;
-  publishedUpdatedAt?: DateLike;
-}): boolean {
-  const published = Math.max(toTime(input.publishedAt), toTime(input.publishedUpdatedAt));
+export function shouldPublishAfterBackfill(input: { draftUpdatedAt: DateLike; publishedAt: DateLike }): boolean {
+  const published = toTime(input.publishedAt);
   const draft = toTime(input.draftUpdatedAt);
   if (Number.isNaN(published) || Number.isNaN(draft)) return false;
   return draft <= published;
@@ -139,7 +137,6 @@ export async function backfillCountryPricing(strapi: Core.Strapi): Promise<void>
       shouldPublishAfterBackfill({
         draftUpdatedAt: draftUpdatedAtBefore,
         publishedAt: published.publishedAt,
-        publishedUpdatedAt: published.updatedAt,
       })
     ) {
       await strapi.documents(UID).publish({ documentId });
