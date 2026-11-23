@@ -76,6 +76,26 @@ export class QuoteSessionStore {
     this.write({ countryCode: current.countryCode, data: rest });
   }
 
+  /** R-02: the guard asks step 1 to show its errors once (consumed by `consumeStep1Review`). */
+  flagStep1Review(): void {
+    const current = this.read();
+    if (!current) return;
+    this.write({
+      countryCode: current.countryCode,
+      data: { ...current.data, step1Review: true },
+    });
+  }
+
+  /** Returns true once after `flagStep1Review`, then clears the flag. */
+  consumeStep1Review(): boolean {
+    const current = this.read();
+    if (current?.data['step1Review'] !== true) return false;
+    const rest = { ...current.data };
+    delete rest['step1Review'];
+    this.write({ countryCode: current.countryCode, data: rest });
+    return true;
+  }
+
   isStep1Completed(): boolean {
     return this.read()?.data['step1Completed'] === true;
   }

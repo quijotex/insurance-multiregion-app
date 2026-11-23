@@ -40,6 +40,46 @@ const SECTIONS: FormSections = {
   ],
 };
 
+describe('US-01 · SC-002 step 2 guard', () => {
+  let session: QuoteSessionStore;
+
+  const run = () =>
+    runInInjectionContext(TestBed.inject(EnvironmentInjector), () =>
+      step1CompleteGuard(
+        { parent: { paramMap: { get: () => 'co' } } } as unknown as ActivatedRouteSnapshot,
+        {} as RouterStateSnapshot,
+      ),
+    ) as Promise<boolean | UrlTree>;
+
+  beforeEach(() => {
+    sessionStorage.clear();
+    TestBed.configureTestingModule({
+      providers: [provideRouter([]), { provide: FormFieldService, useValue: { load: () => of(SECTIONS) } }],
+    });
+    TestBed.inject(WizardCountry).set(null);
+    session = TestBed.inject(QuoteSessionStore);
+    session.start('co');
+  });
+
+  it('lets a completed step 1 through', async () => {
+    session.saveStep1({ fullName: 'Ana', brand: 'mazda' });
+    session.markStep1Completed();
+    expect(await run()).toBe(true);
+  });
+
+  it('redirects to step 1 of the same country when not completed', async () => {
+    const result = (await run()) as UrlTree;
+    expect(TestBed.inject(Router).serializeUrl(result)).toBe('/co/quote');
+  });
+
+  it('redirects again after step 1 is edited', async () => {
+    session.saveStep1({ fullName: 'Ana', brand: 'mazda' });
+    session.markStep1Completed();
+    session.saveStep1({ fullName: 'Ana', brand: 'mazda' });
+    expect(await run()).not.toBe(true);
+  });
+});
+
 describe('US-02 · FR-011 step 1 re-check guard', () => {
   let session: QuoteSessionStore;
   let load: () => Observable<FormSections>;
@@ -78,6 +118,7 @@ describe('US-02 · FR-011 step 1 re-check guard', () => {
     session.markStep1Completed();
     expect(url(await run())).toBe('/co/quote');
     expect(session.isStep1Completed()).toBe(false);
+    expect(session.consumeStep1Review()).toBe(true); // R-02: step 1 is asked to show the errors
   });
 
   it('treats a select value no longer offered as missing', async () => {

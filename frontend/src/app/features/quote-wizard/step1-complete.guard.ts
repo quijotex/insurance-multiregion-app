@@ -36,6 +36,8 @@ export const step1CompleteGuard: CanActivateFn = async (
       });
     }
     if (new FormGroup(controls).valid) return true;
+    // R-02: step 1 shows the errors and focuses the first invalid field once.
+    session.flagStep1Review();
   } catch {
     /* fields failed to load: step 1 shows its own error and retry */
   }
