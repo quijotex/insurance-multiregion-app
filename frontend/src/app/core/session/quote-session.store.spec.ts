@@ -62,6 +62,43 @@ describe('US-00 · FR-011 / FR-012 quote session store', () => {
   });
 });
 
+describe('US-02 · FR-009 chosen plan persistence', () => {
+  let store: QuoteSessionStore;
+
+  beforeEach(() => {
+    sessionStorage.clear();
+    store = new QuoteSessionStore();
+    store.start('co');
+  });
+
+  it('saves and reads the plan id, and clearPlan removes it', () => {
+    expect(store.readPlanId()).toBeNull();
+    store.savePlan('abc');
+    expect(new QuoteSessionStore().readPlanId()).toBe('abc');
+    store.clearPlan();
+    expect(store.readPlanId()).toBeNull();
+  });
+
+  it('saveStep1 keeps the plan id', () => {
+    store.saveStep1({ name: 'Ana' });
+    store.savePlan('abc');
+    store.saveStep1({ name: 'Ana B' });
+    expect(store.readPlanId()).toBe('abc');
+    expect(store.readStep1()).toEqual({ name: 'Ana B' });
+  });
+
+  it('discardData and a country change drop the plan id; the same country keeps it', () => {
+    store.savePlan('abc');
+    store.start('co');
+    expect(store.readPlanId()).toBe('abc');
+    store.start('cl');
+    expect(store.readPlanId()).toBeNull();
+    store.savePlan('xyz');
+    store.discardData();
+    expect(store.readPlanId()).toBeNull();
+  });
+});
+
 describe('US-01 · FR-009 step 1 persistence', () => {
   let store: QuoteSessionStore;
 

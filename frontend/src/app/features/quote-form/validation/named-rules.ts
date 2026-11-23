@@ -22,22 +22,28 @@ export function isValidRut(raw: string): boolean {
   return match[2] === expected;
 }
 
-/** raw is yyyy-mm-dd; age computed from local date components. */
-export function isOfLegalAge(raw: string, legalAge: number, today: Date): boolean {
+/** raw is yyyy-mm-dd; whole years on `today` (local components), or null when invalid or in the future. */
+export function ageOn(raw: string, today: Date): number | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
-  if (!match) return false;
+  if (!match) return null;
   const y = Number(match[1]);
   const m = Number(match[2]);
   const d = Number(match[3]);
   const birth = new Date(y, m - 1, d);
   if (birth.getFullYear() !== y || birth.getMonth() !== m - 1 || birth.getDate() !== d) {
-    return false;
+    return null;
   }
   const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  if (birth.getTime() > t.getTime()) return false;
+  if (birth.getTime() > t.getTime()) return null;
   let age = t.getFullYear() - y;
   if (t.getMonth() + 1 < m || (t.getMonth() + 1 === m && t.getDate() < d)) age--;
-  return age >= legalAge;
+  return age;
+}
+
+/** raw is yyyy-mm-dd; age computed from local date components. */
+export function isOfLegalAge(raw: string, legalAge: number, today: Date): boolean {
+  const age = ageOn(raw, today);
+  return age !== null && age >= legalAge;
 }
 
 function parseYear(raw: string): number | null {

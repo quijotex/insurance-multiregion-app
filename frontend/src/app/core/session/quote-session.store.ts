@@ -71,6 +71,26 @@ export class QuoteSessionStore {
     return this.read()?.data['step1Completed'] === true;
   }
 
+  /** Remembers the chosen plan (documentId) for this tab. */
+  savePlan(planId: string): void {
+    const current = this.read();
+    if (!current) return;
+    this.write({ countryCode: current.countryCode, data: { ...current.data, planId } });
+  }
+
+  readPlanId(): string | null {
+    const id = this.read()?.data['planId'];
+    return typeof id === 'string' && id !== '' ? id : null;
+  }
+
+  clearPlan(): void {
+    const current = this.read();
+    if (!current) return;
+    const rest = { ...current.data };
+    delete rest['planId'];
+    this.write({ countryCode: current.countryCode, data: rest });
+  }
+
   /** Same country keeps data; a different country resets it. */
   start(countryCode: string): void {
     const current = this.read();
