@@ -1,0 +1,45 @@
+<section class="confirmation py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <!-- current 4 on 3 steps: every step shows as done -->
+      <app-stepper [steps]="steps" [current]="4" />
+    </div>
+  </div>
+
+  @if (receipt; as r) {
+    <div class="receipt mx-auto confirmation__reveal" style="--reveal-index: 0">
+      <div class="receipt__head">
+        <svg class="receipt__icon" viewBox="0 0 48 48" width="48" height="48" aria-hidden="true" focusable="false">
+          <circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="3" />
+          <path d="M14 25l7 7 13-14" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <h1 class="receipt__heading" tabindex="-1">¡Listo, ya estás asegurado!</h1>
+      </div>
+      <dl class="receipt__rows">
+        <div class="receipt__row">
+          <dt class="receipt__label">Número de cotización</dt>
+          <dd class="receipt__value receipt__value--strong">{{ r.quoteNumber }}</dd>
+        </div>
+        <div class="receipt__row">
+          <dt class="receipt__label">Plan</dt>
+          <dd class="receipt__value">{{ r.planName }}</dd>
+        </div>
+        <div class="receipt__row">
+          <dt class="receipt__label">País</dt>
+          <dd class="receipt__value">{{ countryName }}</dd>
+        </div>
+        <div class="receipt__row">
+          <dt class="receipt__label">Fecha</dt>
+          <dd class="receipt__value">{{ date }}</dd>
+        </div>
+        <div class="receipt__row">
+          <dt class="receipt__label">Total pagado</dt>
+          <dd class="receipt__value">{{ total }}</dd>
+        </div>
+      </dl>
+      <button type="button" class="button button--cta receipt__cta" (click)="newQuote()">
+        Nueva cotización
+      </button>
+    </div>
+  }
+</section>

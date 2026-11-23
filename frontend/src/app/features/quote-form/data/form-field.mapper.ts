@@ -54,6 +54,7 @@ function mapField(dto: FormFieldDto, section: FormSection, type: FieldType): For
       })),
     },
     inputLimits: mapInputLimits(dto),
+    maskedInSummary: dto.maskedInSummary === true,
   };
 }
 

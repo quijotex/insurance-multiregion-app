@@ -116,13 +116,21 @@ Each component defines: default, hover, focus-visible, disabled and (if applicab
 
 **Motion** — content loads with a skeleton, then items fade up 14px one by one (600ms `cubic-bezier(.2,.7,.2,1)`, 110ms stagger), only on first render, never on validation re-renders. Popups open with a 160ms fade/slide. All of it is off under `prefers-reduced-motion`.
 
-**Summary block** — `.summary-section` with a title + "Editar" secondary link per section (data, vehicle, plan). Masked document shown as `•••• 5678`.
+**Summary block** — `.summary-section`, `__header`, `__title`, `__row`, `--plan` (agreed at US-03 Gate 2)
+- White card, 14px radius, 1px inset `--color-border` ring (`--plan`: brand ring). Header row on every screen: title (18px/700 `--color-action`) left, its secondary pill right ("Editar mis datos", "Cambiar plan").
+- Rows: label `--color-text-muted` left, value right (500). Masked values keep the last 4 characters: `••••••4050`.
+- Plan: name, short description, a divider, then the price (`--color-brand`, 30px) with a `*` and "/ mes", always below the description.
+- Layout: "Tus datos" and "Tu vehículo" side by side from 992px, every card stacked below 992px; the plan card full width below them; acceptance and CTA centred (max 360px, full width on mobile) with `--space-6`+ above.
+
+**Checkbox** — `.checkbox`: a custom 24px box before its label (7px radius, 2px `--color-text-muted` ring; checked: `--color-action` fill with a white check; focus `--focus-ring`), built on a native `<input type="checkbox">`. Terms acceptance: "*Acepto términos y condiciones", where "términos y condiciones" is an underlined `--color-action` link opening the terms in a modal `<dialog>` (title, "Cerrar", "Entendido", Esc closes, focus returns to the link). The pay CTA reads "Quiero mi seguro", never the price.
+
+**Receipt** — `.receipt` (confirmation, US-03 Gate 2): a ticket with a 1.5px dashed `--color-border` border, 14px radius, max-width 360px, centred; a `--color-success` check icon with "¡Listo, ya estás asegurado!" (US-03 Gate 3), rows for quote number (bold), plan, country, date and total paid, then "Nueva cotización" (CTA pill).
 
 **States**
 - **Loading:** skeletons shaped like the final content (cards, fields); `aria-busy` on the region.
 - **Empty** (e.g. no plans): flat illustration or icon, friendly headline, one-line explanation, one action.
 - **Error** (e.g. payment rejected, CMS down): `--color-error-bg` panel with icon, what happened, what to do, and a retry button. Never lose user data.
-- **Success** (confirmation): `--color-success` check icon, headline, quote number prominent and copyable.
+- **Success** (confirmation): the `.receipt` recipe; `--color-success` check icon and headline, quote number in bold.
 
 ## 4. Accessibility (non-negotiable)
 

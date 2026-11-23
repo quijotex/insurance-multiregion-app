@@ -38,6 +38,7 @@ export interface FormFieldDto {
   section: string;
   validations: FormValidationsDto | null;
   options: FormOptionDto[] | null;
+  maskedInSummary?: boolean | null;
 }
 
 export interface FormFieldsResponseDto {
@@ -66,6 +67,8 @@ export interface FormFieldDescriptor {
   options: FieldOption[];
   rules: FieldRules;
   inputLimits: InputLimits;
+  /** Summary shows only the last 4 characters; also drives the simulated payment (ADR 0006). */
+  maskedInSummary: boolean;
 }
 
 export interface FormSections {

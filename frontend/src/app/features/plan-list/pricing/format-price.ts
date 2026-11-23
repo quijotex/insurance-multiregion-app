@@ -1,7 +1,7 @@
 import { Country } from '../../../core/country/country.model';
 
-/** Formats a whole-unit amount in the country's currency, no decimals, e.g. "$ 145.000 / mes". */
-export function formatPrice(
+/** Formats a whole-unit amount in the country's currency, no decimals, e.g. "$ 145.000". */
+export function formatAmount(
   amount: number,
   country: Pick<Country, 'currency' | 'numberLocale'>,
 ): string {
@@ -22,5 +22,13 @@ export function formatPrice(
       formatted = new Intl.NumberFormat('es', digits).format(amount);
     }
   }
-  return `${formatted} / mes`;
+  return formatted;
+}
+
+/** The monthly price shown in step 2, e.g. "$ 145.000 / mes". */
+export function formatPrice(
+  amount: number,
+  country: Pick<Country, 'currency' | 'numberLocale'>,
+): string {
+  return `${formatAmount(amount, country)} / mes`;
 }

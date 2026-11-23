@@ -6,7 +6,7 @@ A single Angular app that quotes car insurance in **Colombia** and **Chile**, wi
 - **Architecture decisions:** [docs/adr/](docs/adr/)
 - **Specs per user story:** [specs/](specs/)
 
-> **Status:** project setup complete; the wizard, seed data and admin bootstrap are built story by story (US-00 → US-03). Sections marked _To be completed_ are filled as each story lands.
+> **Status:** complete. All four stories (US-00 → US-03) are built, reviewed and approved at Gate 3.
 
 > All data in this repository is fictitious. No real people, documents, plates, card data or credentials.
 
@@ -145,10 +145,22 @@ monthly price = base price × driver-age factor × vehicle-age factor   (rounded
   - Driver age: under 25 → 1.20; 25–65 → 1.00; over 65 → 1.15.
   - Vehicle age: 0–5 years → 1.00; 6–10 → 1.10; 11–20 → 1.20.
 
+### Managing the summary and payment (US-03)
+
+- **Terms and conditions:** in **Content Manager › Country**, edit **Terms and conditions** (rich text: headings, paragraphs, bold, lists and links; images and code are not shown), then **Publish**. The summary shows only the published text, in a dialog opened from "términos y condiciones". A country with no terms cannot be paid ([ADR 0007](docs/adr/0007-rich-text-terms-without-html.md)).
+- **Masked fields:** in **Content Manager › Form Field**, tick **Masked in summary** on the identity document field. The summary then shows only its last 4 characters (`••••••4050`). The seed sets it on Colombia's `documentNumber` and Chile's `rut`.
+
+**Payment** is simulated in the browser ([ADR 0006](docs/adr/0006-simulated-payment-and-receipt.md)): no card data is asked for and nothing is charged or sent.
+
+- A payment is **rejected** when the masked identity document ends in `0000` (dots and hyphens ignored), and **approved** otherwise.
+- Test values: Colombia cédula `1020300000`, Chile RUT `10.006.000-0` (rejected); any other valid document (approved).
+- An approved payment shows a quote number like `CO-20261122-7KQ4MZ` (country, date, 6 random characters). After that, the tab keeps only the receipt: the form data and the plan are cleared, and a reload or Back shows the confirmation again. "Nueva cotización" starts over.
+
 ## Security notes
 
 - The browser never receives a Strapi token. It calls only relative `/api/...` URLs, proxied to Strapi by nginx (Docker) or the Angular dev server.
 - The Strapi Public role can only `find` the content the wizard reads (see [ADR 0001](docs/adr/0001-multi-country-content-strategy.md)).
+- Quote data never leaves the browser: the price and the simulated payment run in Angular, and the terms are rendered from Strapi blocks without HTML ([ADR 0007](docs/adr/0007-rich-text-terms-without-html.md)).
 - The secrets in `docker-compose.yml` are dev-only placeholders. Override them with a root `.env` file for anything beyond local use.
 
 ## Known issues and notes
@@ -158,4 +170,4 @@ monthly price = base price × driver-age factor × vehicle-age factor   (rounded
 
 ## Requirements not met
 
-_None so far. Any requirement left out will be listed here with the reason._
+None. The payment is simulated in the browser by design, as agreed for US-03 ([ADR 0006](docs/adr/0006-simulated-payment-and-receipt.md)): no card data is asked for and nothing is charged.

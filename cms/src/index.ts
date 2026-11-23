@@ -1,8 +1,8 @@
 import type { Core } from '@strapi/strapi';
 import { registerCountryIntegrity } from './middlewares/country-integrity';
 import { seedAdmin } from './seed/admin';
-import { backfillCountryPricing, seedCountries } from './seed/countries';
-import { backfillLegalAge, seedFormFields } from './seed/form-fields';
+import { backfillCountryPricing, backfillTerms, seedCountries } from './seed/countries';
+import { backfillLegalAge, backfillMaskedInSummary, seedFormFields } from './seed/form-fields';
 import { grantPublicPermissions } from './seed/permissions';
 import { seedPlans } from './seed/plans';
 
@@ -17,7 +17,9 @@ export default {
     await seedCountries(strapi);
     await backfillLegalAge(strapi);
     await seedFormFields(strapi);
+    await backfillMaskedInSummary(strapi);
     await backfillCountryPricing(strapi);
+    await backfillTerms(strapi);
     await seedPlans(strapi);
     await seedAdmin(strapi);
   },

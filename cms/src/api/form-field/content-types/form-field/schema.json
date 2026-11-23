@@ -21,6 +21,11 @@
     "section": { "type": "enumeration", "enum": ["policyholder", "vehicle"], "required": true },
     "country": { "type": "relation", "relation": "manyToOne", "target": "api::country.country" },
     "validations": { "type": "component", "repeatable": false, "component": "form.validations" },
-    "options": { "type": "component", "repeatable": true, "component": "form.option" }
+    "options": { "type": "component", "repeatable": true, "component": "form.option" },
+    "maskedInSummary": {
+      "type": "boolean",
+      "default": false,
+      "description": "Oculta el valor en el resumen salvo los 4 últimos caracteres. Márcalo en el documento de identidad. También decide el pago simulado (ADR 0006)."
+    }
   }
 }

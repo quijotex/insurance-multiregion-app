@@ -23,6 +23,7 @@ export class CountryService {
         .set('fields[2]', 'legalAge')
         .set('fields[3]', 'currency')
         .set('fields[4]', 'numberLocale')
+        .set('fields[5]', 'termsAndConditions')
         .set('populate[driverAgeBands]', 'true')
         .set('populate[vehicleAgeBands]', 'true')
         .set('populate[icon][fields][0]', 'url')

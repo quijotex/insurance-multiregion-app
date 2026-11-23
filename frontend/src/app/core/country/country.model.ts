@@ -1,3 +1,5 @@
+import type { RichTextBlock } from '../../shared/ui/rich-text/rich-text.model';
+
 /** Strapi DTO types — mirror cms/src/api/country (see contracts/countries-api.md). */
 export interface CountryIconDto {
   id: number;
@@ -23,6 +25,8 @@ export interface CountryDto {
   numberLocale?: string | null;
   driverAgeBands?: AgeBandDto[] | null;
   vehicleAgeBands?: AgeBandDto[] | null;
+  /** Strapi `blocks` JSON; validated by the mapper. */
+  termsAndConditions?: unknown;
   icon: CountryIconDto | null;
 }
 
@@ -52,4 +56,6 @@ export interface Country {
   vehicleAgeBands: AgeBand[];
   iconUrl: string | null;
   iconAlt: string;
+  /** Terms the person accepts before paying (US-03, ADR 0007). [] when missing. */
+  termsAndConditions: RichTextBlock[];
 }
